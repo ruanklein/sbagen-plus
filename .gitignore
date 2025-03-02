@@ -1,2 +1,7 @@
+.DS_Store
 sbagen+
-sbagen.exe
+*.exe
+*.sbg
+*.wav
+*.mp3
+*.ogg
