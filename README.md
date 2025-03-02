@@ -6,16 +6,19 @@ SBaGen+ is a command-line tool for generating binaural beats and isochronic tone
 
 SBaGen+ is a fork of the original SBaGen (Sequenced Binaural Beat Generator) created by Jim Peters. The original project was classified as "bitrotted" by its author, and this fork aims to continue its development by adding new features while maintaining compatibility with the original.
 
-## Features
+SBaGen+ is not intended to be a significantly different software from the original SBaGen. Instead, it's a project dedicated to keeping SBaGen alive and functional. The primary goal is to ensure that SBaGen continues to run on modern operating systems, with occasional additions of features that users have requested in the past.
 
-- Binaural beat generation (requires headphones)
+The name was changed from "Sequenced Binaural Beat Generator" to "Sequenced Brainwave Generator" to better reflect the expanded capabilities of SBaGen+. With the addition of isochronic tones, which are not binaural beats, the original name would be too limiting.
+
+## Features and Bug Fixes
+
+- All features of original SBaGen
 - Isochronic tone generation (works with or without headphones)
-- Support for programmable sequences of tones
-- Mixing with external audio files (MP3/OGG, when compiled with support)
-- Cross-platform (macOS, Windows, Linux)
+- White noise and brown noise generation
 - Support for Apple Silicon (ARM64) and Intel (x86_64)
-- Bug fixes in WAV file generation
-- Improvements in error handling
+- Enhanced build scripts for macOS with support for universal binaries
+- Fixed bug with WAV file duration when using -W option with sequence files
+- Added validation for total amplitude to prevent audio distortion when exceeding 100%
 
 ## Isochronic Tones
 
@@ -142,33 +145,6 @@ Here is a brief overview of the important files in this project:
 ## Documentation
 
 For detailed information on all features, see the [SBAGEN+.txt](SBAGEN+.txt) file.
-
-## Permission Configuration
-
-The `sbagen.c` file is maintained as a historical reference of the original code and is configured with read-only permissions (444). This is managed automatically through Git hooks:
-
-- `post-checkout`: Applies read-only permissions after checkout
-- `post-merge`: Applies read-only permissions after merge
-
-### Installing Git Hooks
-
-After cloning the repository, run the following command to install the Git hooks:
-
-```bash
-./git-hooks/install-hooks.sh
-```
-
-This will ensure that the `sbagen.c` file is automatically set to read-only after checkout and merge operations.
-
-### Modifying the Original File
-
-If you need to modify the `sbagen.c` file, you can temporarily change its permissions:
-
-```bash
-chmod +w sbagen.c  # Add write permission
-# Make your changes
-chmod 444 sbagen.c  # Restore read-only permission
-```
 
 ## License
 
