@@ -1,11 +1,6 @@
 SBaGen+ -- Sequenced Brainwave Generator
 ------------------------------------------
 
-Version 1.5.0
-
-Original Author: Jim Peters
-Current Maintainer: Ruan (ruan.klein@gmail.com)
-
 SBaGen+ is a fork of the original SBaGen (Sequenced Binaural Beat Generator).
 This fork adds new features while maintaining compatibility with the original.
 
@@ -48,7 +43,7 @@ Contents of this document:
 
 2: Installation
 2.1: Installation for Windows users
-2.2: Installation for Mac OS X users
+2.2: Installation for macOS users
 2.3: Installation for Linux and other UNIX users  
 
 3: Invocation
@@ -162,6 +157,46 @@ both sell pre-packaged tapes and CDs with helpline support and that
 kind of thing.
 
 
+1.1: Isochronic Tones
+--------------------
+
+SBaGen+ adds support for isochronic tones, which represent another approach 
+to brainwave entrainment that differs significantly from binaural beats.
+
+While binaural beats require two different frequencies played separately to 
+each ear to create a beat in the brain, isochronic tones use a single tone 
+that is turned on and off at regular intervals (amplitude modulation). This 
+creates distinct pulses of sound with clean breaks in between.
+
+The primary advantages of isochronic tones include:
+
+1. They do not require headphones to be effective, as the pulsing occurs
+   in the sound itself rather than being created by the brain's processing
+   of two different tones.
+
+2. Some research suggests they may produce a stronger entrainment effect
+   than binaural beats because the brain responds more strongly to the
+   sharp contrast between sound and silence.
+
+3. They can be more effective at higher frequencies (beta and gamma ranges),
+   where binaural beats become less perceptible.
+
+In SBaGen+, isochronic tones are implemented by modulating a carrier frequency
+with a pulse frequency. For example, a 300Hz carrier tone pulsed at 10Hz
+creates an isochronic tone that may help induce an alpha brainwave state.
+This is represented in the format 300@10/20, where 300 is the carrier
+frequency, 10 is the pulse rate, and 20 is the amplitude percentage.
+
+Both binaural beats and isochronic tones can be effective for different
+purposes and individuals. Some people respond better to one method than
+the other, so having both options available allows for more personalized
+brainwave entrainment experiences.
+
+While headphones are essential for binaural beats, isochronic tones can be 
+effective with or without headphones, though headphones may still provide 
+a more immersive experience.
+
+
 Some more theory -- the oscillations in the brain are split into four
 'bands' according to frequency:
 
@@ -217,7 +252,7 @@ book "Travelling with Power", although I've not read it (yet).
 2: Installation
 ---------------
 
-For Windows and Mac OS X users there are pre-build binaries available
+For Windows and macOS users there are pre-build binaries available
 from my site.  Linux users must build from source, but I include the
 MP3 and Ogg libraries so that this just means running a script.  For
 other UNIX users, there are some scripts, and it should be easy enough
@@ -291,113 +326,81 @@ ready.
 
 Thanks to the help of Dirk Cloete, Windows users now have a full set
 of tone-set batch files to experiment with, equivalent to the t-*
-scripts on UNIX and Mac OS X.  These also appear in the same directory
+scripts on UNIX and macOS.  These also appear in the same directory
 (*.bat), along with the sequence files (prog-*) and other bits and
 pieces.
 
 
-2.2: Installation for Mac OS X users
-------------------------------------
+2.2: Installation for macOS users
+-----------------------------------
 
-From version 1.4.2, Mac OS X users have a DMG file to download which
-will hopefully make it much easier to get things working.  This
-includes a DEMO command-script that you can double-click to run to get
-a quick taster, and a START command-script that sets up Terminal ready
-to play sequences.
+SBaGen+ for macOS can be compiled from source. The build scripts support both 
+Intel (x86_64) and Apple Silicon (ARM64) processors:
 
-Note that SBaGen was originally written as a UNIX tool, and it was
-adapted to Mac OS X by using CoreAudio for audio output.  For this
-reason it uses the text-mode OS X 'Terminal' application as its user
-interface.  Versions before 1.4.2 were also distributed as traditional
-UNIX TGZ archives.
+1. Basic compilation (without MP3/OGG support):
+   ```
+   ./mk-macos
+   ```
 
-However, with the DMG archive of version 1.4.2 on, installation should
-just be a matter of double-clicking the archive, and dragging things
-around.  However, you may still want to read the TGZ installation
-instructions below to understand more about how to use sbagen and/or
-the command-line.  The new START script should take most of the hassle
-out of setting up the command-line, though.
+2. Compilation for Intel x86_64:
+   ```
+   ./mk-macos -x86
+   ```
 
+3. Compilation with MP3 and OGG support:
+   
+   First, you need to compile the required libraries:
+   
+   For MP3 support (libmad):
+   ```
+   # Download the libmad source code
+   git clone https://github.com/underbit/mad.git libmad-0.15.1b
+   
+   # Make the script executable
+   chmod +x mk-libmad-macos
+   
+   # For ARM64 (Apple Silicon)
+   ./mk-libmad-macos
+   
+   # For Intel x86_64
+   ./mk-libmad-macos -x86
+   ```
+   
+   For OGG support (Tremor):
+   ```
+   # Clone the Tremor repository
+   git clone https://gitlab.xiph.org/xiph/tremor.git
+   
+   # Make the script executable
+   chmod +x mk-tremor-macos
+   
+   # For ARM64 (Apple Silicon)
+   ./mk-tremor-macos
+   
+   # For Intel x86_64
+   ./mk-tremor-macos -x86
+   ```
+   
+   Then compile SBaGen+ with the libraries:
+   ```
+   # For ARM64 with MP3 and OGG support
+   ./mk-macos -mp3 -ogg
+   
+   # For Intel x86_64 with MP3 and OGG support
+   ./mk-macos -x86 -mp3 -ogg
+   
+   # For ARM64 with only MP3 support
+   ./mk-macos -mp3
+   
+   # For ARM64 with only OGG support
+   ./mk-macos -ogg
+   ```
 
-2.2.1: Installation of pre-1.4.2 versions for Mac OS X users
-------------------------------------------------------------
-
-For versions before 1.4.2, download the TGZ file for Mac OS X onto
-your desktop.  Start up a Terminal (you'll find it under
-Applications/Utilities/Terminal), and type the commands below.  (Note
-that I'm using '>>' to indicate the shell prompt, which you shouldn't
-type in).  Remember that you can save time typing by using the Tab key
-to expand the filenames as you go (e.g. you can probably type De<TAB>
-for "Desktop").  Also, the version number you downloaded will probably
-be different to this, so adjust it accordingly:
-
->> tar xvzf Desktop/sbagen-mac-1.0.10.tgz
->> cd sbagen-mac-1.0.10
-
-This unpacks the files into a directory 'sbagen-mac-1.0.10/' in your
-home directory, and moves into that directory.  You can type 'l' or
-'ls -l' to see all the files.
-
-You also need to make sure that '.' (the current directory) is in your
-$PATH.  On 10.0 at least, it doesn't seem to be set up by default.  If
-you are running csh (which is the default up to 10.2 at least), type
-this:
-
->> setenv PATH "${PATH}:."
-
-If you are running zsh or bash, however, type this:
-
->> export PATH="$PATH:."
-
-Now, if you type 'sbagen', you should get a welcome message and a
-brief usage message.  If so, then everything is ready.
-
->> sbagen
-
-Note that you will have to do the 'cd' and 'setenv' every time you
-start up a Terminal to run SBaGen.  You can get around this by editing
-startup files and so on, but that is too much for me to explain here.
+The compiled binary will be created in the current directory as `sbagen+`.
 
 For those new to the UNIX command-line, here are a few basic commands
 you will need.  I can't give you more than a taste here -- you'll need
 to read up on this elsewhere if you need to know more.
-
-Copying, moving and deleting files is done as follows:
-
->> cp old-file new-file
->> mv old-file new-file
->> rm file
-
-You can view files using the 'less' command.  For example:
-
->> less sbagen.c
-
-Use 'q' to quit and arrow keys to move around.  Other useful keys
-include space, return, 'd', 'g' and 'G'.  (Use 'man less' for full
-docs).  Don't be afraid to look inside things -- 'less' will warn you
-if you are trying to look at a binary file.  Remember that this is
-UNIX -- you are supposed to be curious and poke around and try and
-figure out how things work.  For instance, most of the t-* and prog-*
-files have extra information in the comments that you would not see
-otherwise.
-
-You can edit files using 'emacs', which is a very powerful editor.
-For simple use, run it like this:
-
->> emacs t-alpha
-
-Move around within the editor using arrows, ^A and ^E, save using ^X^S
-and exit using ^X^C.  If you want more info on this editor, type ^H or
-^H 'i', or do a search on the 'net.
-
-Remember that most non-interactive UNIX commands (including SBaGen)
-and some interactive ones can be aborted using ^C (Ctrl-C).  This is
-the best way to stop SBaGen once it is running.
-
-Also, on Mac OS X, you may wish to turn the volume up in the System
-Preferences.  However, if you turn it up *too* high in early OS X
-versions, the audio may start to distort (it will sound rougher), so
-watch out.
 
 
 2.3: Installation for Linux and other UNIX users  
@@ -481,7 +484,7 @@ played -- these lines scroll up the screen as one period moves into
 the next.
 
 Remember that you can stop the utility using Ctrl-C on all platforms:
-Windows, Mac OS X and UNIX.  (Most UNIX users already know this, but
+Windows, macOS and UNIX.  (Most UNIX users already know this, but
 it seems that many Windows users don't know about this standard DOS
 key combination).
 
@@ -531,6 +534,20 @@ amplitudes (20, 36 and 2).  This combination is supposedly something
 like "body-asleep, brain-awake", assuming I've reproduced it
 correctly.
 
+To test isochronic tones, you can use the @ notation. For example:
+
+>> sbagen -i 300@10/20
+
+This creates an isochronic tone with a carrier frequency of 300Hz, pulsing at 
+10Hz (alpha range), with an amplitude of 20%. Unlike binaural beats, isochronic 
+tones can be effective even without headphones.
+
+You can also combine isochronic tones with other sounds:
+
+>> sbagen -i pink/40 300@10/20
+
+This combines pink noise with an isochronic tone in the alpha range.
+
 While you're at it, try the alternate 'spin' effect.  Not everyone
 likes this, but in any case it's there if you want to use it:
 
@@ -544,7 +561,7 @@ bit-width.  For example:
 >> sbagen -b 8 -i pink/40 100+1.5/20 200+6/30
 
 
-For UNIX and Mac OS X, you'll find that there are a set of short
+For UNIX and macOS, you'll find that there are a set of short
 tone-set scripts (t-*) that you can run from the command-line.  For
 example:
 
@@ -559,7 +576,7 @@ Try out some of these scripts/batch files to get an idea of some of
 the possibilities.
 
 
-For all platforms (UNIX, Windows and Mac OS X), the sequence files
+For all platforms (UNIX, Windows and macOS), the sequence files
 (prog-*) can be used in the same way:
 
 >> sbagen prog-NSDWS-example.sbg
@@ -572,7 +589,7 @@ from start):
 >> sbagen -q 1 prog-NSDWS-example.sbg
 >> sbagen -S prog-NSDWS-example.sbg
 
-On UNIX and Mac OS X, there are also a few Perl-scripts which you can
+On UNIX and macOS, there are also a few Perl-scripts which you can
 run (p-*).  These generate a sequence on the fly and then run it.  For
 anyone familiar with Perl, this is a good way to generate sequences
 that are slightly different each night in a random way.  For example:
@@ -603,6 +620,10 @@ option below).  For example, to pipe to bplay under UNIX, you could
 use the following:
 
 >> sbagen -r 8000 -O -i 100+0.92/30 200+4.2/15 | bplay -S -s 8000 -b 16
+
+To output an isochronic tone to a file:
+
+>> sbagen -r 44100 -o isochronic-alpha.raw -i 300@10/20
 
 The -L option allows a time-limit to be set on the output.  So, for
 example, to output 45 minutes of data to a file, and then play it with

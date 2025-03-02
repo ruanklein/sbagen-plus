@@ -6,10 +6,6 @@ SBaGen+ is a command-line tool for generating binaural beats and isochronic tone
 
 SBaGen+ is a fork of the original SBaGen (Sequenced Binaural Beat Generator) created by Jim Peters. The original project was classified as "bitrotted" by its author, and this fork aims to continue its development by adding new features while maintaining compatibility with the original.
 
-**Version:** 1.5.0  
-**Original Author:** Jim Peters  
-**Current Maintainer:** Ruan (ruan.klein@gmail.com)
-
 ## Features
 
 - Binaural beat generation (requires headphones)
@@ -27,13 +23,9 @@ Version 1.5.0 adds support for isochronic tones, which use amplitude modulation 
 - May be more effective for some people
 - Are defined in the format `<carrier>@<pulse>/<amplitude>`
 
-Example: `300@10/20` - carrier frequency of 300Hz, pulse rate of 10Hz, amplitude of 20%
-
 ## Installation
 
 ### macOS (including Apple Silicon)
-
-See the [README-MACOS.txt](README-MACOS.txt) file for detailed compilation instructions.
 
 Summary:
 
@@ -100,7 +92,7 @@ To compile SBaGen+ with MP3 and OGG support, you need to first compile the requi
    ./mk-macos -ogg
    ```
 
-The compiled binary will be created in the current directory as `sbagen`.
+The compiled binary will be created in the current directory as `sbagen+`.
 
 ### Linux and Windows
 
@@ -121,20 +113,13 @@ See the platform-specific README files.
 
 ## Examples
 
-The `examples/` directory contains various usage examples:
-
-- `examples/basics/ts-brain-isochronic-alpha.sbg`: Isochronic tones in the alpha range
-- `examples/basics/ts-brain-isochronic-beta.sbg`: Isochronic tones in the beta range
-- `examples/basics/ts-brain-isochronic-theta.sbg`: Isochronic tones in the theta range
-- `examples/basics/ts-brain-isochronic-delta.sbg`: Isochronic tones in the delta range
+The `examples/` directory contains various usage examples.
 
 ## File Overview
 
 Here is a brief overview of the important files in this project:
 
-- `SBAGEN.txt`: Full user documentation and installation notes; **PLEASE READ THIS**
-- `sbagen.exe`: The Win32 executable (ZIP distribution only)
-- `sbagen+`: The macOS executable (Mac distribution only)
+- `SBAGEN+.txt`: Full user documentation and installation notes (**PLEASE READ THIS**)
 - `COPYING.txt`: License (GNU General Public License version 2)
 - `*.sbg`: Various sequences that can be run through sbagen
 - `ts-*.sbg`: Single tone-sets
@@ -144,14 +129,14 @@ Here is a brief overview of the important files in this project:
 - `holosync.txt`: Some notes on the CenterPointe Holosync techniques
 - `theory*.txt`: Some notes from experimentation
 - `river*.ogg`: Loopable background river sound OGG file (under CC license); note that for Linux and macOS these are distributed in a separate TGZ archive
-- `sbagen+.c`, `*.c`: The SBaGen+ source code
-- `sbagen.c`: The original SBaGen source code
+- `sbagen+.c`, `*+.c`: The SBaGen+ source code
+- `sbagen.c`, `*.c`: The original SBaGen source code
 - `mk`: A short script to build using GCC on Linux
 - `mk-*`: Scripts to build on other platforms -- see the comments in files
 
 ## Documentation
 
-For detailed information on all features, see the [SBAGEN.txt](SBAGEN.txt) file.
+For detailed information on all features, see the [SBAGEN+.txt](SBAGEN+.txt) file.
 
 ## License
 
@@ -159,5 +144,4 @@ SBaGen+ is distributed under the GPL license. See the [COPYING.txt](COPYING.txt)
 
 ## Credits
 
-- Original SBaGen was developed by Jim Peters
-- SBaGen+ is maintained by Ruan
+Original SBaGen was developed by Jim Peters. See [SBaGen project](https://uazu.net/sbagen/).
