@@ -673,10 +673,12 @@ main(int argc, char **argv) {
    
    if (opt_W && !opt_o && !opt_O)
       error("Use -o or -O with the -W option");
-   if (opt_W && opt_L < 0 && !opt_E) {
-      fprintf(stderr, "*** The length has not been specified for the -W option; assuming 1 hour ***\n");
-      fprintf(stderr, "(Use -L or -E with the -W option to control the length of the WAV file)\n\n");
-      opt_L= 60*60*1000;
+   if (opt_W && opt_L < 0) {
+      if (!opt_E) {
+         fprintf(stderr, "*** The length has not been specified for the -W option; enabling -E option ***\n");
+         fprintf(stderr, "(WAV file will have the same duration as the sequence)\n\n");
+         opt_E = 1;  // Automatically enable -E option
+      }
    }
    
    mix_in= 0;
@@ -1341,9 +1343,16 @@ loop() {
   err= fast ? out_buf_ms * (fast_mult - 1) : 0;
   if (opt_L)
     byte_count= out_bps * (S64)(opt_L * 0.001 * out_rate);
-  if (opt_E)
-    byte_count= out_bps * (S64)(t_per0(now, fast_tim1) * 0.001 * out_rate /
-				(fast ? fast_mult : 1));
+  if (opt_E) {
+    // Calculate the correct duration based on the last time in the sequence file
+    int duration = t_per0(fast_tim0, fast_tim1);
+    byte_count= out_bps * (S64)(duration * 0.001 * out_rate /
+                (fast ? fast_mult : 1));
+    if (!opt_Q) {
+      fprintf(stderr, "*** Sequence duration: %02d:%02d:%02d (hh:mm:ss) ***\n", 
+              duration/3600000, (duration/60000)%60, (duration/1000)%60);
+    }
+  }
 
   // Do byte-swapping if bigendian and outputting to a file or stream
   if ((opt_O || opt_o) &&
