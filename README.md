@@ -107,13 +107,13 @@ See the platform-specific README files.
 
 ```bash
 # Generate a simple binaural beat (carrier 200Hz, beat 12hz, amplitude 10%)
-./sbagen -i 200+12/10
+./sbagen+ -i 200+12/10
 
 # Generate an isochronic tone (carrier 300Hz, pulse 10Hz, amplitude 20%)
-./sbagen -i 300@10/20
+./sbagen+ -i 300@10/20
 
 # Run a sequence file
-./sbagen examples/basics/ts-brain-isochronic-alpha.sbg
+./sbagen+ examples/basics/ts-brain-isochronic-alpha.sbg
 ```
 
 ## Examples
