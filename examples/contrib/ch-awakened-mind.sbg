@@ -1,0 +1,20 @@
+## Posted by Crawford Hart to the sbagen-users mailing list on
+## Fri, 19 May 2006:
+##
+## The Awakened Mind
+##
+## 20 minute program. Four voices, one each in beta, alpha, theta and
+## delta.  All four present.  Slow drop in frequency as volume glides
+## from beta-weighted to delta/theta weighted.
+
+-SE
+
+off: -
+ts1: pink/60 750+15/8 500+10/4 350+7/0 100+2/0
+ts2: pink/60 750+14/0 500+9/8 350+6/6 100+2/8
+
+
+00:00:00 off ->
+00:00:15 ts1 ->
+00:20:00 ts2 ->
+00:20:30 off

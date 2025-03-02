@@ -1,0 +1,28 @@
+## From Jim Peters:
+##
+##      EXPERIMENTAL OVERNIGHT SEQUENCE
+##
+##	I want to get up at 5:30 to put money in for a bath 
+##	at 8:00, okay?  (i.e. put money in the coin meter to 
+##      heat up the hot water tank)
+##
+
+ts1: 100+0.92/20 200+4.2/40
+ts-wake: 100+0.92/10 200+8/40
+ts-wake-ping: 100+0.92/10 200+8/40 bell+2050/50
+off: -
+
+22:00 ts1
+05:15 ts1 ->
+05:30 ts-wake
+05:30:03 ts-wake-ping
+05:30:06 ts-wake-ping
+05:30:09 ts-wake-ping
+05:30:12 ts-wake-ping
+05:35 off ->
+06:00 ts1
+07:30 ts1 ->
+07:45 ts-wake
+08:00 off
+
+

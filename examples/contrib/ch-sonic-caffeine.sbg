@@ -1,0 +1,39 @@
+## Posted by Crawford Hart to the sbagen-users mailing list on Fri, 1
+## Jun 2007:
+##
+## Sonic Caffeine
+##
+## Focus and concentration. A 45 minute program that ramps up through
+## several beta frequencies.  Keeps you mentally alert and the your
+## attention focused on the task at hand.
+
+-SE
+
+ts: pink/80 250+18/4
+ts1: pink/80 250+22/4
+ts2: pink/80 250+30/4
+ts3: pink/80 250+33/4
+ts4: pink/80 250+14/4
+off: -
+
+
+00:00:00 off ->
+00:00:10 ts
+00:05:00 ts ->
+00:05:10 ts1
+00:09:00 ts1 ->
+00:09:10 ts2
+00:15:00 ts2 ->
+00:15:10 ts3
+00:17:00 ts3 ->
+00:17:10 ts1
+00:20:00 ts1 ->
+00:20:10 ts2
+00:30:00 ts2 ->
+00:30:10 ts3
+00:35:00 ts3 ->
+00:35:10 ts2
+00:40:00 ts2 ->
+00:43:00 ts4
+00:45:00 ts4 ->
+00:45:30 off

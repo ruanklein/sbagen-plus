@@ -1,0 +1,62 @@
+## From Jim Peters:
+##
+##	!! EXPERIMENTAL !!
+##
+##	30 minute tape.  Scans the frequency range, with two carriers,
+##	sliding up and down, covering the delta/theta bands.  Ends by
+##	introducing a third tone so that there are two `anchors' (at
+##	0.92 and 4.2Hz) at the end, in addition to the carrier that
+##	goes on up into the alpha band to bring the subject into
+##	wakefulness.
+##
+##	Hopefully, if there are any interesting points in these
+##	frequency ranges, they will be stimulated as the frequency
+##	scans by.  The anchors at the end hopefully give a rounded,
+##	balanced mood for the end of the session.
+##
+##	Headphones recommended for maximum effect, not too loud.
+##	Headphones on, lie down, relax, and allow things to happen.
+##
+##	This version modified for low-quality earphones without any 
+##	bass response.
+##
+
+-SE
+
+t00:	300+4.0/30	400+8.0/15
+t01:	300+1.5/30	400+5.6/15
+t02:	300+0.5/30	400+4.0/15
+t03:	300+1.5/30	400+1.5/15
+t04:	300+4.0/30	400+0.5/15
+t05:	300+5.6/30	400+1.5/15
+t06:	300+8.0/30	400+4.0/15
+t07:	300+5.6/30	400+5.6/15
+t08:	300+4.0/30	400+8.0/15
+t09:	300+1.5/30	400+5.6/15
+t10:	300+0.5/30	400+4.0/15
+t11:	300+0.7/30	400+1.5/15
+t12:	300+0.92/30	400+4.0/15
+t13:	300+0.92/30	400+5.6/15	500+4.2/0
+t14:	300+0.92/25	400+8.0/12.5	500+4.2/3.3
+t15:	300+0.92/20	400+10.0/10	500+4.2/6.7
+off:	-
+
+23:59:55 == off ->
+0:00 == t00 ->
+0:02 == t01 ->
+0:04 == t02 ->
+0:06 == t03 ->
+0:08 == t04 ->
+0:10 == t05 ->
+0:12 == t06 ->
+0:14 == t07 ->
+0:16 == t08 ->
+0:18 == t09 ->
+0:20 == t10 ->
+0:22 == t11 ->
+0:24 == t12 ->
+0:26 == t13 ->
+0:28 == t14 ->
+0:30 == t15 ->
+0:30:15 == off
+

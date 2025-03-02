@@ -1,0 +1,37 @@
+#!/bin/bash
+
+# Cross-compilation to ARM.  Adjust XBIN below according to your
+# cross-compiler location.
+#
+# Assumes that you have downloaded the Tremor CVS snapshot from the
+# Vorbis site and unpacked it (resulting in a directory named Tremor):
+#
+#   http://www.xiph.org/ogg/vorbis/download/tremor_cvs_snapshot.tgz
+#   http://www.xiph.org/ogg/vorbis/download/
+#
+# It make be in a numbered release file by now, so look around the
+# site if you can't find it.
+#
+# You may also need to install libtool to get this to build.
+
+XBIN=/usr/local/arm/2.95.3/bin/
+XGCC=$XBIN/arm-linux-gcc
+XCPP=$XBIN/cpp
+
+cd Tremor || { echo "Tremor directory not found!!"; exit 1; }
+
+./autogen.sh --host=arm CC=$XGCC CPP=$XCPP || exit 1
+make || exit 1
+
+echo ""
+
+cp -v .libs/libvorbisidec.a ../libs/linux-arm-libvorbisidec.a || {
+    echo libvorbisidec.a missing; exit 1; }
+
+#cp -v ivorbiscodec.h ivorbisfile.h ogg.h os_types.h config_types.h ../libs/ || {
+#    echo Not all expected header files present; exit 1; }
+
+make clean >/dev/null 2>&1
+
+echo DONE
+

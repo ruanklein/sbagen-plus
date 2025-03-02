@@ -1,0 +1,25 @@
+## Posted by Crawford Hart to the sbagen-users mailing list on Fri, 1
+## Jun 2007:
+##
+## Inspiration
+##
+## Starts with 5 minutes of harmonized carriers at 10Hz alpha, followed
+## by a two minutes glide to 8Hz. 10 minutes at 8Hz, and then another
+## 12 minutes with a low delta tone (1.5) Hz in a third harmonized
+## carrier mixed in. Ends with a three minute glide back to 10 hz.
+
+-SE
+off: -
+ts1: pink/80 100+1.5/0 200+10.5/3 400+10.5/3
+ts2: pink/80 100+1.5/0 200+8/3 400+8/3
+ts3: pink/80 100+1.5/4 200+7.5/3 400+7.5/3
+
+00:00:00 off ->
+00:00:10 ts1
+00:05:00 ts1 ->
+00:07:00 ts2
+00:17:00 ts2 ->
+00:18:00 ts3
+00:30:00 ts3 ->
+00:33:00 ts1 ->
+00:33:30 off

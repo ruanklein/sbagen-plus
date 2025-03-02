@@ -1,0 +1,22 @@
+## From Jim Peters:
+##
+##      EXPERIMENTAL OVERNIGHT SEQUENCE
+##
+##	Sleep waves - covers frequencies from 0.5 Hz to 6 Hz in 
+##	waves through the night, using two tones
+##
+
+ts1: 100+2.5/30 200+3/30
+ts2: 100+0.5/30 200+6/30
+ts-wake: 100+1.5/15 200+7.2/30 150+4/15
+off: -
+
+22:00 ts1 ->
+00:00 ts2 ->
+02:00 ts1 ->
+04:00 ts2 ->
+06:00 ts1 ->
+08:00 ts-wake ->
+09:00 off
+
+

@@ -1,0 +1,213 @@
+#!/usr/bin/perl
+
+sub usage {
+    print <<EOT;
+Usage: p-drop <digit><digit>[.<digit>...]<a-l>[s|k][+][/<amp>] [<sbagen-options>]
+
+The first argument gives the 'level' and 'type' of the programme to
+run.  The digits 00 to 99 select the level, based on carrier
+frequencies from 200Hz (00) down to 2Hz (99).  The idea is to work
+from level 00 to 99, waiting for each to become 'boring' before moving
+on.  (In theory, the whole set could take several years to work
+through.)  Later levels require headphones that can reproduce really
+deep bass frequencies, ideally down to 10Hz or lower.  I'm currently
+using Sony MDR-EX70LP earphones which in theory go down to 6Hz, and
+which I am very happy to recommend.  (Note that the following model,
+the MDR-EX71SL, gives very poor quality sound by comparison.)  Also,
+you might wish to jump right in at the 20-30 range; this is where
+Centerpointe start their programme.  If you want to fine-tune the
+level, you can include a decimal point (e.g. 20.5a for halfway between
+20a and 21a).
+
+The letter a-l (or A-L if you prefer) selects the beat frequencies.
+Beat frequencies always start at 10Hz, and then drop exponentially to
+a target, which is as follows for letters A-L: 4.4, 3.7, 3.1, 2.5,
+2.0, 1.5, 1.2, 0.9, 0.7, 0.5, 0.4, 0.3.  Using A, you never get down
+to delta frequencies.  Deeper beats (i.e. later letters) are supposed
+to be better, so long as you really are entraining to them.  Like the
+carriers, this is something to build up over time.
+
+The optional letter 's' following indicates that frequencies should
+slide rather than being stepped.  Sliding gives a more general
+experience, without giving the brain the opportunity to sync precisely
+with any one frequency for any significant period of time.  In my
+experience, this can feel smoother and more natural.  I'm still
+experimenting with this, though.  Stepped frequencies (the default)
+can sometimes give separate 3-minute dream scenes as different
+frequencies are stimulated, which you won't get with sliding tones.
+Since they hold you at a particular frequency, you can potentially go
+deeper into it.
+
+The optional letter 'k' indicates a super-stepped change -- using
+changes at 1 minute intervals instead of 3 minute intervals.  This is
+experimental; it may give a more intense session than the default
+settings.
+
+The optional '+' indicates a 60-minute programme rather than a
+30-minute one.  The extra 30 minutes keeps you at the final beat
+frequency for the whole time, although carrier changes are spread over
+the whole 60 minutes.
+
+The optional '/<amp>' lets you increase the amplitude of the waves if
+necessary.  For example, you may need to boost it to compensate for
+the poor low-frequency response of your headphone or amp or whatever,
+especially for the very low carrier frequencies in later levels.
+
+Note that the Centrepointe entry-level CD corresponds very roughly to
+29d+, and the demo on their site to 58a (i.e. an advanced level, but
+not going too deep).  They appear to use stepped beat frequencies.
+
+Please consider joining the sbagen-users mailing list if you want to
+discuss using this script.  See http://uazu.net/sbagen/ for the link.
+
+BIG LEGAL NOTE and DISCLAIMER: If you use this script, you do so AT
+YOUR OWN RISK.  Whilst this script generates binaural beats that I
+hope are roughly similar in effect to those used by Centerpointe (by
+dropping the carrier frequency in stages, for instance), I have not
+made any attempt to reproduce their binaural frequencies exactly.
+Also, there is a lot more to the Centerpointe programme CDs than just
+the binaural beats.  The soundtracks contain rain and water sounds and
+also resonating bell sounds that I'm sure have significant additional
+effects, and there are also unexplained low frequency tones at places
+on these CDs.  In addition Centerpointe provides a strong support
+system that keeps people motivated and helps them through any
+difficulties they may have using the programme.  Their CDs have been
+fully tested by thousands of people over years, whilst this script is
+relatively untested at present.  So, really, this is intended only for
+experimenters who use it at their own risk.  People who require a
+fully tested, supported and packaged solution should go and give
+Centerpointe some money: http://www.centerpointe.com/links.cfm?ad=27103 
+END OF BIG LEGAL NOTE
+EOT
+   exit 1;
+}
+
+# Features when stepping: 
+#  Using all beat target codes from D-L, 77 different beat frequencies
+#  are stimulated between 0.3 and 8.5Hz, along with 10Hz which is used
+#  on every one.  This gives a fair chance that any interesting
+#  frequencies in that range might be stimulated during the sessions.
+
+usage() unless (@ARGV);
+usage() unless ($ARGV[0] =~ /^(\d\d(\.\d+)?)([a-zA-Z])([sk]?)(\+?)(\/([\d.]+))?$/);
+shift;
+
+$carr= 200 - 2 * ($1);
+$bcod= lc($3);
+$slide= $4 eq 's';
+$n_step= ($4 eq 'k') ? 30 : 10;
+$long= $5 eq '+';
+$amp= ($7 eq '') ? 0.5 : $7;
+$stepslide= $n_step > 20 ? 5 : 10;	# Seconds slide between steps
+
+# Carriers
+$len= $long ? 3600 : 1800;
+$c0= $carr + 5;
+$c1= $long ? $carr + 2.5 : $carr;
+$c2= $carr;
+
+sub exp_range {
+    my ($cnt, $b0, $b1)= @_;
+    my $logb0= log($b0);
+    my $logb1= log($b1);
+    my @rv= ();
+    for (0..($cnt-1)) {
+	push @rv, exp($logb0 + ($logb1-$logb0) * $_/($cnt-1));
+    }
+    return @rv;
+}
+
+# Beats; steps or slides over the frequencies in @beat (however many 
+# there are) over the first 30 minutes, and then holds on the final 
+# frequency for the following 30 minutes, if $long.
+@beat= ();
+if ($bcod =~ /[a-l]/) {
+    @target= qw(4.4 3.7 3.1 2.5 2.0 1.5 1.2 0.9 0.7 0.5 0.4 0.3);
+    @beat= exp_range($n_step, 10, $target[ord($bcod) - ord('a')]);
+} else {
+    usage();
+}
+$steps= @beat;
+
+if ($slide) {
+    printf STDERR "Carrier slides from ${c0}Hz to ${c2}Hz\n";
+    printf STDERR "Beat frequency slides from $beat[0]Hz to $beat[$steps-1]Hz\n";
+    printf STDERR "\n";
+} else {
+    printf STDERR "Carrier steps from ${c0}Hz to ${c2}Hz\n";
+    printf STDERR "Beat frequency steps from $beat[0]Hz to $beat[$steps-1]Hz:\n";
+    print STDERR "  " . join(" ", map { sprintf("%.2f", $_) } @beat) . "\n";
+    printf STDERR "\n";
+}
+
+sub fmt {
+    my $sec= shift;
+    my $min= int($sec / 60); $sec %= 60;
+    my $hour= int($min / 60); $min %= 60;
+    return sprintf("%d:%02d:%02d", $hour, $min, $sec);
+}
+
+@out1= ();
+@out2= ();
+push @out1, "off: -";
+push @out2, "23:59:55 == off ->";
+
+if ($slide) {
+    # Slide version
+    for (0..($steps-1)) {
+	my $tim= int($_ * 1800 / ($steps-1));
+	push @out1, sprintf("ts%02d: %g+%g/%s", $_,
+			    $c0 + ($c1-$c0) * $tim / 1800.0,
+			    $beat[$_], $amp);
+	push @out2, sprintf("%s == ts%02d ->", fmt($tim), $_);
+    }
+    
+    if ($long) {
+	push @out1, "tsend: $c2+$beat[$steps-1]/$amp";
+	push @out2, "1:00 == tsend ->";
+	push @out2, "1:00:10 == off";
+    } else {
+	push @out2, "0:30:10 == off";
+    }
+} else {
+    # Step version
+    for (0..($steps-1)) {
+	my $tim0= int($_ * 1800 / $steps);	# Period start time
+	my $tim1= int(($_+1) * 1800 / $steps); 	# Period end time
+	push @out1, sprintf("ts%02d: %g+%g/%s", $_, 
+			    $c0 + ($c2-$c0) * $tim1/$len,
+			    $beat[$_], $amp);
+	push @out2, sprintf("%s == ts%02d ->", fmt($tim0), $_);
+	push @out2, sprintf("%s == ts%02d ->", fmt($tim1 - $stepslide), $_);
+    }
+    
+    if ($long) {
+	for ($steps .. (2*$steps-1)) {
+	    my $tim0= int($_ * 1800 / $steps); 	# Period start time
+	    my $tim1= int(($_+1) * 1800 / $steps); 	# Period end time
+	    push @out1, sprintf("ts%02d: %g+%g/%s", $_, 
+				$c0 + ($c2-$c0) * $tim1/$len,
+				$beat[$steps-1], $amp);
+	    push @out2, sprintf("%s == ts%02d ->", fmt($tim0), $_);
+	    push @out2, sprintf("%s == ts%02d ->", fmt($tim1 - $stepslide), $_);
+	}
+	push @out2, sprintf("%s == off", fmt($len));
+    } else {
+	push @out2, sprintf("%s == off", fmt($len));
+    }
+}
+
+die unless open OUT, ">tmp-prog";
+print OUT <<END;
+#
+#	This file was AUTOMATICALLY GENERATED
+#
+
+END
+
+print OUT join("\n", @out1, '', @out2);
+die unless close OUT;
+
+exec "./sbagen -SE " . join(" ", @ARGV) . " tmp-prog";
+die;
+

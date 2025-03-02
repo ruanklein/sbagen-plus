@@ -1,0 +1,9 @@
+#!/bin/bash
+
+#
+# Build sbagen on blackfin, without MAD or OGG (as yet)
+#
+# See also: http://www.tearsoffire.org/twiki/bin/view/Projects/BfSbagen
+#
+
+bfin-uclinux-gcc -DT_LINUX -Wl,-elf2flt -o sbagen sbagen.c -L/opt/uClinux/bfin-uclinux/bfin-uclinux/lib -lm -lpthread

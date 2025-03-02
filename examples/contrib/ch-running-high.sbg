@@ -1,0 +1,17 @@
+## Posted by Crawford Hart to the sbagen-users mailing list on Fri, 1
+## Jun 2007:
+##
+## Running High
+##
+## 15 minute program combines the Schuman Resonance with the "LSD"
+## frequency and 38Hz for endorphin release.
+
+-SE
+
+ts1: pink/50 110+7.83/4 250+20.215/4 400+38/4
+off: -
+
+00:00:00 off ->
+00:00:15 ts1
+00:15:00 ts1 ->
+00:15:30 off

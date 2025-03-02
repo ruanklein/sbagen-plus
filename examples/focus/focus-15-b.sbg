@@ -1,0 +1,21 @@
+##    
+##    Please note: These tone-sets are based on data from a document
+##    received from an anonymous source.  See "focus.txt" for details.
+##    The data is almost identical to the USENET-released data that
+##    appears in the *-a.sbg files.  It is included here though
+##    because in a few tone-sets, extra tones were included, which may
+##    be interesting or useful to certain experimenters.  Also
+##    although the frequencies were measured, again the relative
+##    amplitudes of the tones were not, so the results are not likely
+##    to be exactly the same as the Monroe Institute tapes.  Also I
+##    believe that the Monroe Institute uses a guiding voice that
+##    leads the subject through the experience.
+##
+##    F15 100[1.5]  200[4.0]  250[4.0]  300[4.0]  500[7.05]  630[7.0]  750[7.0]
+##
+##    "No time -- 3 hours seems like 2 minutes"
+##
+
+ts: 100+1.5/10  200+4.0/10  250+4.0/10  300+4.0/10  500+7.05/10  630+7.0/10  750+7.0/10
+
+0:00 ts

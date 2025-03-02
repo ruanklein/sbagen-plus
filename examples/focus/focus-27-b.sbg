@@ -1,0 +1,22 @@
+##    
+##    Please note: These tone-sets are based on data from a document
+##    received from an anonymous source.  See "focus.txt" for details.
+##    The data is almost identical to the USENET-released data that
+##    appears in the *-a.sbg files.  It is included here though
+##    because in a few tone-sets, extra tones were included, which may
+##    be interesting or useful to certain experimenters.  Also
+##    although the frequencies were measured, again the relative
+##    amplitudes of the tones were not, so the results are not likely
+##    to be exactly the same as the Monroe Institute tapes.  Also I
+##    believe that the Monroe Institute uses a guiding voice that
+##    leads the subject through the experience.
+##
+##    F27 50[0.80]  400[4.0]  503[4.2]  600[4.0]  750[4.0]  900[4.0]
+##
+##    "The park -- a way-station, a place of high creativity, a
+##     stepping stone into areas beyond"
+##
+
+ts: 50+0.80/10  400+4.0/10  503+4.2/10  600+4.0/10  750+4.0/10  900+4.0/10
+
+0:00 ts

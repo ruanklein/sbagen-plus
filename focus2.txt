@@ -1,0 +1,95 @@
+(Also note that T. Sone has done some more detailed Monroe analyses
+using FFTs, resulting in the ts1-*.sbg files in the examples/focus/
+directory, which might be worth comparing to these measurements.)
+
+
+BAVSA analysis of some Monroe recordings
+----------------------------------------
+
+Mr Jim Peters,
+  I am currently using the program BAVSA, it is a great program to find 
+binaural beat frequencies in audio files.
+  I am trying to make a library with binaural beat frequencies and its 
+related state of conscience, because the information available at internet 
+and books it is not very exact in the frequencies, they usually speak about 
+beta, alpha, etc without a specific frequency number.
+  For that reason i am "decompiling" Hemi-Sync audio files, because The 
+Monroe Institute doesn't show what frequencies uses in each CD and have them 
+as a secret.
+  When i make a preset with BWGen i found a espectral power of 4.0 or more 
+in each binaural beat frequency, but when i analize an Hemi-Sync audio file 
+it is hard to find a binaural beat.
+  The question is: What is the minimal espectral power in order to have a 
+binaural beat ? 0.5, 1.0, 1.5 ?
+  May be you have some recommendation that could help me to build this 
+library.
+
+PD: i'm sending you some audio files analyzed
+
+0001 Hemi-Sync - Concentracion
+------------------------------
+
+Duration 59:38, source EMule.
+200.0+4.0/3.21, 250.0+16.0/3.25
+222.0-40.0/0.43 as XBox ?
+
+0002 Monroe Institute - Concentration
+-------------------------------------
+
+Duration ?, source EMule.
+It's not easy to find a binaural beat. At 11:38 and 23:23 i observe:
+294.0+16.0/1.24 and 147.0+4.0/1.27
+
+0003 HemiSync - Mind Food - 01 - Concentration (1)
+-------------------------------------------------------
+
+Duration ?, source EMule.
+Idem 0001 (Hemi-Sync - Concentracion)
+250.0+16.0/2.89, 200.0+4.0/3.60 and 222.0-40.0/3.10
+
+0004 Hemi-Sync - Human Plus - Think Fast 02 30min's
+---------------------------------------------------
+
+Duration 30:18s, source EMule.
+It's not easy to find a binaural beat. May be 107.35+1.5/1.14
+
+0005 The Gateway Experience - Wave 1 Discovery - #3 Advanced Focus 10
+---------------------------------------------------------------------
+
+* Duration 36:05, source my CD.
+* At 16:18 (counting from 1 to 10) 107.70+1.60/1.31
+* At 19:55 "Ten, Ten, Ten.. Relax and Enjoy Focus 10"
+* At 20:08 Idem 16:18, 107.45+1.55/1.14
+* At 281.20+22.00/14.99 (beta wave, coming back to awake state)
+
+0006 The Gateway Experience - Wave II Threshold - #1 Introduction to Focus 12.wav
+---------------------------------------------------------------------------------
+
+* Duration 35:08, source My CD.
+* At 14:40 Focus 12.
+  50.0-0.50/0.61, 100.0-1.50/0.64, 109.65-20.90/0.30,
+  110.40+19.40/0.32 ?
+  74.60+49.20/0.64, 74.85+48.70/0.64, may  be XBox ?
+
+0007 Hemi-Sync - Human Plus - Think Fast
+----------------------------------------
+
+* Duration 29:55, source EMule.
+* I couldn't found a binaural beat.
+* At 29:43 281.25+22.10/15.62 (beta wave, coming back to awake state)
+
+0008 Hemi-Sync - Mind Food - Retain-Release-Recall - 192Kbs
+-----------------------------------------------------------
+
+* Duration XX:XX, source EMule.
+* 100.10+1.60/1.52, 150.10+3.80/1.18, 200.25+3.90/0.81
+  124.55-47.30/1.19, 175.15-46.30/1.20 as XBox ?
+* At 31:23 501.10+28.00/4.54 (beta wave, coming back to awake state)
+
+0010 Hemi-sync - Metamusic - Baroque Garden For Concentration [MP3 256Kbps].rar Vivaldi-Albinoni-Corelli - Baroque Garden For Concentration - 01 - Largo from Oboye Concerto in B Flat Major
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+* Duration 4:15, source EMule.
+* It's not easy to find a binaural beat
+* At 1:33 (only Oboye) 196.0-4.00/2.09.
+

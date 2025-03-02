@@ -1,0 +1,87 @@
+==== TODO list for SBaGen
+
+=== Current
+
+Merge in ARTS patch
+
+An SBG file containing "-i pink/40 100+1.5/20 200-4/36 400+8/2" does
+  not give the expected result, although adding -D before that DOES.
+  It seems that all -i options in SBG files are broken.
+
+Write minimal GUI for SBaGen:  (use fltk?)
+
+- Maybe menus for file load/open/save/save as/etc
+- Maybe "Select" tab allows file selection
+- "Editor" tab shows file contents, allows editing
+- "Test" tab shows -D output
+- "Play" tab plays file
+- "Write WAV" tab writes WAV to disc
+
+Add AIFF output as well as WAV.
+
+
+=== Time permitting / version 2 rewrite / suggestions
+
+Add support for triggering WAV/MP3 samples at certain points in the
+sequence: for example, "You have now entered Theta at 7Hz", or
+whatever.
+
+Add 'mixspin:' and 'mixbeat:' options.  The first would apply the spin
+effect to the mix stream. The second would use a Hilbert transform and
+a 'twist' of the resulting complex waveform to shift the L+R channels
+up and down in frequency to create a binaural beat out of any
+recording.  The idea seems sound, it just needs implementing and
+testing.
+
+Give Mac users desktop access to the application, using double-click
+to run an SBG file, for example.
+
+Possibly add JACK support (jackit.sf.net); this is yet another good
+reason to rewrite the core code to fit a callback model.  This would
+lead onto easier CoreAudio and Windows audio support too.
+
+Allow several channels that act independently, i.e. with independent
+slides going on through other activity on other channels.
+
+Create a sbagenlib to do all the play-time sequencing and audio
+generation, permitting several different front ends to be created.
+
+Make an 'easy' SDL-based clickable GUI interface for Windows users,
+separate from the more powerful command-line interface.
+Alternatively, rewrite completely for SDL, with a different file
+format, and automatic conversion of old SBG files.
+
+More:
+
+Maybe allow keyboard control to fade between different sequences in
+real-time.  Actually this was suggested connected with rhybag.  This
+might be achieved by a rewrite using SDL for the front-end and audio
+output code, effectively creating a completely new app.
+
+Maybe add a screen that flashes in sync with the beats, as a cheap
+light-glasses replacement.
+
+Maybe add a feature to record timing of user events during a session
+indicated by user clicks or keypresses.
+
+Maybe add a feature to add modulation of the volume level in addition
+to the beating.
+
+Add light glasses control with in the MagicJim / AudioStrobe method,
+i.e. adding high-frequency tones to trigger the flashes.
+
+Suggestion: Add LPT1 light glasses control.  The coding would be
+significantly different between Linux and Windows.  There are also
+synchronisation issues, with the timing different for each soundcard.
+
+Suggestion: "sinusoidal, gaussian or user defined sweep in a frequency
+range" (!?)
+
+Suggestion: Add coloured noise to SBaGen as mentioned on the mailing
+list.
+
+Add more organic feel to tones etc, by introducing very low-frequency
+variations in carrier frequency, or beat frequency, or whatever.
+
+
+

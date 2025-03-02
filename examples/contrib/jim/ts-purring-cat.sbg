@@ -1,0 +1,14 @@
+##
+##      Sub-delta 0.2 Hz, delta 3.78Hz, beta 38.84Hz
+##      
+##      During one all-night randomly-generated sequence (see p-* files),
+##      I was aware of a really strong effect from one set of tones, so I
+##      awoke to take a note of the tone-set.  This was it.  For some reason
+##      I can't remember, I called it 'purring cat'.  It doesn't have quite 
+##      the effect now, so maybe I need to be deep already for it to work.
+##      
+
+ts: 112.85+0.20/40.00 225.70+3.78/10.00 564.26+38.84/3.50
+
+0:00 ts
+

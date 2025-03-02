@@ -1,0 +1,21 @@
+##
+##    Please note: These tone-sets are based on data from a document
+##    that appeared on USENET, from someone who appears to have
+##    measured the frequencies used on some of the Monroe Institute
+##    tapes.  See "wave.txt" for more details.  Although the
+##    frequencies were measured, the relative amplitudes of the tones
+##    were not, so the results are not likely to be identical to the
+##    Monroe Institute tapes.  Also I believe that the Monroe
+##    Institute uses a guiding voice that leads the subject through
+##    the experience.
+##    
+##      Tape 1 - Orientation (Focus 3)
+##      Hemisync, Energy Conversion Box, Gateway Affirmation, Resonant Tuning
+##
+##      l/r 300/304 plus 100 Hz and 500 Hz carriers without recognizeable Delta
+##
+
+ts: 100+0/10 302+4/10 500+0/10
+
+0:00 ts
+

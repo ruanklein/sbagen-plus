@@ -1,0 +1,9 @@
+## Posted by Takeshi Sone to the sbagen-users mailing list on Thu, 14
+## Jun 2007.  This is intended to have an effect similar to a part of
+## the Gateway Experience CD from the Monroe Institute.
+##
+## ts1-focus21.sbg
+
+focus21: spin:300+0.1/25 120/1.7 200+4/4.6 240/0.3 250+4/2.7 300+4/1.7 600+16/1.3 755+16/0.7 900+16/0.4
+
+0:00 focus21

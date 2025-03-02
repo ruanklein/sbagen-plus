@@ -1,0 +1,196 @@
+MONROE INSTITUTE `FOCUS LEVELS'
+-------------------------------
+
+The scripts mentioned here are based on a document that appeared on
+USENET, from someone who appears to have measured the frequencies used
+on some of the Monroe Institute tapes (the information is included at
+the end of this file).  Although the frequencies were measured, the
+relative amplitudes of the tones were not, so the results will not be
+completely identical to those from the Monroe Institute tapes.  Also I
+believe that the Monroe Institute uses a guiding voice that leads the
+subject through the experience, along with other supporting materials.
+
+Despite that, these tone-sets (or Focus levels) may be useful for
+experimenters to base their own tone-sets on.  This information also
+gives us a much better idea of what frequencies the Monroe Institute
+is working with, and what they are using them for.
+
+USE AND EXPERIMENT WITH ALL OF THIS AT YOUR OWN RISK !!  
+
+The scripts are as follows (these are executable under UNIX - Windows
+users will have to read them using a text editor, or see the original
+documents below):
+
+  t-wave-1   Tones from a series of tapes apparently called "Wave 1"
+  t-wave-2   Tones from a series of tapes apparently called "Wave 2"
+  t-focus-1  The set of `Focus Levels' as measured in the document
+  t-focus-2  The set of `Focus Levels' measured in a document from 
+               another anonymous source, almost identical to the first 
+               set, with a few additional tones in some of the focus
+               levels.
+  t-seqall   An experimental 2-hour sequence that goes through the 
+               focus levels 10,12,15,21,22,23,24,25,26,27 in order, 
+               giving 10 minutes on each.
+
+A quick note to those new to binaurals - to really explore the effect
+of these tones, you need to relax into the sounds, sink into them.
+Don't play them too loud - they can be played just above the level of
+the background noise (20dB above according to the document).  The
+stereo effect must be present for them to work - mono output is
+useless !  If using headphones, you can mix in some pink noise to give
+background noise by editing the scripts (see the comments).
+
+Another source of information on the effects of the Focus Levels is
+one of the books by Ken Eagle Feather.  He participated in several of
+the Monroe Institute programs, and at one stage was a test subject in
+their labs.  He describes several different Focus Levels that he
+experienced in his book "Tracking Freedom", pages 170-176.  Below is a
+summary of the focus levels that he mentions, and their effects.  This
+may be useful as a starting-point to understanding the effects of the
+frequencies selected by the Monroe Institute.
+
+ Focus 10 - brain awake, body asleep
+ Focus 12 - expanded awareness, in the mood to head out and explore
+ Focus 15 - no time, 3 hours seems like 2 minutes
+ Focus 21 - alternate energy systems, bridge into worlds with non-human
+              entities
+ Focus 22 - place where people with `loose, chaotic thoughts' go after 
+              death
+ Focus 24 - belief system territories, place where dogmatically
+              inclined people go when dead
+ Focus 27 - the park, a way-station, a place of high creativity, a
+              stepping stone to areas beyond.
+
+For more information, see the Monroe Institute web-site:
+  
+  http://www.monroeinstitute.org/programs/hemi-sync.html
+
+There are also more notes on my web-site and the sourceforge home
+page, and some additional notes are included in the TGZ and ZIP files:
+
+  http://www.uazu.net/sbagen/
+  http://sbagen.sf.net/
+
+Happy experimenting -
+
+Jim
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+Here are the original measurements:
+
+-----------------------------------------------------------------------
+Wave I - Discovery
+-----------------------------------------------------------------------
+
+Tape 1 - Orientation (Focus 3)
+Hemisync, Energy Conversion Box, Gateway Affirmation, Resonant Tuning
+
+l/r 300/304 plus 100 Hz and 500 Hz carriers without recognizeable Delta
+-----------------------------------------------------------------------
+
+Tape 2 - Intro Focus 10
+
+Focus 10, Ten Point Relaxation
+
+100[4.0], 300[4.0], 500[4.0]
+
+-----------------------------------------------------------------------
+
+Tape 3 - Advanced Focus 10
+Recall
+
+-----------------------------------------------------------------------
+
+Tape 4 - Release and Recharge (Focus 10)
+Process of Energy Conversion - Daily Exercise!
+
+l/r 100/104, 414/410, 504/500
+
+-----------------------------------------------------------------------
+
+Tape 5 - Exploration Sleep (Focus 10)
+Remembering who and what you are, Rolling out, Floating upwards
+
+l/r 100/104, 300/304, 496/500
+
+-----------------------------------------------------------------------
+
+Tape 6 - Focus 10 Free Flow for your own purpose
+
+l/r 100/104, 300/304, 500/504
+C1: 308/322, 500/515
+
+-----------------------------------------------------------------------
+Wave II - Threshold
+-----------------------------------------------------------------------
+
+Tape 1 - Intro Focus 12
+
+l/r 51/51.75, 98.75/101; Delta-Frq: 0.75 + 2.25 Hz
+
+Tape 2 - Problem Solving (Focus 12)
+
+l/r 99.5/101, 202.7/204.2
+
+-----------------------------------------------------------------------
+                   Focus Levels/Frequencies
+
+F3   59[1.2]-110[1.3], 288[3.7]
+
+F10  100[1.5], 200[4.0], 250[4.0], 300[4.0]
+
+F12  100[1.5], 200[4.0], 250[4.0], 300[4.0], 400[10.0],
+       500[10.1], 600[4.8]
+
+F15  100[1.5], 200[4.0], 250[4.0], 300[4.0], 500[7.05],
+       630[7.1], 750[7.0]
+
+F21  200[4.0], 250[4.0], 300[4.0], 600[16.2], 750[15.9],
+       900[16.2]
+
+F22  Same as F21
+
+F23  400[3.9], 503[4.0], 600[4.0], 750[3.9], 900[4.0]
+
+F24  50[0.75], 400[3.9], 503[4.0], 600[4.0], 750[4.0],
+       900[4.0]
+
+F25  503[4.0], 600[4.0], 750[4.0], 900[4.0]
+
+F26  400[3.9], 503[4.2], 600[4.0], 750[4.0], 900[4.0]
+
+F27  Same as F26
+
+Example: The notation 503[4.2] should be understood to
+represent a beat frequency of 4.2 Hz between two carriers
+equally separated from 503 Hz (i.e., 500.9 and 505.1 Hz).
+
+Amplitudes are generally maintained about 20 dB above
+background 1/f (pink) noise and/or surf.
+
+The Monroe Institute equipment used to generate the tones is/was
+completely analog so precise control of frequency and phase was not
+possible.
+
+-----------------------------------------------------------------------
+
+And here's another set:
+
+F03 50[1.2] 100[1.3]  288[3.6]
+F10 100[1.5]  200[4.0]  250[4.0]  300[4.0]
+F12 50[0.25]  100[1.5]  200[4.0]  250[4.0]  300[4.0]  400[10.0]  500[10.1] 
+600[4.8]
+F15 100[1.5]  200[4.0]  250[4.0]  300[4.0]  500[7.05]  630[7.0]  750[7.0]
+F21 200[4.0]  250[4.0]  300[4.0]  600[16.2]  750[16.2]  900[16.2]
+F22 200[4.0]  250[4.0]  300[4.0]  600[16.2]  750[16.2]  900[16.2]  (same
+as F21)
+F23 400[3.9]  503[4.0]  600[4.0]  750[3.9]  900[4.0]
+F24 50[0.75]  200[1.5]  400[3.9]  503[4.0]  600[4.0]  750[4.0]  900[4.0]
+F26 400[3.9]  503[4.2]  600[4.0]  750[4.0]  900[4.0]
+F27 50[0.80]  400[4.0]  503[4.2]  600[4.0]  750[4.0]  900[4.0]
+
+Sometimes F21 is as follows:
+F21 200[4.0]  250[5.4]  300[5.4]  600[16.2]  750[16.2]  900[16.2]
+
+--------------------------------------------------------------------------

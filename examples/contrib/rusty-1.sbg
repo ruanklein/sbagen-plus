@@ -1,0 +1,44 @@
+##
+##	A sequence from Rusty Wickell
+##
+
+-SE
+
+bluehigh: pink/65  709.4+11.08/5 354.7+5.54/10 177.35+2.77/20
+bluelow: pink/65   568.43+8.88/5 284.21+4.44/10 142.11+2.22/20
+bluemid: pink/65   640+10/5 320+5/10 160+2.5/20
+
+00:00:00 bluemid ->
+00:15:00 bluehigh ->
+00:30:00 bluemid ->
+00:45:00 bluelow ->
+01:00:00 bluemid ->
+01:15:00 bluehigh ->
+01:30:00 bluemid ->
+01:45:00 bluelow ->
+02:00:00 bluemid ->
+02:15:00 bluehigh ->
+02:30:00 bluemid ->
+02:45:00 bluelow ->
+03:00:00 bluemid ->
+03:15:00 bluehigh ->
+03:30:00 bluemid ->
+03:45:00 bluelow ->
+04:00:00 bluemid ->
+04:15:00 bluehigh ->
+04:30:00 bluemid ->
+04:45:00 bluelow ->
+05:00:00 bluemid ->
+05:15:00 bluehigh ->
+05:30:00 bluemid ->
+05:45:00 bluelow ->
+06:00:00 bluemid ->
+06:15:00 bluehigh ->
+06:30:00 bluemid ->
+06:45:00 bluelow ->
+07:00:00 bluemid ->
+07:15:00 bluehigh ->
+07:30:00 bluemid ->
+07:45:00 bluelow ->
+08:00:00 bluemid
+

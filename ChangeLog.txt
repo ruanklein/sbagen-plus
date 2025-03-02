@@ -1,0 +1,124 @@
+1.5.0   Added support for isochronic tones
+	Updated macOS build scripts to support Apple Silicon (ARM64)
+	Renamed macOS scripts from macosx to macos
+	Added support for building universal binaries for macOS
+	Updated documentation to include isochronic tone usage
+	Added example files for isochronic tones in different frequency ranges
+	Rebranded as SBaGen+ to indicate the fork from the original project
+
+1.4.5   Update Mac OSX build to use Intel 32-bit
+
+1.4.4   Fixes to support sound output on Vista
+	Make "Edit sequence" work on WinXP
+	Default to 60-minutes for WAV-output if a length can't be established
+	"Write to WAV (30 min)" option for Windows
+	Stop status line wrapping on Windows
+
+1.4.3	Fixed problem when playing 7+ hour sequences with -SE or -L
+	Warns properly if the WAV file limit of ~7 hours is exceeded, and truncates
+
+1.4.2	Handles playing sequences to the clock across a daylight savings time change
+	Improved Linux /dev/dsp initialisation to get a good fragment size
+	Fixed OGG setup bug that affected some Linux systems when playing river sounds
+
+1.4.1	Added wakeup option to -p drop
+	Permitted duration of -p drop session to be modified
+	Added ReplayGain handling for OGG files
+	Applied vorbisgain to river sound files
+	Added support for writing to a WAV file through Windows right-click menu
+	River sounds now distributed in separate archive, except on Windows
+
+1.4.0	Added support for randomly looping OGG files with SBAGEN_LOOPER tag
+	Added two standard looping river sounds OGG files to archive
+	Added <carr>/<amp> for handling plain sine tones (no beats)
+	Sequence (SBG) files may now contain all options, including -i and -p
+	Added -d option to select a different /dev/dsp device
+	Added -c option to compensate for low-frequency rolloff of audio equipment
+	Added bail-out code so that thread terminates correctly if other one dies
+	Added -p drop builtin predefined sequence (thanks to Jonathan Bisson for 
+	  the first version of this code)
+	Added -p slide builtin predefined sequence
+	Added support to look for -m files in program directory
+
+1.2.0	Added support for Ogg and MP3 files for mix input with -m switch
+	Added mix/<vol> channel type for controlling level of mix input
+	Added ring buffering for -m and -M input streams to reduce chance of dropouts
+	Added short usage message, with longer usage help with option -h
+	Added "Press return" message for Windows users on error
+	Added dithering to improve output quality
+	Output rate is now automatically picked up from input WAV/Ogg/MP3 file, 
+	  unless overridden by -r
+	Added support for command-line options embedded in sequence files (e.g. -m)
+	Display ## comments from sequence file on playback
+	Support multiple sequence files on the command line, to permit separate
+	  files for tone-set libraries and sequences, for example
+	Support automatic building with/without MP3/OGG according to availability
+	Better information in error reports
+	Miscellaneous clean-ups
+	Documentation overhaul
+	Using .sbg extension now, to improve user experience on Windows 
+	Converted most t-* files to ts-*.sbg
+	Created .sbg files for tone-sets in shell-scripts
+	Updated all .sbg files to include ## comments and options where necessary
+
+1.0.14	Fixed endianness problem on output for OSX users
+	Added T_MSVC macro to handle compilation using MSVC
+	Added mk-msvc.txt with instructions for building with MSVC
+
+1.0.13	Increased number of channels to 16 (was 8)
+	For mix-in files ending with .wav/.WAV, correctly skip header
+
+1.0.12	NetBSD script added
+	Added mix options: -m and -M
+	New p-drop sequence script
+	
+1.0.11	Changed Mac support to use CoreAudio because Carbon calls failed on OS 10.1
+
+1.0.10	Added support for Mac OS X using Carbon calls.
+	Added -T option to start playback at a given clock time
+	Cleaned up platform-specific code handling in source
+
+1.0.9	Added support for Windows real-time output through direct Win32 calls
+	Added experimental support for user-defined brain waveforms
+
+1.0.8	Added new `spin' effect
+
+1.0.7	Added -F and -R options to allow faster changes within the sequence
+
+1.0.6	Fixed -q to work correctly in conjunction with -SE
+	Fixed to use binary-mode when outputting files (for DOS)
+
+1.0.5	Added code to handle output on non-ANSI terminals when NO_ANSI_TTY is defined
+
+1.0.4	Added -W option to write WAV file headers to files or stdout
+	Added -S and -E options to run sequence as a script
+	Preprocessor lines added to support compilation without direct /dev/dsp output
+	-L option now outputs exactly the right length, with either raw or WAV output
+
+1.0.3	Allowed sequence file to be read from standard input
+	Changed -v option to -D, and added options -o -O -L -Q
+	Tidied up time + voice output, and time scanning
+	Switched to using stderr for informational output, with quiet option
+	Added facility to output to a file or pipe
+	Added a time limit option
+	Improved synchronisation with real-time
+	Added bell sound
+
+1.0.2	Made more friendly to other compilers
+	No longer requires C++ part of GCC to build
+
+1.0.1	Added 8-bit support
+	Rationalised argument processing
+
+1.0.0	Initial release
+
+TO-DO	Add support on Mac OS X for CoreAudio sample-rate conversion
+	
+TO-DO	Maybe necessary to fix DOS output to pipe to use binary mode ?
+	Allow multiple simultaneous sequences to run, overlaying one another
+	Tone-set option to gently oscillate the beat frequency up and down
+	Option to randomize the carrier frequencies/phases slightly
+	Fade between tone-sets according to joystick port input
+	Open /dev/dsp twice, and set buffers not-too-long and not-too-short
+	Option to output a loop-able file of exactly the right length for -i option
+	Allow keypresses to cause sequence to jump forwards/backwards to marked points

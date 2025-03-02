@@ -1,0 +1,27 @@
+## Posted by Christopher J. Maler to sbagen-users on Wed, 16 Feb 2005:
+##
+## Tempus Fugit 5:12
+##
+## I've been playing with this sequence for a while now. I call it
+## Tempus Fugit 5:12.  It's based on, as you could guess 5 and 12 hz
+## beats with the 8.5 midway point added.  I've been experiencing some
+## very strange dreams after falling asleep to this preset. Thought
+## I'd share.  Chris
+
+off: - 
+s1: 500.00+12.00/25 0.00+0.00/0 0.00+0.00/0
+s2: 500.00+12.00/18 310.00+8.50/25  0.00+0.00/0
+s3: 500.00+12.00/10 310.00+8.50/18 120.00+5.00/25
+s4: 500.00+12.00/25 310.00+8.50/10 120.00+5.00/18
+s5: 500.00+12.00/18 310.00+8.50/25 120.00+5.00/10
+s6: 0.00+0.00/0 0.00+0.00/0 0.00+0.00/0
+
+NOW+0:00:00 off ->
++0:00:10 s1
++0:10 s2
++0:20 s3
++0:30 s4
++0:40 s5
++0:50 s6
++0:51 s6 ->
++0:51:15 off

@@ -1,0 +1,19 @@
+## Posted by Crawford Hart to the sbagen-users mailing list on
+## Fri, 19 May 2006:
+##
+## Instant Einstein
+##
+## 15 minutes at 40Hz in a 2 voice harmonic box.  Supposed to be a
+## significant frequency, involved in problem solving and possibly psi
+## activity.
+
+-SE
+
+ts: pink/80 360-40/6 440+40/6
+off: -
+
+00:00:00 off ->
+00:00:15 ts
+00:15:00 ts ->
+00:15:30 off
+

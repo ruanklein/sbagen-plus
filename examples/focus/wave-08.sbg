@@ -1,0 +1,19 @@
+##
+##    Please note: These tone-sets are based on data from a document
+##    that appeared on USENET, from someone who appears to have
+##    measured the frequencies used on some of the Monroe Institute
+##    tapes.  See "wave.txt" for more details.  Although the
+##    frequencies were measured, the relative amplitudes of the tones
+##    were not, so the results are not likely to be identical to the
+##    Monroe Institute tapes.  Also I believe that the Monroe
+##    Institute uses a guiding voice that leads the subject through
+##    the experience.
+##    
+##      Tape 2 - Problem Solving (Focus 12)
+##
+##      l/r 99.5/101, 202.7/204.2
+##
+
+ts: 100.25+1.5/10 203.45+1.5/10
+
+0:00 ts

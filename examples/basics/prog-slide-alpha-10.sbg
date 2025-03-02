@@ -1,0 +1,10 @@
+## From Jim Peters:
+##
+##      Half-hour "-p slide" session at 10Hz (alpha waves) mixed with river
+##	sounds.  See SBAGEN.TXT for a full explanation.  You can edit this 
+##	file and adjust the +10 to try other frequencies.  This works with 
+##	the same principles as the 'drop' sessions, only at 'right angles'.
+##
+
+-m river1.ogg -p slide 200+10/1 mix/100
+

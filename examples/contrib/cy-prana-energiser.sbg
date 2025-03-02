@@ -1,0 +1,47 @@
+## Chaven R Yenketswamy
+## 
+## Prana Energizer, 3 minutes
+##
+## I picked this up whilst trying to do a frequency scan to identify
+## optimum meditation states.  The scan was run on Brainwave Generator
+## using a background sound(Babbling Brook) and with frequencies
+## varying from (15 to 7 and 4 to 7).  The interval between 5.2 to 5.9
+## appeared to be very calm and gentle to me.  I've tried to reproduce
+## this interval in the following profile.  At first I couldn't hear
+## anything then realised that most of the waves could be cancelling
+## each other.  Well the energy has to go somewhere!  The sound you
+## hear at first is a low background whine something like a cosmic
+## frequency.  I therefore increased the carriers all proportionally
+## by 120% to make the profile more audible at lower audio levels.  It
+## appears this profile increases energy in the pranamayakosha
+## (i.e. raises ones vital energy).  Generally one needs to chant
+## Mantras for hrs to achieve such a result.  Well you can experience
+## symptoms like warmth in you feet which is typical of what i get
+## from Mantra chanting but in a shorter time.  May need some
+## confirmation and then optimisation.
+
+#Binaurals
+
+#(12.4, 5.2) -> (11.6,5.7) -> (11.2,5.9)
+
+#Carriers
+#(620,260) -> (580,285) -> (560,295)
+
+#Time
+#      (1.5 mins)   (1.5 mins)
+
+
+-SE
+
+ts1: 744+12.4/5.0 312+5.2/5.0
+ts2: 696+11.6/5.0 342+5.7/5.0
+ts3: 672+11.2/5.0 354+5.9/5.0
+
+off: -
+
+00:00:00 == off ->
+00:00:01 == ts1 ->
+00:01:30 == ts2 ->
+00:03:00 == ts3 ->
+00:03:01 == off ->
+

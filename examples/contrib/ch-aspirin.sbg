@@ -1,0 +1,30 @@
+## Posted by Crawford Hart to the sbagen-users mailing list on
+## Fri, 19 May 2006:
+##
+## Ultimate Aspirin
+##
+## Three frequencies said to promote endorphin release. 2.5 and 4 Hz
+## each in their turn pairing with 38Hz, with all three playing in the
+## middle of the cycle.  Carriers sound in octaves, separated enough to
+## avoid cross binaurals.
+
+-SE
+
+ts1: pink/80 100+2.5/3 200+4/0 400+38/3
+ts2: pink/80 100+2.5/0 200+4/3 400+38/3
+ts3: pink/80 100+2.5/3 200+4/3 400+38/3
+off: -
+
+
+00:00:00 off ->
+00:00:15 ts1
+00:03:30 ts1 ->
+00:04:00 ts2
+00:06:00 ts2 ->
+00:06:30 ts3
+00:08:00 ts3 ->
+00:08:30 ts2
+00:10:30 ts2 ->
+00:11:00 ts1
+00:12:00 ts1 ->
+00:12:30 off

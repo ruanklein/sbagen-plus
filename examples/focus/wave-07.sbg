@@ -1,0 +1,20 @@
+##
+##    Please note: These tone-sets are based on data from a document
+##    that appeared on USENET, from someone who appears to have
+##    measured the frequencies used on some of the Monroe Institute
+##    tapes.  See "wave.txt" for more details.  Although the
+##    frequencies were measured, the relative amplitudes of the tones
+##    were not, so the results are not likely to be identical to the
+##    Monroe Institute tapes.  Also I believe that the Monroe
+##    Institute uses a guiding voice that leads the subject through
+##    the experience.
+##    
+##      Tape 1 - Intro Focus 12
+##
+##      l/r 51/51.75, 98.75/101; Delta-Frq: 0.75 + 2.25 Hz
+##
+
+ts: 51.375+0.75/10 99.875+2.25/10
+
+0:00 ts
+

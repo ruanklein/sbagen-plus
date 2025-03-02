@@ -1,0 +1,9 @@
+## Posted by Takeshi Sone to the sbagen-users mailing list on Thu, 14
+## Jun 2007.  This is intended to have an effect similar to a part of
+## the Gateway Experience CD from the Monroe Institute.
+##
+## ts1-intro.sbg
+
+intro: spin:300+0.1/25 50.25-0.5/8 100-1.5/16 120/1.6 240/0.3
+
+0:00 intro

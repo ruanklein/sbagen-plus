@@ -1,0 +1,57 @@
+## From Jim Peters:
+##
+##      EXPERIMENTAL OVERNIGHT SEQUENCE
+##
+
+none: pink/40
+theta4: pink/40 150+4/30
+theta5: pink/40 150+5/30
+theta6: pink/40 150+6/30
+theta7: pink/40 150+7/30
+alpha8: pink/40 150+8/30
+alpha10: pink/40 150+10/30
+beta12: pink/40 150+12/30
+
+theta-bursts: {
+ +00:00 theta4
+ +00:10 none
+ +00:20 theta4
+ +00:30 none
+ +00:40 theta4
+ +00:50 none
+}
+
+down-then-up: {
+ +00:00 == theta6 ->
+ +00:10 == theta4
+ +00:20 == theta4 ->
+ +00:30 == theta6 ->
+ +00:40 == alpha8
+ +00:45 none
+}
+
+22:00 theta-bursts
+
+23:00 theta-bursts
+
+00:00 down-then-up
+
+01:00 theta-bursts
+
+02:00 down-then-up
+
+03:00 theta-bursts
+
+04:00 down-then-up
+
+05:00 down-then-up
+
+06:00 theta-bursts
+
+07:00 == theta6 ->
+07:10 == theta4
+07:20 == theta4 ->
+07:30 == theta6 ->
+07:40 == alpha8 ->
+08:00 == beta12
+08:20 none

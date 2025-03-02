@@ -1,0 +1,28 @@
+## From Jim Peters:
+##
+##       This is a quick test for the `spin' effect; note that you can
+##       listen to the spin effect at normal volume levels -- it
+##       doesn't need to be quiet like binaural beats.
+##
+
+-SE
+
+ts1: spin:200+12/80
+ts2: spin:200+5/80
+ts3: spin:200+4/80
+ts4: spin:200+3/80
+off: -
+
+0:00	== ts1 ->
+0:05	== ts2 ->
+0:10	== ts3 ->
+0:15	== ts4 
+0:20	off
+
+# NOW	== ts1 ->
+# +0:05	== ts1 ->
+# +0:10	== ts2 ->
+# +0:15	== ts3 ->
+# +0:20	== ts4 
+# +0:25	off
+

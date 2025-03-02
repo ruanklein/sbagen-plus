@@ -1,0 +1,41 @@
+## This is an experimental sequence downloaded from Ghostlab.org.
+## See here (open "Session Avril/Mai 2006"):
+##   http://www.ghostlab.org/rubrique.php3?id_rubrique=85
+##
+##      Bells II
+##
+##
+
+-SE
+
+ts1: bell+70/10
+ts2: bell+70/10
+ts3: bell+70/10
+ts4: bell+70/10
+ts5: bell+70/10
+ts6: bell+70/10  
+
+off: -
+
+23:59:59 == off ->
+
+0:00:00 == ts1 ->
+0:00:01 == ts2 ->
+0:00:02 == ts3 ->
+0:00:03 == ts4 ->
+0:00:04 == ts5 ->
+0:00:05 == ts6 ->
+0:00:06 == ts1 ->
+0:00:07 == ts2 ->
+0:00:08 == ts3 ->
+0:00:09 == ts4 ->
+0:00:10 == ts5 ->
+0:00:11 == ts6 ->
+0:00:12 == ts1 ->
+0:00:13 == ts2 ->
+0:00:14 == ts3 ->
+0:00:15 == ts4 ->
+0:00:16 == ts5 ->
+0:00:17 == ts6 ->
+
+0:00:40 == off

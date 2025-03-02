@@ -1,0 +1,18 @@
+## From Jim Peters:
+##
+##	EXPERIMENTAL OVERNIGHT SEQUENCE
+##
+##	This should be connecting to my other self, and my Truth 
+##	all night (!?).  You never know.
+##
+
+ts1: 100+0.92/30 200+4.2/30
+ts-wake: 100+0.92/15 200+7/30
+off: -
+
+22:00 ts1
+06:00 ts1 ->
+07:00 ts-wake ->
+08:00 off
+
+

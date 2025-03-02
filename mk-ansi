@@ -1,0 +1,16 @@
+:
+#
+#	This script can (hopefully) be used to compile on an ANSI-C compiler
+#
+
+# Adjust according to your system (if you don't have /dev/dsp, use
+# T_POSIX for file-only output)
+CC='cc -DT_LINUX -Wall -O3 -s -lm'
+
+# Strip out all C++-style comments, and `inline' specs
+sed -e 'sI//.*$II' -e 's/inline//' <sbagen.c >temp.c || exit 1
+
+# Compile
+$CC temp.c -o sbagen || exit 1
+rm temp.c
+

@@ -1,0 +1,16 @@
+## From Jim Peters:
+##
+##      EXPERIMENTAL OVERNIGHT SEQUENCE
+##      
+
+DT2: pink/40 100+1.5/25 200+4/25 
+DT3: pink/40 100+1.5/25 200+4/25 300+6/10
+DTA2: pink/40 100+1.5/25 200+4/5 300+10/10
+off: -
+
+22:00 DT2
+07:00 DT3 ->
+08:00 DTA2
+09:00 off
+
+

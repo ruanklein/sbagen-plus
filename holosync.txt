@@ -1,0 +1,181 @@
+[ See also the p-drop script for related material ]
+
+Subject: CenterPointe HoloSync entry level analysis
+
+I received the entry level package in the CenterPointe HoloSync
+programme a couple of weeks before Christmas.  I've been using it more
+or less every day since.
+
+I hadn't been tempted to analyse what frequencies they'd been using
+until just recently, and now I've got some results that might be
+interesting to others on this list.
+
+Basically, they are using plain binaurals with no fancy tricks at all,
+as far as I can make out.  It is simple enough that I don't even think
+they would object to me showing you.
+
+See this image for an overview of the beat frequencies in the
+entry-level "Dive", their basic 30-minute track to listen to each day:
+(The image is in my 'temp' directory, so I may delete it in a few
+months).
+
+  http://uazu.net/temp/dive-beats.gif
+
+So, this is very reassuring for the rest of us experimenters out here.
+I think what it shows is that you don't need anything too fancy -- the
+thing that matters more is the dedication to keep using it.
+
+I think the thing that makes their programme work is the structure and
+encouragement they give to people who have signed up, rather than
+purely the raw technology.  I mean, it's the technology that does the
+work, but it can't do anything for you unless you listen to it often
+enough (e.g. every day), and that is where the support system and
+structure comes in.  They apparently send out letters or packages
+every two weeks once you're on the programme.  There is loads of
+stuff, too much to handle (in 4-5 weeks I have received in total 5 CDs
+of talks, a couple of subliminal soundtracks, a 'bonus' CD, a book,
+and loads of 'special reports' etc).  This is what makes their
+programme tick -- the activity and constant reminders to stick with
+it.
+
+Anyway, apart from the binaural beats you can see in the image above,
+there are also other sounds on the tracks.  There is a constant
+background of falling rain, which seems to increase and decrease in
+strength at times.  There are also some kinds of bells (or 'crystal
+bowls').  These resonate, and this sound seems to go right through
+your brain sometimes.  At times I thought I heard sub-bass tones, but
+I haven't found those yet through analysis.
+
+I know they claim that it is the binaurals that are doing all the
+work, but the other sounds must have some effect, psychologically at
+least.  When I was doing analysis to find the binaurals, I noticed
+that the 'bell' sounds often modulated at delta-frequency kinds of
+rates, for instance (although not binaurally).
+
+You can hear an example of the whole thing on their MP3 demo on their
+website:
+
+  http://www.centerpointe.com/links.cfm?ad=27103
+
+Anyway, back to the binaurals.  Their idea is that deeper levels of
+their programme use lower and lower carrier frequencies.  You take
+this stage-by-stage, spending 4-6 months on each level, requiring 12
+levels and about 7 years for the whole thing.  By the end you can be
+entraining to carriers down as low as 4-8Hz, and using special
+headphones.  The lowest beat frequency they entrain to is 0.2Hz, I
+believe.  In much later levels they also do use some night-long
+entrainment.  (All the above information is my impression from the
+various materials sent, and so on, and I may have got some of the
+details wrong).
+
+Each level takes as long as it does in order to allow any emotional
+junk to clear as necessary.
+
+The entry-level "Awakening" that I have here uses carriers around
+140-145Hz.  The demo on the site uses carriers around 85Hz.  (Who
+knows what level that corresponds to!)
+
+Anyway, here are the frequencies, approximately, for the entry-level
+"Dive", with about 3 minutes on each, using SBaGen notation
+(i.e. centre carrier frequency, then beat frequency, so 100+2 means
+101Hz and 99Hz; a negative sign (100-2) would put the channels the
+other way around).
+
+  144.6+10
+  144.3+9
+  143.9+8
+  143.4+7
+  142.9+6
+  142.4+5
+  141.7+3.5 (x2)
+  141.3+2.6 (x2)
+
+These values are not too accurate -- probably +/- 0.1.  Also, I had to
+use a long filter (0.1Hz low-pass) to get these values, as the signal
+levels are quite unstable.  I don't know if this is intentional, or
+simply a side-effect of the rest of the audio going on.  If they put
+the whole thing through a dynamic compressor (the kind of compressor
+you use in a music studio), it could perhaps have had this effect.
+Also, one channel is often louder than the other.
+
+Maybe all these things are significant, and I'm missing some big
+secret in their technique, or maybe it is all accidental.  I really
+can't say.
+
+"Immersion", which is the 30-minute CD you use immediately after
+listening to "The Dive", once you have got used to "The Dive" by
+itself, just keeps you at a nice low beat frequency for the whole
+track:
+
+  141.4-2.5
+
+Apart from that there is more rain, varying, but no bells, if I
+remember rightly.  However, I'm often far away by this stage.  I think
+there may be some other sounds/tones around as well.
+
+Regarding levels for the binaurals, these vary between about 0.5 and
+0.2, using SBaGen notation again (i.e. between 0.5% and 0.2% of the
+amplitude of full-scale sine-waves), assuming I count the quieter of
+the two tones when they are unbalanced.  However, the tracks
+themselves aren't too loud (except for the resonances), so these might
+need adjusting.
+
+Incidentally, is it possible, do you think, that this left-right
+imbalance is intentional, to give some kind of bias towards one side
+of the brain?  I can't be sure myself.
+
+Now, looking at the MP3 Demo on their site.  This one is quite
+confused -- there is a loud tone one one side, and a much quieter one
+on the other.  The difference is large -- much larger than in the
+packaged level -- the signal in the left ear is 6x greater amplitude
+than the right.  There also seems to be significant cross-over,
+perhaps due to the joint-stereo encoding.  However, the binaural
+effect is still clearly present in the analysis:
+
+  http://uazu.net/temp/demo-beats.gif
+
+The tones go like this, about 2:30 each one, taking 18 minutes in
+total:
+
+  86.3-10.2
+  85.8-9.1
+  85.3-8.0
+  84.8-7.0
+  84.3-6.0
+  83.9-5.3
+  83.5-4.4
+
+So, there we are.  Never mind slides or long fades or anything like
+that, just plain tones seem to be doing the job, at least for the
+binaural part of the HoloSync package.  (Add to that: rain, resonating
+bells, "Silent Subliminals" in later levels, possible unidentified
+low-frequency content, huge amounts of support materials, and so on,
+and so on).
+
+So, that's interesting, I think.  I certainly don't mind recommending
+their programme now to other people, so long as those people are
+willing and able to pay the asking price.
+
+For myself, I don't have the cash for later levels, so I'll probably
+be experimenting with lowering carrier frequencies in my own way.  If
+cash were not an issue, though, I would be tempted to carry on with
+the programme.
+
+That's it for now --
+
+Jim
+
+P.S.  Incidentally, in writing this note and my web-site pages, I've
+been trying to send all the uncertain people with cash to spend and a
+need for support to CenterPointe, keeping the remaining hard-core
+experimenters to play with SBaGen.  I think this serves everyone's
+purposes, and avoids any collision of interest when I reverse-engineer
+their tracks, like I just did above.
+
+-- 
+ Jim Peters                  (_)/=\~/_(_)                 jim@uazu.net
+                          (_)  /=\  ~/_  (_)
+ Uazú                  (_)    /=\    ~/_    (_)                http://
+ B'ham, UK          (_) ____ /=\ ____ ~/_ ____ (_)            uazu.net
+
+ Design/view/compare digital filters with Fiview:   http://uazu.net/FI

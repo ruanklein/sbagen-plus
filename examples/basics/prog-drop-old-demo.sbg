@@ -1,0 +1,37 @@
+## From Jim Peters:
+##
+##      Half-hour demo 'drop' session at level 00d, returning to
+##      waking frequencies at the end.  
+##
+##	Note that drops can now be generated using the -p drop option --
+##	see the prog-drop-00d sequence file.
+##
+
+-SE -m river1.ogg
+
+off: -
+ts00: 205+10/1.0 mix/100
+ts01: 204.444+8.57244/1.0 mix/100
+ts02: 203.889+7.34867/1.0 mix/100
+ts03: 203.333+6.29961/1.0 mix/100
+ts04: 202.778+5.4003/1.0 mix/100
+ts05: 202.222+4.62937/1.0 mix/100
+ts06: 201.667+3.9685/1.0 mix/100
+ts07: 201.111+3.40198/1.0 mix/100
+ts08: 200.556+2.91632/1.0 mix/100
+ts09: 200+2.5/1.0 mix/100
+
+0:00:00 == off ->
+0:00:05 == ts00 ->
+0:03:00 == ts01 ->
+0:06:00 == ts02 ->
+0:09:00 == ts03 ->
+0:12:00 == ts04 ->
+0:15:00 == ts05 ->
+0:18:00 == ts06 ->
+0:21:00 == ts07 ->
+0:24:00 == ts08 ->
+0:27:00 == ts09 ->
+0:29:00 == ts09 ->
+0:29:40 == ts00 ->
+0:29:50 == off

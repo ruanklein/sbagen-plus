@@ -1,0 +1,20 @@
+##    
+##    Please note: These tone-sets are based on data from a document
+##    that appeared on USENET, from someone who appears to have
+##    measured the frequencies used on some of the Monroe Institute
+##    tapes.  See "focus.txt" for more details.  Although the
+##    frequencies were measured, the relative amplitudes of the tones
+##    were not, so the results are not likely to be exactly the same
+##    as the Monroe Institute tapes.  Also I believe that the Monroe
+##    Institute uses a guiding voice that leads the subject through
+##    the experience.  Despite that, these tone-sets (or Focus levels)
+##    may be useful for experimenters to base their own tone-sets on.
+##    
+##    F10  100[1.5], 200[4.0], 250[4.0], 300[4.0]
+##    
+##    "Brain awake, body asleep"
+##
+
+ts: 100+1.5/10 200+4.0/10 250+4.0/10 300+4.0/10
+
+0:00 ts

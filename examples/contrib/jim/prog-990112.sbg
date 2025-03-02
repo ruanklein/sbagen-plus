@@ -1,0 +1,30 @@
+## From Jim Peters:
+##
+##      EXPERIMENTAL OVERNIGHT SEQUENCE
+##
+##	Sleep waves - wavering around the 5-7 Hz mark for light 
+##	dreaming, hopefully, with 1.5Hz mixed in as well
+##	
+
+ts1: 100+1.5/30 200+5/15
+ts2: 100+1.5/30 200+7/15
+ts-wake: 100+1.5/15 200+8/30 150+4/15
+off: -
+
+sleep-wave-1: {
+ +0:00 ts1 ->
+ +0:30 ts2 ->
+}
+
+22:00 sleep-wave-1
+23:00 sleep-wave-1
+00:00 sleep-wave-1
+01:00 sleep-wave-1
+02:00 sleep-wave-1
+03:00 sleep-wave-1
+04:00 sleep-wave-1
+05:00 sleep-wave-1
+06:00 ts2 ->
+07:00 ts-wake ->
+08:00 off
+

@@ -1,0 +1,42 @@
+## Posted by Crawford Hart to the sbagen-users mailing list on
+## Fri, 19 May 2006:
+##
+## Schumann Cycle
+##
+## All seven Schumann Resonances each in their own harmonic box.
+
+# I've been exploring high beta ranges. This sequence is a good
+# example. It uses the 7 frequencies of the Schumann Resonance,
+# starting at 7.83 and ending at the same place. Each of the higher
+# frequencies holds for 5 minutes.
+
+-SE
+
+ts1: pink/80 125.2+7.83/4 109.62-7.83/4
+ts2: pink/80 112-14/3 126+14/3
+ts3: pink/80 160+20/3 120-20/3
+ts4: pink/80 208+26/3 156-26/3
+ts5: pink/80 264+33/3 198-33/3
+ts6: pink/80 312+39/3 234-39/3
+ts7: pink/80 125.2+7.83/0 109.62-7.83/0 360+45/3 270-45/3
+ts8: pink/80 125.2+7.83/3 109.62-7.83/3 360+45/0 270-45/0
+off: -
+
+00:00:00 off ->
+00:00:15 ts1 ->
+00:10:00 == ts1
+00:10:02 ts2 ->
+00:15:00 == ts2
+00:15:02 ts3 ->
+00:20:00 == ts3
+00:20:02 ts4 ->
+00:25:00 == ts4
+00:25:02 ts5 ->
+00:30:00 == ts5
+00:30:02 ts6 ->
+00:35:00 == ts6
+00:35:02 ts7 ->
+00:40:00 ts7 ->
+00:42:00 ts8
+00:45:00 ts8 ->
+00:45:30 off

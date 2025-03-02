@@ -1,0 +1,9 @@
+## Posted by Takeshi Sone to the sbagen-users mailing list on Thu, 14
+## Jun 2007.  This is intended to have an effect similar to a part of
+## the Gateway Experience CD from the Monroe Institute.
+##
+## ts1-homing.sbg
+
+homing: 475+16/9 599.5+17/3 599.5+63/3
+
+0:00 homing

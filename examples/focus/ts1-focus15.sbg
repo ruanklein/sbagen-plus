@@ -1,0 +1,9 @@
+## Posted by Takeshi Sone to the sbagen-users mailing list on Thu, 14
+## Jun 2007.  This is intended to have an effect similar to a part of
+## the Gateway Experience CD from the Monroe Institute.
+##
+## ts1-focus15.sbg
+
+focus15: spin:300+0.1/25 120/1.5 202.15-4.3/0.7 240/0.3 250/0.5 254.25-0.5/0.4 302.4-4.8/0.9 507.55+7.3/0.6 606.6-7.3/0.6 803.65-7.3/0.6
+
+0:00 focus15

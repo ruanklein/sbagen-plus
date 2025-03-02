@@ -1,0 +1,9 @@
+:
+
+CC='cc -DT_LINUX -Wall -O3 -s -lm -lossaudio'
+sed -e 's/\/dev\/dsp/\/dev\/audio/g' <sbagen.c >temp.c || exit 1
+sed -e 's/sys\/soundcard.h/soundcard.h/g' <temp.c >temp2.c || exit 1
+
+$CC temp2.c -o sbagen || exit 1
+rm -f temp.c temp2.c
+

@@ -1,0 +1,16 @@
+## This is an experimental sequence downloaded from Ghostlab.org.
+## See here (open "Session Avril/Mai 2006"):
+##   http://www.ghostlab.org/rubrique.php3?id_rubrique=85
+##
+##  Planets
+##
+
+-SE
+
+off: -
+
+t00:    272.2+7.83/100 332+7.83/100 421.3+7.83/100 289.4+7.83/100 367.5+7.83/100 442+7.83/100 295.7+7.83/100 414.7+7.83/100 422+7.83/100
+
+0:00:00 == off ->
+0:05:05 == t00 ->
+0:05:30 == off

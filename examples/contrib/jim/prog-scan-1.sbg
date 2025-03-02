@@ -1,0 +1,51 @@
+## From Jim Peters:
+##
+##	Scans the frequency range, gradually sliding up, then down, 
+##	independently on separate channels.  If anything is going to 
+##	happen, hopefully it will at some point in the time-period.
+##
+
+# Start at time 0:00
+-T 0:00
+
+ts1:	100+0.5/30	200+2/15	
+ts2:  	100+1/30	200+1/15	
+ts3:  	100+2/30	200+0.5/15	
+ts4:  	100+4/30	200+1/15	
+ts5:  	100+8/30	200+2/15	
+ts6:  	100+4/30	200+4/15	
+ts7:  	100+2/30	200+8/15	
+ts8:  	100+1/30	200+4/15	
+
+seq: {
+ +0:00 == ts5 ->
+ +0:02 == ts6 ->
+ +0:04 == ts7 ->
+ +0:06 == ts8 ->
+ +0:08 == ts1 ->
+ +0:10 == ts2 ->
+ +0:12 == ts3 ->
+ +0:14 == ts4 ->
+}
+
+seq80: {		# 1:20 mins
+ +0:00 seq
+ +0:16 seq
+ +0:32 seq
+ +0:48 seq
+ +1:04 seq
+}
+
+seq4h: {
+ +0:00 seq80
+ +1:20 seq80
+ +2:40 seq80
+}
+
+0:00 seq4h
+4:00 seq4h
+8:00 seq4h
+12:00 seq4h
+16:00 seq4h
+20:00 seq4h
+

@@ -1,0 +1,135 @@
+## From Jim Peters:
+##
+##	This is a version of prog-chakras-1, adjusted to fit better on one 
+##	side of a C90 tape (46:40 mins or so), using 2:55 mins between bells.
+##	The frequencies have also been altered to scan across the range in 
+##	which I am guessing the chakra lies.  This way, the chakra should 
+##	hopefully be stimulated at some point in the period, even if I have
+##	all the frequencies wrong.
+##
+##	This was designed for use for a Reiki meeting, in which 3 three people
+##	give healing to one person on the table, for four positions of 3 mins 
+##	each, after which everyone changes around (so everyone has a turn on the
+##	table).  This is why the sequence repeats every 12 mins (approx) - this
+##	is how long each person gets.
+##
+#	Original notes follow ...
+#
+#	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#
+#	** WARNING: This is very experimental.  I'm not at all sure that it is
+#	** possible to find frequencies for the Chakras, if they are the same for
+#	** each person, if they are always at the same frequency, or even if all
+#	** of the Chakras can be stimulated in this way.  I AM NOT AWARE ENOUGH
+#	** TO SAY IF THIS REALLY WORKS.  This is just an experiment.
+#
+#	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+#
+#	This cycles through a sequence of four pure-tuned chords, each
+#	of which takes 3 minutes, and is designed to stimulate
+#	different Chakras.  A bell indicates the change between
+#	chords.  Each cycle of chords takes 12 minutes, and this is
+#	repeated endlessly.
+#
+#	The frequencies for the Chakras, and the idea that the Chakras
+#	can indeed be stimulated in this way, using Theta frequencies,
+#	has come purely from my own experience and sensations that I
+#	have felt whilst listening to binaural beats at different
+#	frequencies.
+#
+#	I have no idea if the Chakras are at the same frequencies for
+#	other people, or even if I have really got the right
+#	frequencies for myself.
+#
+#	So take this as it comes.  You may need to experiment on
+#	yourself a bit to find what the individual frequencies do to
+#	you.
+#
+#	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+#
+# Carriers:
+#
+# Root  50  100  200  400  800
+# 3rd            250  500  1000
+# 5th       150  300  600  1200
+# m7th           350  700  1400
+#
+# 100 250 600        or 150 375 900
+# 100 300 500        or 150 450 750
+# 100 250 600        or 150 375 900
+# 100 200 300 500    or 150 300 450 750
+#
+# Chakras, approx frequencies:  (VERY APPROX, EXPERIMENTAL)
+#
+#             1 2 3 4		Sliding range	(11%, 88%)
+#  7th 7.50         X		 7.05->8.00  	(7.16, 7.89)
+#  6th 6.60       X		 6.10->7.05	(6.21, 6.94)
+#  5th 5.60     X		 5.25->6.10	(5.34, 6.01)
+#  4th 4.90   X     X		 4.55->5.25	(4.63, 5.17)
+#  3rd 4.20   X			 3.90->4.55	(3.97, 4.48)
+#  2nd 3.65     X		 3.50->3.90	(3.54, 3.86)
+#  1st 3.30       X X		 3.10->3.50	(3.14, 3.46)
+#      1.50   X   X		 
+#      0.92     X   X		 
+
+-SE
+
+# Set based on 50Hz fundamental
+#ts50-1: 100+1.50/30 250+4.20/12 600+4.90/5 bell+2050/20
+#ts50-2: 100+0.92/30 300+3.65/10 500+5.60/6 bell+2050/20
+#ts50-3: 100+1.50/30 250+3.30/12 600+6.60/5 bell+2050/20
+#ts50-4: 100+0.92/30 200+3.30/15 300+4.90/10 500+7.5/6 bell+2050/20
+
+# Sliding set
+ts50-1a: 100+1.50/0  250+4.55/0  600+4.55/0 bell+2050/20
+ts50-1b: 100+1.50/30 250+4.48/12 600+4.63/5
+ts50-1c: 100+1.50/30 250+3.97/12 600+5.17/5
+ts50-1d: 100+1.50/0  250+3.90/0  600+5.25/0
+ts50-2a: 100+0.92/0  300+3.90/0  500+5.25/0 bell+2050/20
+ts50-2b: 100+0.92/30 300+3.86/10 500+5.34/6
+ts50-2c: 100+0.92/30 300+3.54/10 500+6.01/6
+ts50-2d: 100+0.92/0  300+3.50/0  500+6.10/0
+ts50-3a: 100+1.50/0  250+3.50/0  600+6.10/0 bell+2050/20
+ts50-3b: 100+1.50/30 250+3.46/12 600+6.21/5
+ts50-3c: 100+1.50/30 250+3.14/12 600+6.94/5
+ts50-3d: 100+1.50/0  250+3.10/0  600+7.05/0
+ts50-4a: 100+0.92/0  200+3.10/0  300+4.55/0  500+7.05/0 bell+2050/20
+ts50-4b: 100+0.92/30 200+3.14/15 300+4.63/10 500+7.16/6
+ts50-4c: 100+0.92/30 200+3.46/15 300+5.17/10 500+7.89/6
+ts50-4d: 100+0.92/0  200+3.50/0  300+5.25/0  500+8.00/0
+
+# Misc
+off: -
+bell: bell+2050/20
+
+seq1: {		# 11:40 minutes (one cycle)
+ +0:00:00 == ts50-1a ->
+ +0:00:20 == ts50-1b ->
+ +0:02:35 == ts50-1c ->
+ +0:02:55 == ts50-1d ->
+ +0:02:55 == ts50-2a ->
+ +0:03:15 == ts50-2b ->
+ +0:05:30 == ts50-2c ->
+ +0:05:50 == ts50-2d ->
+ +0:05:50 == ts50-3a ->
+ +0:06:10 == ts50-3b ->
+ +0:08:25 == ts50-3c ->
+ +0:08:45 == ts50-3d ->
+ +0:08:45 == ts50-4a ->
+ +0:09:05 == ts50-4b ->
+ +0:11:20 == ts50-4c ->
+ +0:11:40 == ts50-4d ->
+}
+
+seq4: {		# 4x11:40 == 46:40 (four cycles)
+ +0:00:00 seq1
+ +0:11:40 seq1
+ +0:23:20 seq1
+ +0:35:00 seq1
+}
+
+0:00:00 off ->
+0:00:01 seq4
+0:46:41 bell ->
+0:46:51 off ->
+

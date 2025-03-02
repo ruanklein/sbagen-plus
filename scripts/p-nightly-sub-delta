@@ -1,0 +1,71 @@
+#!/usr/bin/perl
+
+# Enter wake-up hour as hh or hh:mm as first argument, if required
+
+$tar= 7;	# 7am
+if (@ARGV && ($ARGV[0] =~ /^(\d+):(\d+)$/)) {
+    shift;
+    $tar= $1 + $2 / 60;
+} elsif (@ARGV && ($ARGV[0] =~ /^(\d+)$/)) {
+    shift;
+    $tar= $1;
+}
+
+printf "Generating tones from 21:00 -> %02d:%02d\n", int($tar), int(60 * ($tar - int($tar)));
+
+my @ts= ();	# Tone-sets
+my @tl= ();	# Time-lines
+
+# Binaural range
+my $r0= 0.2;
+my $r1= 1.0;
+my $lr0= log $r0;
+my $lr1= log $r1;
+
+# Carrier range
+my $cr0= 60;
+my $cr1= 120;
+my $lcr0= log $cr0;
+my $lcr1= log $cr1;
+
+my $cnt= 0;
+while (1) {
+    $hh= -3 + int($cnt / 6);
+    $mm= 10 * ($cnt % 6);
+    last if ($hh + $mm/60 >= $tar);
+    $hh += 24 if ($hh < 0);
+    
+    $bb= exp($lr0 + ($lr1 - $lr0) * rand);
+    $cc= exp($lcr0 + ($lcr1 - $lcr0) * rand);
+    $dmy= rand;
+    push @ts, sprintf "t%02d: %.2f+%5.3f/40 %.2f+4.2/10\n", $cnt, $cc, $bb, $cc * 2;
+    push @tl, sprintf "%02d:%02d t%02d\n", $hh, $mm, $cnt;
+    push @tl, sprintf "%02d:%02d off\n", $hh, $mm+5;
+    $cnt++;
+}
+
+die unless open OUT, ">tmp-prog";
+print OUT <<END;
+#
+#       The idea of this sequence is to play random tones in the sub
+#       1.0Hz band all night, accompanied by a 4.2Hz tone to somehow
+#       provide a kind of link up to consciousness.
+#
+#	This file was AUTOMATICALLY GENERATED
+#
+
+END
+
+print OUT @ts;
+print OUT <<END;
+off: -
+wakeup: 100+0.92/20 200+4.2/20 400+7/40
+
+END
+print OUT @tl;
+printf OUT "%02d:%02d wakeup\n", int($tar), int(60 * ($tar - int($tar)));
+printf OUT "%02d:%02d off\n", 1 + int($tar), int(60 * ($tar - int($tar)));
+die unless close OUT;
+
+exec "sbagen tmp-prog";
+die;

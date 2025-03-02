@@ -1,0 +1,9 @@
+:
+
+# Use this script if /dev/dsp is not present on the target system.
+# Output is still possible to a file or pipe.
+
+CC='cc -DT_POSIX -Wall -O3 -s -lm'
+
+$CC sbagen.c -o sbagen || exit 1
+
