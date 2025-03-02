@@ -1,0 +1,8 @@
+#!/bin/sh
+
+# Hook to apply read-only permissions to sbagen.c file after merge
+echo "Applying read-only permissions to sbagen.c file..."
+chmod 444 sbagen.c
+echo "Permissions applied successfully!"
+
+exit 0 

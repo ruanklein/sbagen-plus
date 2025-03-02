@@ -145,3 +145,51 @@ SBaGen+ is distributed under the GPL license. See the [COPYING.txt](COPYING.txt)
 ## Credits
 
 Original SBaGen was developed by Jim Peters. See [SBaGen project](https://uazu.net/sbagen/).
+
+## Permission Configuration
+
+The `sbagen.c` file is maintained as a historical reference of the original code and is configured with read-only permissions (444). This is managed automatically through Git hooks:
+
+- `post-checkout`: Applies read-only permissions after checkout
+- `post-merge`: Applies read-only permissions after merge
+
+### Installing Git Hooks
+
+After cloning the repository, run the following command to install the Git hooks:
+
+```bash
+./git-hooks/install-hooks.sh
+```
+
+This will ensure that the `sbagen.c` file is automatically set to read-only after checkout and merge operations.
+
+### Modifying the Original File
+
+If you need to modify the `sbagen.c` file, you can temporarily change its permissions:
+
+```bash
+chmod +w sbagen.c  # Add write permission
+# Make your changes
+chmod 444 sbagen.c  # Restore read-only permission
+```
+
+## Compilation
+
+To compile SBaGen+ on macOS:
+
+```bash
+./mk-macos
+```
+
+To create a universal binary (ARM64 and x86_64):
+
+```bash
+./mk-macos -universal
+```
+
+## Features
+
+- Support for isochronic tones
+- Support for macOS on ARM64 and x86_64 architectures
+- Bug fixes in WAV file generation
+- Improvements in error handling
