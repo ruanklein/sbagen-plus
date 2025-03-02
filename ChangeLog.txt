@@ -8,6 +8,7 @@
 	Fixed bug with WAV file duration when using -W option with sequence files
 	Improved error handling for Carbon.h inclusion on modern macOS
 	Enhanced mk-macos script with -universal option for building universal binaries
+	Added validation for total amplitude to prevent audio distortion when exceeding 100%
 
 1.4.5   Update Mac OSX build to use Intel 32-bit
 

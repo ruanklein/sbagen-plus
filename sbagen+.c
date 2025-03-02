@@ -217,6 +217,7 @@ void setupOptC(char *spec) ;
 extern int out_rate, out_rate_def;
 void create_drop(int ac, char **av);
 void create_slide(int ac, char **av);
+void validateTotalAmplitude(Voice *voices, int numChannels, const char *line, int lineNum);
 
 #define ALLOC_ARR(cnt, type) ((type*)Alloc((cnt) * sizeof(type)))
 #define uint unsigned int
@@ -2794,6 +2795,10 @@ readNameDef() {
     }
     badSeq();
   }
+  
+  // Validate total amplitude before adding to the list
+  validateTotalAmplitude(nd->vv, N_CH, lin_copy, in_lin);
+  
   nd->nxt= nlist; nlist= nd;
 }  
 
@@ -3283,3 +3288,21 @@ create_slide(int ac, char **av) {
 
 
 // END //
+
+// Function to validate the total amplitude of voices
+void validateTotalAmplitude(Voice *voices, int numChannels, const char *line, int lineNum) {
+  double totalAmplitude = 0.0;
+  
+  for (int ch = 0; ch < numChannels; ch++) {
+    if (voices[ch].typ != 0) { // If voice is active
+      // Convert from internal amplitude format back to percentage
+      double ampPercentage = voices[ch].amp / 40.96;
+      totalAmplitude += ampPercentage;
+    }
+  }
+  
+  if (totalAmplitude > 100.0) {
+    error("Total amplitude exceeds 100%% (%.2f%%) at line %d:\n  %s\nPlease reduce amplitudes to prevent audio distortion.", 
+          totalAmplitude, lineNum, line);
+  }
+}
