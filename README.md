@@ -14,6 +14,8 @@ SBaGen+ is a fork of the original SBaGen (Sequenced Binaural Beat Generator) cre
 - Mixing with external audio files (MP3/OGG, when compiled with support)
 - Cross-platform (macOS, Windows, Linux)
 - Support for Apple Silicon (ARM64) and Intel (x86_64)
+- Bug fixes in WAV file generation
+- Improvements in error handling
 
 ## Isochronic Tones
 
@@ -23,7 +25,7 @@ Version 1.5.0 adds support for isochronic tones, which use amplitude modulation 
 - May be more effective for some people
 - Are defined in the format `<carrier>@<pulse>/<amplitude>`
 
-## Installation
+## Compilation
 
 ### macOS (including Apple Silicon)
 
@@ -38,6 +40,9 @@ Summary:
 
 # Compilation for Intel x86_64
 ./mk-macos -x86
+
+# Universal binary (ARM64 and x86_64)
+./mk-macos -universal
 ```
 
 #### Compiling with MP3/OGG Support
@@ -138,14 +143,6 @@ Here is a brief overview of the important files in this project:
 
 For detailed information on all features, see the [SBAGEN+.txt](SBAGEN+.txt) file.
 
-## License
-
-SBaGen+ is distributed under the GPL license. See the [COPYING.txt](COPYING.txt) file for details.
-
-## Credits
-
-Original SBaGen was developed by Jim Peters. See [SBaGen project](https://uazu.net/sbagen/).
-
 ## Permission Configuration
 
 The `sbagen.c` file is maintained as a historical reference of the original code and is configured with read-only permissions (444). This is managed automatically through Git hooks:
@@ -173,23 +170,10 @@ chmod +w sbagen.c  # Add write permission
 chmod 444 sbagen.c  # Restore read-only permission
 ```
 
-## Compilation
+## License
 
-To compile SBaGen+ on macOS:
+SBaGen+ is distributed under the GPL license. See the [COPYING.txt](COPYING.txt) file for details.
 
-```bash
-./mk-macos
-```
+## Credits
 
-To create a universal binary (ARM64 and x86_64):
-
-```bash
-./mk-macos -universal
-```
-
-## Features
-
-- Support for isochronic tones
-- Support for macOS on ARM64 and x86_64 architectures
-- Bug fixes in WAV file generation
-- Improvements in error handling
+Original SBaGen was developed by Jim Peters. See [SBaGen project](https://uazu.net/sbagen/).
