@@ -5,7 +5,7 @@ SBaGen+ is a fork of the original SBaGen (Sequenced Binaural Beat Generator).
 This fork adds new features while maintaining compatibility with the original.
 
 This utility, released under the GNU GPL v2 (see the file
-COPYING), generates pink noise, binaural beats, and isochronic tones through your
+COPYING), generates white/pink/brown noise, binaural beats, and isochronic tones through your
 soundcard in real-time according to a 24-hour programmed sequence read
 from a file. It can also be used to play a sequence on demand, rather
 than according to the clock. MP3 or OGG soundtracks may also be mixed
