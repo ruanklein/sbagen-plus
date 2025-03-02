@@ -1,4 +1,5 @@
-1.5.0   Added support for isochronic tones
+1.5.0   Added support for white noise and brown noise types
+	Added support for isochronic tones
 	Updated macOS build scripts to support Apple Silicon (ARM64)
 	Renamed macOS scripts from macosx to macos
 	Added support for building universal binaries for macOS

@@ -1217,6 +1217,8 @@ Here are the different types:
 
   -                             # Channel not in use
   pink/<amp>                    # Pink noise
+  white/<amp>                   # White noise
+  brown/<amp>                   # Brown noise
   mix/<amp>                     # Soundtrack input mix
   <carrier><sign><freq>/<amp>   # Binaural tones
   <carrier>/<amp>		# Sine-wave (a binaural tone with 0Hz beat)
@@ -1256,6 +1258,17 @@ as with other tone types. For example, 300@10/20 generates a 300Hz tone
 that pulses at 10Hz with an amplitude of 20%. Unlike binaural beats, 
 isochronic tones can be effective even when not using headphones, as they
 don't rely on the brain combining two slightly different frequencies.
+
+The white noise generates a random signal with equal energy at all frequencies.
+It can be used for masking background sounds or as a meditation aid. The
+amplitude <amp> controls the volume level. For example, white/10 generates
+white noise at 10% amplitude.
+
+The brown noise (also known as Brownian noise) has more energy in the lower
+frequencies, creating a deeper, more bass-heavy sound than pink noise. It's
+often described as similar to the sound of a waterfall or heavy rainfall.
+The amplitude <amp> controls the volume level. For example, brown/15 generates
+brown noise at 15% amplitude.
 
 The bell sound can be used to give cues and signals during the
 sequence.  A simple 'ping' is generated at the given frequency at

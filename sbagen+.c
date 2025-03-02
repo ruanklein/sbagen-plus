@@ -327,7 +327,7 @@ usage() {
 
 struct Voice {
   int typ;			// Voice type: 0 off, 1 binaural, 2 pink noise, 3 bell, 4 spin,
-   				//   5 mix, 6 mixspin, 7 mixbeat, 8 isochronic, -1 to -100 wave00 to wave99
+   				//   5 mix, 6 mixspin, 7 mixbeat, 8 isochronic, 9 white noise, 10 brown noise, -1 to -100 wave00 to wave99
   double amp;			// Amplitude level (0-4096 for 0-100%)
   double carr;			// Carrier freq (for binaural/bell/isochronic), width (for spin)
   double res;			// Resonance freq (-ve or +ve) (for binaural/spin/isochronic)
@@ -336,7 +336,7 @@ struct Voice {
 struct Channel {
   Voice v;			// Current voice setting (updated from current period)
   int typ;			// Current type: 0 off, 1 binaural, 2 pink noise, 3 bell, 4 spin,
-   				//   5 mix, 6 mixspin, 7 mixbeat, 8 isochronic, -1 to -100 wave00 to wave99
+   				//   5 mix, 6 mixspin, 7 mixbeat, 8 isochronic, 9 white noise, 10 brown noise, -1 to -100 wave00 to wave99
   int amp, amp2;		// Current state, according to current type
   int inc1, off1;		//  ::  (for binaural tones, offset + increment into sine 
   int inc2, off2;		//  ::   table * 65536)
@@ -1111,6 +1111,14 @@ sprintVoice(char *p, Voice *vp, Voice *dup) {
       if (dup && vp->amp == dup->amp)
 	return sprintf(p, "  ::");
       return sprintf(p, " pink/%.2f", AMP_AD(vp->amp));
+    case 9:
+      if (dup && vp->amp == dup->amp)
+	return sprintf(p, "  ::");
+      return sprintf(p, " white/%.2f", AMP_AD(vp->amp));
+    case 10:
+      if (dup && vp->amp == dup->amp)
+	return sprintf(p, "  ::");
+      return sprintf(p, " brown/%.2f", AMP_AD(vp->amp));
     case 3:
       if (dup && vp->carr == dup->carr && vp->amp == dup->amp)
 	return sprintf(p, "  ::");
@@ -1297,6 +1305,39 @@ noise2() {
   return noise_buf[noise_off++]= (tot >> NS_ADJ);
 }
 
+//
+//	Generate next sample for white noise, with same
+//	scaling as the sin_table[].
+//
+static inline int 
+white_noise() {
+  // White noise is simply a random value without filtering
+  return ((seed= seed * RAND_MULT % 131074) - 65535) * (ST_AMP / 65535);
+}
+
+//
+//	Generate next sample for brown noise, with same
+//	scaling as the sin_table[].
+//	Brown noise has more energy in lower frequencies,
+//	implemented as a random walk (integration of white noise)
+//
+static int brown_last = 0;
+static inline int 
+brown_noise() {
+  // Generate a random value
+  int random = ((seed= seed * RAND_MULT % 131074) - 65535);
+  
+  // Integrate the random value with a decay factor to avoid overflow
+  brown_last = (brown_last + (random / 16)) * 0.9;
+  
+  // Limit the value to avoid overflow
+  if (brown_last > 65535) brown_last = 65535;
+  if (brown_last < -65535) brown_last = -65535;
+  
+  // Scale to the same level as the sin_table
+  return brown_last * (ST_AMP / 65535);
+}
+
 //	//
 //	//	Generate next sample for simulated pink noise, scaled the same
 //	//	as the sin_table[].  This version uses a library random number
@@ -1461,6 +1502,16 @@ outChunk() {
 	  break;
        case 2:	// Pink noise
 	  val= ns * ch->amp;
+	  tot1 += val;
+	  tot2 += val;
+	  break;
+       case 9:	// White noise
+	  val= white_noise() * ch->amp;
+	  tot1 += val;
+	  tot2 += val;
+	  break;
+       case 10:	// Brown noise
+	  val= brown_noise() * ch->amp;
 	  tot1 += val;
 	  tot2 += val;
 	  break;
@@ -2742,6 +2793,16 @@ readNameDef() {
        nd->vv[ch].amp= AMP_DA(amp);
        continue;
     }
+    if (1 == sscanf(p, "white/%lf %c", &amp, &dmy)) {
+       nd->vv[ch].typ= 9;
+       nd->vv[ch].amp= AMP_DA(amp);
+       continue;
+    }
+    if (1 == sscanf(p, "brown/%lf %c", &amp, &dmy)) {
+       nd->vv[ch].typ= 10;
+       nd->vv[ch].amp= AMP_DA(amp);
+       continue;
+    }
     if (2 == sscanf(p, "bell%lf/%lf %c", &carr, &amp, &dmy)) {
        nd->vv[ch].typ= 3;
        nd->vv[ch].carr= carr;
@@ -3286,9 +3347,6 @@ create_slide(int ac, char **av) {
    correctPeriods();
 }   
 
-
-// END //
-
 // Function to validate the total amplitude of voices
 void validateTotalAmplitude(Voice *voices, int numChannels, const char *line, int lineNum) {
   double totalAmplitude = 0.0;
@@ -3306,3 +3364,5 @@ void validateTotalAmplitude(Voice *voices, int numChannels, const char *line, in
           totalAmplitude, lineNum, line);
   }
 }
+
+// END //
