@@ -4,6 +4,7 @@ SBaGen+ -- Sequenced Brainwave Generator
 SBaGen+ is a fork of the original SBaGen (Sequenced Binaural Beat Generator).
 This fork adds new features while maintaining compatibility with the original.
 
+From the original Author:
 This utility, released under the GNU GPL v2 (see the file
 COPYING), generates white/pink/brown noise, binaural beats, and isochronic tones through your
 soundcard in real-time according to a 24-hour programmed sequence read
@@ -40,33 +41,29 @@ Contents of this document:
 0: Legal notice
 
 1: Theory
+1.1: Isochronic Tones
 
-2: Installation
-2.1: Installation for Windows users
-2.2: Installation for macOS users
-2.3: Installation for Linux and other UNIX users  
+2: Invocation
+2.1: Outputting to a pipe or a file
+2.2: Mixing in background sounds
+2.3: Standard background sounds
+2.4: Creating loopable OGGs
+2.4.1: Using ReplayGain with OGG files
+2.5: Compensating for headphone low frequency roll-off
+2.6: The 'drop' sequences
+2.6.1: More detailed notes on -p drop options
+2.6.2: Adjusting the length of a -p drop session
+2.7: The 'slide' sequences
 
-3: Invocation
-3.1: Outputting to a pipe or a file
-3.2: Mixing in background sounds
-3.3: Standard background sounds
-3.4: Creating loopable OGGs
-3.4.1: Using ReplayGain with OGG files
-3.5: Compensating for headphone low frequency roll-off
-3.6: The 'drop' sequences
-3.6.1: More detailed notes on -p drop options
-3.6.2: Adjusting the length of a -p drop session
-3.7: The 'slide' sequences
+3: Writing sequence files
+3.1: The sequence-file format
+3.1.1: Command-line options within the sequence file
+3.1.2: Tone-set definition lines
+3.1.3: Time-sequence lines
+3.1.4: Block definition lines
+3.2: Multiple sequence files
 
-4: Writing sequence files
-4.1: The sequence-file format
-4.1.1: Command-line options within the sequence file
-4.1.2: Tone-set definition lines
-4.1.3: Time-sequence lines
-4.1.4: Block definition lines
-4.2: Multiple sequence files
-
-5: Predefined sequences
+4: Predefined sequences
 
 5: Conclusion
 
@@ -249,206 +246,7 @@ some of his experiences on Monroe Institute workshops in his first
 book "Travelling with Power", although I've not read it (yet).
 
 
-2: Installation
----------------
-
-For Windows and macOS users there are pre-build binaries available
-from my site.  Linux users must build from source, but I include the
-MP3 and Ogg libraries so that this just means running a script.  For
-other UNIX users, there are some scripts, and it should be easy enough
-to build, but you're somewhat on your own.  If you get in trouble, I
-will help if I can, though -- E-mail me.
-
-See my site for a FAQ and other related links:
-  
-  http://uazu.net/sbagen/
-
-
-2.1: Installation for Windows users
------------------------------------
-
-Since version 1.4.0, I am using InnoSetup for distributing SBaGen,
-which gives Windows users a proper installer.  This should make things
-very straightforward.  You can still access SBaGen from the DOS prompt
-directly if you like (see below), but now you can also do most things
-from the desktop:
-
-- To run a sequence, double-click on the icon.  This brings up a DOS
-  window in which SBaGen runs.  To stop SBaGen playing, press Ctrl-C.
-
-- To edit a sequence, right-click and select "Edit sequence", which
-  will bring up NotePad, or your default editor.
-
-- To write a WAV file from a sequence instead of playing it,
-  right-click and select "Write to WAV".  A file 'out.wav' will be
-  generated.  (Note that this only works well with sequences that have
-  a fixed length, otherwise they get a default length of one hour.)
-  You can also do this by adding "-Wo out.wav" near the top of a SBG
-  file and double-clicking on it.
-
-If you need more features than this, you may still need to use the DOS
-prompt, but hopefully you won't, because all the important options can
-be included in the SBG file now.
-
-
-2.1.1: Installation of pre-1.4.0 versions for Windows users
------------------------------------------------------------
-
-Download the ZIP archive and unpack it somewhere suitable.  Unpacking
-it in C:\ seems a good idea to me, because that way it is easier to
-find from the DOS prompt.  Alternatively you could unpack it somewhere
-else and/or move the directory to some other location you prefer.
-
-To set the utility up to run without using DOS, double-click on one of
-the SBG files (for example any of the prog-* files).  Windows will
-prompt you for the application to use for SBG files, and then use
-"Other" or "Locate" to select "SBAGEN.EXE" from wherever you unpacked
-it.  You can now run SBG files by double-clicking on them.
-
-This is enough to let you try out most of the supplied files (prog-*
-and ts-*).
-
-However, if you want to get full control over the utility, you need to
-use the DOS prompt.  Start up the MS-DOS prompt, and CD to the
-directory in which all the files have been unpacked.  For example
-(assuming version 1.0.10, and using '>>' to indicate the shell
-prompt):
-
->> CD C:\SBAGEN-1.0.10
->> DIR/P
-
-This should show a lot of files, including SBAGEN.EXE.  If you are in
-the correct directory, typing 'sbagen' should now give a welcome
-message and a summary of the command's usage.  If so, everything is
-ready.
-
->> sbagen
-
-Thanks to the help of Dirk Cloete, Windows users now have a full set
-of tone-set batch files to experiment with, equivalent to the t-*
-scripts on UNIX and macOS.  These also appear in the same directory
-(*.bat), along with the sequence files (prog-*) and other bits and
-pieces.
-
-
-2.2: Installation for macOS users
------------------------------------
-
-SBaGen+ for macOS can be compiled from source. The build scripts support both 
-Intel (x86_64) and Apple Silicon (ARM64) processors:
-
-1. Basic compilation (without MP3/OGG support):
-   ```
-   ./mk-macos
-   ```
-
-2. Compilation for Intel x86_64:
-   ```
-   ./mk-macos -x86
-   ```
-
-3. Compilation with MP3 and OGG support:
-   
-   First, you need to compile the required libraries:
-   
-   For MP3 support (libmad):
-   ```
-   # Download the libmad source code
-   git clone https://github.com/underbit/mad.git libmad-0.15.1b
-   
-   # Make the script executable
-   chmod +x mk-libmad-macos
-   
-   # For ARM64 (Apple Silicon)
-   ./mk-libmad-macos
-   
-   # For Intel x86_64
-   ./mk-libmad-macos -x86
-   ```
-   
-   For OGG support (Tremor):
-   ```
-   # Clone the Tremor repository
-   git clone https://gitlab.xiph.org/xiph/tremor.git
-   
-   # Make the script executable
-   chmod +x mk-tremor-macos
-   
-   # For ARM64 (Apple Silicon)
-   ./mk-tremor-macos
-   
-   # For Intel x86_64
-   ./mk-tremor-macos -x86
-   ```
-   
-   Then compile SBaGen+ with the libraries:
-   ```
-   # For ARM64 with MP3 and OGG support
-   ./mk-macos -mp3 -ogg
-   
-   # For Intel x86_64 with MP3 and OGG support
-   ./mk-macos -x86 -mp3 -ogg
-   
-   # For ARM64 with only MP3 support
-   ./mk-macos -mp3
-   
-   # For ARM64 with only OGG support
-   ./mk-macos -ogg
-   ```
-
-The compiled binary will be created in the current directory as `sbagen+`.
-
-For those new to the UNIX command-line, here are a few basic commands
-you will need.  I can't give you more than a taste here -- you'll need
-to read up on this elsewhere if you need to know more.
-
-
-2.3: Installation for Linux and other UNIX users  
-------------------------------------------------
-
-Download the TGZ and unpack it somewhere.  On Linux, the executable
-can be built using the little 'mk' script:
-
->> ./mk
-
-This script assumes GCC on Linux.  If you're using something else,
-please check the script and adjust it as necessary.  There is also a
-script 'mk-ansi' which strips out non-ANSI C stuff before compiling,
-which may work if you don't have GCC.  A user has provided 'mk-netbsd'
-to build on NetBSD.  The other 'mk-*' scripts cover other
-possibilities and other platforms -- see the comments in the files for
-more details.
-
-If you want Ogg and/or MP3 support, and the pre-built .a files aren't
-any good to you, you'll need to rebuild them yourself.  See
-'mk-tremor-linux' and 'mk-libmad-linux', which include some
-instructions at the top of those files.  On UNIX in general this
-should be fairly straightforward -- just be happy that you're not
-trying to build this on Windows!
-
-On UNIX systems the code handles output to a stereo /dev/dsp device
-using either 16-bit signed or 8-bit unsigned samples, or to standard
-output, or to a WAV or raw file.
-
-Regarding minimum processor requirements, a Pentium-75 can easily
-handle 8 channels of 16-bit 44100Hz binaural beat output.  OGG or MP3
-decoding obviously requires more processor power, though.  All the
-most time-critical parts use integers only (including Ogg and MP3
-decoding), so the code should be relatively easily portable to ARM or
-whatever, although I haven't tried this.
-
-Note that the 'nice' or 'renice' commands may be used as root to give
-sbagen a greater priority if output gets choppy on low-spec machines.
-In any case, you may want to permanently install the 'sbagen' binary
-by copying it to /usr/local/bin/.  It needs no support files to run.
-
-Once built, you can test the utility quickly by using any of the *.sbg
-files as an argument to sbagen.  There are also some shell-scripts
-(t-*) that take you through certain sets of tone-sets, and some
-perl-scripts (p-*) which generate and run sequences.
-
-
-3: Invocation (all platforms)
+2: Invocation
 -----------------------------
 
 One quick thing to note before we start -- remember to play these
@@ -601,7 +399,7 @@ of 7:30 and runs it.  Naturally you won't hear anything unless it is
 already night time.
 
 
-3.1: Outputting to a pipe or a file
+2.1: Outputting to a pipe or a file
 -----------------------------------
 
 You don't need to read this section if you are only interested in
@@ -674,7 +472,7 @@ for slowly changing tone-sets, but you may wish to adjust this value
 according to your needs.
 
 
-3.2: Mixing in background sounds
+2.2: Mixing in background sounds
 --------------------------------
 
 There are two options to allow you to mix in a background soundtrack
@@ -724,7 +522,7 @@ Piping data in like this has the advantage of not requiring a huge WAV
 file to be stored on your disk.
 
 
-3.3: Standard background sounds
+2.3: Standard background sounds
 -------------------------------
 
 SBaGen comes with two standard OGG files that loop themselves
@@ -757,7 +555,7 @@ However, possibly other licensing arrangements could be arranged if
 you contact me.
 
 
-3.4: Creating loopable OGGs
+2.4: Creating loopable OGGs
 ---------------------------
 
 This section will be of interest only to those people who want to
@@ -816,7 +614,7 @@ The initial part is read in all cases, and then #0, #1 and #2 can be
 used to select different cross-fade times.
 
 
-3.4.1: Using ReplayGain with OGG files
+2.4.1: Using ReplayGain with OGG files
 --------------------------------------
 
 SBaGen supports ReplayGain tags in the OGG header.  What this means is
@@ -830,7 +628,7 @@ for another in their sequences.  (Thanks to Dylan Carlson for
 suggesting this.)
 
 
-3.5: Compensating for headphone low frequency roll-off
+2.5: Compensating for headphone low frequency roll-off
 ------------------------------------------------------
 
 For those who are interested in working with especially low carrier
@@ -896,7 +694,7 @@ please remove or comment out any -c options in any sequences you send
 to other people.
 
 
-3.6: The 'drop' sequences
+2.6: The 'drop' sequences
 -------------------------
 
 This is a series of sequences that are designed to be used fairly
@@ -969,7 +767,7 @@ with won't work, because you won't be able to entrain that low without
 lots of practice.
 
 
-3.6.1: More detailed notes on -p drop options
+2.6.1: More detailed notes on -p drop options
 ---------------------------------------------
 
 Usage: 
@@ -1038,7 +836,7 @@ other sounds to the beats.  Anything you add here will automatically
 be faded in and out at the start and end of the session.
 
 
-3.6.2: Adjusting the length of a -p drop session
+2.6.2: Adjusting the length of a -p drop session
 ------------------------------------------------
 
 An optional specification may be added after -p drop and before the
@@ -1064,7 +862,7 @@ steps.  Also note that you must include the lengths for all three
 parts even if you are not using '+' or '^' for a hold or wake-up part.
 
 
-3.7: The 'slide' sequences
+2.7: The 'slide' sequences
 --------------------------
 
 Usage:
@@ -1103,7 +901,7 @@ experiment with the -c amplitude-compensation option (see the section
 above).
 
 
-4: Writing sequence files
+3: Writing sequence files
 -------------------------
 
 If you decide you would like to create your own sequences, then you
@@ -1119,7 +917,7 @@ any simple text editor).  Mac users will have to use an editor that
 respects UNIX line-endings (e.g. 'emacs', BBEdit, or whatever).
 
 
-4.1: The sequence-file format
+3.1: The sequence-file format
 -----------------------------
 
 Within the sequence file, blank lines, and any leading/trailing white
@@ -1143,7 +941,7 @@ These are described below.  Take a look at the example sequence-files
 (prog-*).  They are useful to see how all these work together.
 
 
-4.1.1: Command-line options within the sequence file
+3.1.1: Command-line options within the sequence file
 ----------------------------------------------------
 
 All of the command-line options reported by 'sbagen -h' can also be
@@ -1190,7 +988,7 @@ try this:
   -L 0:30 -T 14:00
 
 
-4.1.2: Tone-set definition lines
+3.1.2: Tone-set definition lines
 --------------------------------
 
 The purpose of this is to describe a set of binaural tones, pink noise
@@ -1289,7 +1087,7 @@ Once a tone-set has been defined, it may be used in time-sequence
 lines.
 
 
-4.1.3: Time-sequence lines
+3.1.3: Time-sequence lines
 --------------------------
 
 Whereas the tone-set lines describe the different sets of tones that
@@ -1320,7 +1118,7 @@ More complex examples give time relative to the time that sbagen
 started running (NOW, or NOW+04:00), or relative to the last absolute
 time mentioned (+00:03:30).  They also use different varieties of
 fade-in or fade-out (== or <>), and use '->' to slide to the next
-time-sequence.  You can also name blocks (see 4.1.4) instead of
+time-sequence.  You can also name blocks (see 3.1.4) instead of
 tone-sets.  These more complex options are described below.
 
 Take a simple example such as this one:
@@ -1407,7 +1205,7 @@ Any number of relative times may also be used with an absolute time,
 to modify it, for example 'NOW+04:00+01:12:04' or '12:00+00:00:20'.
 
 
-4.1.4: Block definition lines
+3.1.4: Block definition lines
 -----------------------------
 
 This introduces a set of lines, which can then be later used like a
@@ -1486,7 +1284,7 @@ By putting little sequences into blocks like this, it makes it easier
 to later build up a sequence from fixed parts.
 
 
-4.2: Multiple sequence files
+3.2: Multiple sequence files
 ----------------------------
 
 If multiple files are specified on the command-line, then they are all
@@ -1496,6 +1294,27 @@ themselves.
 
 Note that putting two different full sequences together typically
 won't work unless they were designed to work together.
+
+
+4: Predefined sequences
+----------------------
+
+SBaGen+ comes with several predefined sequences that you can use without having to create your own sequence files. These are accessed using the -p option followed by the sequence name and any required parameters.
+
+The most commonly used predefined sequences are:
+
+1. **drop** - A sequence that gradually drops from a higher frequency to a lower one, useful for meditation and relaxation.
+   Example: `sbagen -p drop 00ds+`
+
+2. **slide** - Similar to drop but with a smoother transition between frequencies.
+   Example: `sbagen -p slide 00ds+`
+
+These predefined sequences accept various parameters to customize their behavior. See sections 2.6 and 2.7 for detailed information on the parameters and options available for these sequences.
+
+You can also mix these predefined sequences with background sounds:
+   Example: `sbagen -m river1.ogg -p drop 00ds+ mix/99`
+
+The program also includes several example sequence files (prog-*.sbg) and tone-set files (ts-*.sbg) that you can use as templates for creating your own sequences.
 
 
 5: Conclusion
