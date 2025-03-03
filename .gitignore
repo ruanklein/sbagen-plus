@@ -1,2 +1,9 @@
-sbagen+
-sbagen.exe
+.DS_Store
+build
+libs/*.a
+sbagen+-*
+*.exe
+*.sbg
+*.wav
+*.mp3
+*.ogg

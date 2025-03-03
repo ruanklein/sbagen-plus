@@ -6,137 +6,122 @@ SBaGen+ is a command-line tool for generating binaural beats and isochronic tone
 
 SBaGen+ is a fork of the original SBaGen (Sequenced Binaural Beat Generator) created by Jim Peters. The original project was classified as "bitrotted" by its author, and this fork aims to continue its development by adding new features while maintaining compatibility with the original.
 
-## Features
+SBaGen+ is not intended to be a significantly different software from the original SBaGen. Instead, it's a project dedicated to keeping SBaGen alive and functional. The primary goal is to ensure that SBaGen continues to run on modern operating systems, with occasional additions of features that users have requested in the past.
 
-- Binaural beat generation (requires headphones)
+The name was changed from "Sequenced Binaural Beat Generator" to "Sequenced Brainwave Generator" to better reflect the expanded capabilities of SBaGen+. With the addition of isochronic tones, which are not binaural beats, the original name would be too limiting.
+
+## Features and Bug Fixes
+
+- All features of original SBaGen
 - Isochronic tone generation (works with or without headphones)
-- Support for programmable sequences of tones
-- Mixing with external audio files (MP3/OGG, when compiled with support)
-- Cross-platform (macOS, Windows, Linux)
+- White noise and brown noise generation
 - Support for Apple Silicon (ARM64) and Intel (x86_64)
+- Fixed bug with WAV file duration when using -W option with sequence files
+- Added validation for total amplitude to prevent audio distortion when exceeding 100%
 
-## Isochronic Tones
+## Compilation
 
-Version 1.5.0 adds support for isochronic tones, which use amplitude modulation of a single frequency to create a pulsing effect. Unlike binaural beats, isochronic tones:
+SBaGen+ can be compiled for macOS, Linux and Windows. The build process is divided into two steps:
 
-- Do not require headphones
-- May be more effective for some people
-- Are defined in the format `<carrier>@<pulse>/<amplitude>`
+1. **Building the libraries**: This step is only necessary if you want MP3 and OGG support
+2. **Building the main program**: This step compiles SBaGen+ using the libraries built in the previous step
 
-## Installation
+### Build Scripts Structure
 
-### macOS (including Apple Silicon)
+- **Library build scripts**:
 
-Summary:
+  - `macos-build-libs.sh`: Builds libraries for macOS (universal binary - ARM64 + x86_64)
+  - `linux-build-libs.sh`: Builds libraries for Linux (32-bit and 64-bit)
+  - `windows-build-libs.sh`: Builds libraries for Windows using MinGW (cross-compilation)
 
-```bash
-# Basic compilation (without MP3/OGG support)
-./mk-macos
+- **Main program build scripts**:
+  - `macos-build-sbagen+.sh`: Builds SBaGen+ for macOS
+  - `linux-build-sbagen+.sh`: Builds SBaGen+ for Linux
+  - `windows-build-sbagen+.sh`: Builds SBaGen+ for Windows using MinGW (cross-compilation)
 
-# Compilation with MP3 and OGG support for ARM64
-./mk-macos -mp3 -ogg
-
-# Compilation for Intel x86_64
-./mk-macos -x86
-```
-
-#### Compiling with MP3/OGG Support
-
-To compile SBaGen+ with MP3 and OGG support, you need to first compile the required libraries:
-
-1. **Compiling libmad (MP3 support)**:
-
-   ```bash
-   # First, download the libmad source code
-   git clone https://github.com/underbit/mad.git libmad-0.15.1b
-
-   # Make the script executable
-   chmod +x mk-libmad-macos
-
-   # For ARM64 (Apple Silicon)
-   ./mk-libmad-macos
-
-   # For Intel x86_64
-   ./mk-libmad-macos -x86
-   ```
-
-2. **Compiling Tremor (OGG support)**:
-
-   ```bash
-   # First, clone the Tremor repository
-   git clone https://gitlab.xiph.org/xiph/tremor.git
-
-   # Make the script executable
-   chmod +x mk-tremor-macos
-
-   # For ARM64 (Apple Silicon)
-   ./mk-tremor-macos
-
-   # For Intel x86_64
-   ./mk-tremor-macos -x86
-   ```
-
-3. **Compiling SBaGen+ with the libraries**:
-
-   ```bash
-   # For ARM64 with MP3 and OGG support
-   ./mk-macos -mp3 -ogg
-
-   # For Intel x86_64 with MP3 and OGG support
-   ./mk-macos -x86 -mp3 -ogg
-
-   # For ARM64 with only MP3 support
-   ./mk-macos -mp3
-
-   # For ARM64 with only OGG support
-   ./mk-macos -ogg
-   ```
-
-The compiled binary will be created in the current directory as `sbagen+`.
-
-### Linux and Windows
-
-See the platform-specific README files.
-
-## Basic Usage
+### Building for macOS
 
 ```bash
-# Generate a simple binaural beat (carrier 200Hz, beat 12hz, amplitude 10%)
-./sbagen -i 200+12/10
+# Build the libraries (only needed for MP3 and OGG support)
+./macos-build-libs.sh
 
-# Generate an isochronic tone (carrier 300Hz, pulse 10Hz, amplitude 20%)
-./sbagen -i 300@10/20
-
-# Run a sequence file
-./sbagen examples/basics/ts-brain-isochronic-alpha.sbg
+# Build SBaGen+
+./macos-build-sbagen+.sh
 ```
 
-## Examples
+### Building for Linux
 
-The `examples/` directory contains various usage examples.
+```bash
+# Build the libraries (only needed for MP3 and OGG support)
+./linux-build-libs.sh
 
-## File Overview
+# Build SBaGen+
+./linux-build-sbagen+.sh
+```
 
-Here is a brief overview of the important files in this project:
+### Building for Windows (cross-compilation on Linux/macOS)
 
-- `SBAGEN+.txt`: Full user documentation and installation notes (**PLEASE READ THIS**)
-- `COPYING.txt`: License (GNU General Public License version 2)
-- `*.sbg`: Various sequences that can be run through sbagen
-- `ts-*.sbg`: Single tone-sets
-- `prog-*.sbg`: Longer sequences of tone-sets
-- `p-*`: Some Perl-scripts that generate and run sequences
-- `focus.txt` / `wave.txt`: Some notes on the scripts that were derived from reported Monroe Institute focus levels
-- `holosync.txt`: Some notes on the CenterPointe Holosync techniques
-- `theory*.txt`: Some notes from experimentation
-- `river*.ogg`: Loopable background river sound OGG file (under CC license); note that for Linux and macOS these are distributed in a separate TGZ archive
-- `sbagen+.c`, `*+.c`: The SBaGen+ source code
-- `sbagen.c`, `*.c`: The original SBaGen source code
-- `mk`: A short script to build using GCC on Linux
-- `mk-*`: Scripts to build on other platforms -- see the comments in files
+```bash
+# Build the libraries (only needed for MP3 and OGG support)
+./windows-build-libs.sh
+
+# Build SBaGen+
+./windows-build-sbagen+.sh
+```
+
+## Usage
+
+After compilation, you will have the following binaries:
+
+- macOS: `sbagen+-macOS`
+- Linux: `sbagen+-linux32` and `sbagen+-linux64`
+- Windows: `sbagen+-win32.exe` and `sbagen+-win64.exe`
+
+### Example usage:
+
+```bash
+# Play a simple sequence with brown noise
+./sbagen+-macOS -i brown/80 200@10/08
+
+# Play with an MP3 background file
+./sbagen+-macOS -m background.mp3 -i mix/80 200@10/08
+```
+
+## Notes
+
+- MP3 and OGG support is optional and requires building the corresponding libraries.
+- If you don't build the libraries, SBaGen+ will still work, but without support for these audio formats.
+- The build scripts check for the existence of the libraries and use them if available.
+
+## Troubleshooting
+
+### Issues with MP3 or OGG
+
+If you encounter issues with MP3 or OGG files, check if the libraries were built correctly:
+
+```bash
+# Check if the libraries exist
+./check-libs.sh
+```
+
+This script will check for the presence of all required libraries and provide information about which ones are missing.
+
+If the libraries don't exist, run the library build script for your platform:
+
+```bash
+# For macOS
+./macos-build-libs.sh
+
+# For Linux
+./linux-build-libs.sh
+
+# For Windows (cross-compilation)
+./windows-build-libs.sh
+```
 
 ## Documentation
 
-For detailed information on all features, see the [SBAGEN+.txt](SBAGEN+.txt) file.
+For detailed information on all features, see the [SBAGEN+.txt](docs/SBAGEN+.txt) file.
 
 ## License
 

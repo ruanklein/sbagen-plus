@@ -2,7 +2,7 @@
 //	SBaGen+ - Sequenced Brainwave Generator
 //
 //	Original version (c) 1999-2011 Jim Peters <jim@uazu.net>
-//	Current fork maintained by Ruan <ruan.klein@gmail.com>
+//	Current fork maintained by Ruan <https://ruan.sh/>
 //
 //	For latest version see http://sbagen.sf.net/ or
 //	http://uazu.net/sbagen/. Released under the GNU GPL version 2.
@@ -217,6 +217,7 @@ void setupOptC(char *spec) ;
 extern int out_rate, out_rate_def;
 void create_drop(int ac, char **av);
 void create_slide(int ac, char **av);
+void validateTotalAmplitude(Voice *voices, int numChannels, const char *line, int lineNum);
 
 #define ALLOC_ARR(cnt, type) ((type*)Alloc((cnt) * sizeof(type)))
 #define uint unsigned int
@@ -241,56 +242,69 @@ OSStatus mac_callback(AudioDeviceID, const AudioTimeStamp *, const AudioBufferLi
 
 void 
 help() {
-  printf("SBaGen+ - Sequenced Brainwave Generator, version " VERSION "\n"
-	 "Original version (c) 1999-2011 Jim Peters, http://uazu.net/\n"
-	 "Current fork maintained by Ruan <ruan.klein@gmail.com>\n"
-	 "Released under the GNU GPL v2. See file COPYING.\n"
-	 "\n"
-	 "Usage: sbagen [options] seq-file ...\n"
-	 "       sbagen [options] -i tone-specs ...\n"
-	 "       sbagen [options] -p pre-programmed-sequence-specs ...\n"
-	 "\n"
-	 "Options:  -h        Display this help-text\n"
-	 "          -Q        Quiet - don't display running status\n"
-	 "          -D        Dump sequence to stdout instead of playing it\n"
-	 "          -q <n>    Quick mode - run sequence at <n> times normal speed\n"
-	 "          -S        Output from the first tone-set time in the sequence (Start),\n"
-	 "                      instead of running according to the clock\n"
-	 "          -E        Output until the last tone-set in the sequence (End),\n"
-	 "                      instead of outputting forever\n"
-	 "          -T time   Start at the given clock-time (hh:mm)\n"
-	 "          -L time   Select the length of time (hh:mm or hh:mm:ss) to output for\n"
-	 "          -r <n>    Set output rate to <n> Hz (default 44100)\n"
-	 "          -b <n>    Set output bits to <n> (8 or 16, default 16)\n"
-	 "          -B <n>    Set output buffer size to <n> samples (default 8192)\n"
-	 "          -c <spec> Compensate for headphone low-frequency roll-off\n"
-	 "                      <spec> is a comma-separated list of freq=adjust pairs\n"
-	 "          -m <file> Read audio data from the given file and mix it with the\n"
-	 "                      generated binaural beats; may be ogg/mp3/wav/raw format\n"
-	 "          -M <file> Same as -m, but loop the file\n"
-	 "          -i <spec> Generate from an 'immediate' spec, e.g.:\n"
-	 "                      pink/40 300+10/20 mix/50\n"
-	 "                      (pink noise, binaural 300Hz+10Hz beat, mix from file)\n"
-	 "                      300@10/20\n"
-	 "                      (isochronic 300Hz carrier with 10Hz beat frequency)\n"
-	 "          -p <spec> Generate from a pre-programmed sequence type, e.g.:\n"
-	 "                      drop 00ds+\n"
-	 "                      slide 200+10/1\n"
-	 "          -o <file> Output raw data to the given file instead of soundcard\n"
-	 "          -O        Output raw data to stdout instead of soundcard\n"
-	 "          -W <file> Output WAV data to the given file instead of soundcard\n"
-	 "          -Wo <file> Output WAV data to the given file as well as to soundcard\n"
-	 "          -WO <file> Output WAV data to the given file as well as to soundcard\n"
-	 "                      with the generated binaural beats (raw only)\n"
-	 "For more details, see the file SBAGEN.txt\n"
-	 );
+   printf("SBaGen+ - Sequenced Brainwave Generator, version " VERSION
+     NL "Original version (c) 1999-2011 Jim Peters, http://uazu.net/"
+     NL "Current fork maintained by Ruan, https://ruan.sh/"
+	  NL "Released under the GNU GPL v2. See file COPYING."
+	  NL 
+	  NL "Usage: sbagen [options] seq-file ..."
+	  NL "       sbagen [options] -i tone-specs ..."
+	  NL "       sbagen [options] -p pre-programmed-sequence-specs ..."
+	  NL
+	  NL "Options:  -h        Display this help-text"
+	  NL "          -Q        Quiet - don't display running status"
+	  NL "          -D        Display the full interpreted sequence instead of playing it"
+	  NL "          -i        Immediate.  Take the remainder of the command line to be"
+	  NL "                     tone-specifications, and play them continuously"
+	  NL "          -p        Pre-programmed sequence.  Take the remainder of the command"
+	  NL "                     line to be a type and arguments, e.g. \"drop 00ds+\""
+	  NL "          -q mult   Quick.  Run through quickly (real time x 'mult') from the"
+	  NL "                     start time, rather than wait for real time to pass"
+	  NL
+	  NL "          -r rate   Select the output rate (default is 44100 Hz, or from -m)"
+#ifndef MAC_AUDIO
+	  NL "          -b bits   Select the number bits for output (8 or 16, default 16)"
+#endif
+	  NL "          -L time   Select the length of time (hh:mm or hh:mm:ss) to output"
+	  NL "                     for.  Default is to output forever."
+	  NL "          -S        Output from the first tone-set in the sequence (Start),"
+	  NL "                     instead of working in real-time.  Equivalent to '-q 1'."
+	  NL "          -E        Output until the last tone-set in the sequence (End),"
+	  NL "                     instead of outputting forever."
+	  NL "          -T time   Start at the given clock-time (hh:mm)"
+	  NL
+	  NL "          -o file   Output raw data to the given file instead of /dev/dsp"
+	  NL "          -O        Output raw data to the standard output"
+	  NL "          -W        Output a WAV-format file instead of raw data"
+	  NL "          -m file   Read audio data from the given file and mix it with the"
+	  NL "                      generated binaural beats; may be "
+#ifdef OGG_DECODE
+	  "ogg/"
+#endif
+#ifdef MP3_DECODE
+	  "mp3/"
+#endif
+	  "wav/raw format"
+	  NL "          -M        Read raw audio data from the standard input and mix it"
+	  NL "                      with the generated binaural beats (raw only)"
+	  NL
+	  NL "          -R rate   Select rate in Hz that frequency changes are recalculated"
+	  NL "                     (for file/pipe output only, default is 10Hz)"
+	  NL "          -F fms    Fade in/out time in ms (default 60000ms, or 1min)"
+#ifdef OSS_AUDIO
+	  NL "          -d dev    Select a different output device instead of /dev/dsp"
+#endif
+	  NL "          -c spec   Compensate for low-frequency headphone roll-off; see docs"
+	  NL
+	  );
+   exit(0);
 }
 
 void 
 usage() {
   error("SBaGen+ - Sequenced Brainwave Generator, version " VERSION 
 	NL "Original version (c) 1999-2011 Jim Peters, http://uazu.net/"
-	NL "Current fork maintained by Ruan <ruan.klein@gmail.com>"
+	NL "Current fork maintained by Ruan, https://ruan.sh/"
 	NL "Released under the GNU GPL v2. See file COPYING."
 	NL 
 	NL "Usage: sbagen [options] seq-file ..."
@@ -326,7 +340,7 @@ usage() {
 
 struct Voice {
   int typ;			// Voice type: 0 off, 1 binaural, 2 pink noise, 3 bell, 4 spin,
-   				//   5 mix, 6 mixspin, 7 mixbeat, 8 isochronic, -1 to -100 wave00 to wave99
+   				//   5 mix, 6 mixspin, 7 mixbeat, 8 isochronic, 9 white noise, 10 brown noise, -1 to -100 wave00 to wave99
   double amp;			// Amplitude level (0-4096 for 0-100%)
   double carr;			// Carrier freq (for binaural/bell/isochronic), width (for spin)
   double res;			// Resonance freq (-ve or +ve) (for binaural/spin/isochronic)
@@ -335,7 +349,7 @@ struct Voice {
 struct Channel {
   Voice v;			// Current voice setting (updated from current period)
   int typ;			// Current type: 0 off, 1 binaural, 2 pink noise, 3 bell, 4 spin,
-   				//   5 mix, 6 mixspin, 7 mixbeat, 8 isochronic, -1 to -100 wave00 to wave99
+   				//   5 mix, 6 mixspin, 7 mixbeat, 8 isochronic, 9 white noise, 10 brown noise, -1 to -100 wave00 to wave99
   int amp, amp2;		// Current state, according to current type
   int inc1, off1;		//  ::  (for binaural tones, offset + increment into sine 
   int inc2, off2;		//  ::   table * 65536)
@@ -673,10 +687,12 @@ main(int argc, char **argv) {
    
    if (opt_W && !opt_o && !opt_O)
       error("Use -o or -O with the -W option");
-   if (opt_W && opt_L < 0 && !opt_E) {
-      fprintf(stderr, "*** The length has not been specified for the -W option; assuming 1 hour ***\n");
-      fprintf(stderr, "(Use -L or -E with the -W option to control the length of the WAV file)\n\n");
-      opt_L= 60*60*1000;
+   if (opt_W && opt_L < 0) {
+      if (!opt_E) {
+         fprintf(stderr, "*** The length has not been specified for the -W option; enabling -E option ***\n");
+         fprintf(stderr, "(WAV file will have the same duration as the sequence)\n\n");
+         opt_E = 1;  // Automatically enable -E option
+      }
    }
    
    mix_in= 0;
@@ -1108,6 +1124,14 @@ sprintVoice(char *p, Voice *vp, Voice *dup) {
       if (dup && vp->amp == dup->amp)
 	return sprintf(p, "  ::");
       return sprintf(p, " pink/%.2f", AMP_AD(vp->amp));
+    case 9:
+      if (dup && vp->amp == dup->amp)
+	return sprintf(p, "  ::");
+      return sprintf(p, " white/%.2f", AMP_AD(vp->amp));
+    case 10:
+      if (dup && vp->amp == dup->amp)
+	return sprintf(p, "  ::");
+      return sprintf(p, " brown/%.2f", AMP_AD(vp->amp));
     case 3:
       if (dup && vp->carr == dup->carr && vp->amp == dup->amp)
 	return sprintf(p, "  ::");
@@ -1294,6 +1318,39 @@ noise2() {
   return noise_buf[noise_off++]= (tot >> NS_ADJ);
 }
 
+//
+//	Generate next sample for white noise, with same
+//	scaling as the sin_table[].
+//
+static inline int 
+white_noise() {
+  // White noise is simply a random value without filtering
+  return ((seed= seed * RAND_MULT % 131074) - 65535) * (ST_AMP / 65535);
+}
+
+//
+//	Generate next sample for brown noise, with same
+//	scaling as the sin_table[].
+//	Brown noise has more energy in lower frequencies,
+//	implemented as a random walk (integration of white noise)
+//
+static int brown_last = 0;
+static inline int 
+brown_noise() {
+  // Generate a random value
+  int random = ((seed= seed * RAND_MULT % 131074) - 65535);
+  
+  // Integrate the random value with a decay factor to avoid overflow
+  brown_last = (brown_last + (random / 16)) * 0.9;
+  
+  // Limit the value to avoid overflow
+  if (brown_last > 65535) brown_last = 65535;
+  if (brown_last < -65535) brown_last = -65535;
+  
+  // Scale to the same level as the sin_table
+  return brown_last * (ST_AMP / 65535);
+}
+
 //	//
 //	//	Generate next sample for simulated pink noise, scaled the same
 //	//	as the sin_table[].  This version uses a library random number
@@ -1341,9 +1398,16 @@ loop() {
   err= fast ? out_buf_ms * (fast_mult - 1) : 0;
   if (opt_L)
     byte_count= out_bps * (S64)(opt_L * 0.001 * out_rate);
-  if (opt_E)
-    byte_count= out_bps * (S64)(t_per0(now, fast_tim1) * 0.001 * out_rate /
-				(fast ? fast_mult : 1));
+  if (opt_E) {
+    // Calculate the correct duration based on the last time in the sequence file
+    int duration = t_per0(fast_tim0, fast_tim1);
+    byte_count= out_bps * (S64)(duration * 0.001 * out_rate /
+                (fast ? fast_mult : 1));
+    if (!opt_Q) {
+      fprintf(stderr, "*** Sequence duration: %02d:%02d:%02d (hh:mm:ss) ***\n", 
+              duration/3600000, (duration/60000)%60, (duration/1000)%60);
+    }
+  }
 
   // Do byte-swapping if bigendian and outputting to a file or stream
   if ((opt_O || opt_o) &&
@@ -1451,6 +1515,16 @@ outChunk() {
 	  break;
        case 2:	// Pink noise
 	  val= ns * ch->amp;
+	  tot1 += val;
+	  tot2 += val;
+	  break;
+       case 9:	// White noise
+	  val= white_noise() * ch->amp;
+	  tot1 += val;
+	  tot2 += val;
+	  break;
+       case 10:	// Brown noise
+	  val= brown_noise() * ch->amp;
 	  tot1 += val;
 	  tot2 += val;
 	  break;
@@ -2732,6 +2806,16 @@ readNameDef() {
        nd->vv[ch].amp= AMP_DA(amp);
        continue;
     }
+    if (1 == sscanf(p, "white/%lf %c", &amp, &dmy)) {
+       nd->vv[ch].typ= 9;
+       nd->vv[ch].amp= AMP_DA(amp);
+       continue;
+    }
+    if (1 == sscanf(p, "brown/%lf %c", &amp, &dmy)) {
+       nd->vv[ch].typ= 10;
+       nd->vv[ch].amp= AMP_DA(amp);
+       continue;
+    }
     if (2 == sscanf(p, "bell%lf/%lf %c", &carr, &amp, &dmy)) {
        nd->vv[ch].typ= 3;
        nd->vv[ch].carr= carr;
@@ -2785,6 +2869,10 @@ readNameDef() {
     }
     badSeq();
   }
+  
+  // Validate total amplitude before adding to the list
+  validateTotalAmplitude(nd->vv, N_CH, lin_copy, in_lin);
+  
   nd->nxt= nlist; nlist= nd;
 }  
 
@@ -3272,5 +3360,22 @@ create_slide(int ac, char **av) {
    correctPeriods();
 }   
 
+// Function to validate the total amplitude of voices
+void validateTotalAmplitude(Voice *voices, int numChannels, const char *line, int lineNum) {
+  double totalAmplitude = 0.0;
+  
+  for (int ch = 0; ch < numChannels; ch++) {
+    if (voices[ch].typ != 0) { // If voice is active
+      // Convert from internal amplitude format back to percentage
+      double ampPercentage = voices[ch].amp / 40.96;
+      totalAmplitude += ampPercentage;
+    }
+  }
+  
+  if (totalAmplitude > 100.0) {
+    error("Total amplitude exceeds 100%% (%.2f%%) at line %d:\n  %s\nPlease reduce amplitudes to prevent audio distortion.", 
+          totalAmplitude, lineNum, line);
+  }
+}
 
 // END //
