@@ -1,10 +1,12 @@
 1.5.0 Rebranded as SBaGen+ to indicate the fork from the original project   
 	Added support for white noise and brown noise types
 	Added support for isochronic tones
+	Added support for ALSA output device (Linux)
 	Updated documentation to include isochronic tone usage
 	Updated documentation to include brown noise and white noise
 	Updated macOS build scripts to support Apple Silicon (ARM64)
 	Updated build scripts to compile for linux 32 and 64 bit
+	Updated build scripts to compile for linux native ARM64/AArch64
 	Updated build scripts to compile for windows 32 and 64 bit	
 	Fixed bug with WAV file duration when using -W option with sequence files
 	Improved error handling for Carbon.h inclusion on modern macOS
