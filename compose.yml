@@ -1,0 +1,16 @@
+services:
+  build:
+    build: .
+    container_name: build-sbagen-plus
+    platform: linux/amd64
+    volumes:
+      - .:/sbagen-plus
+    working_dir: /sbagen-plus
+    command:
+      - /bin/sh
+      - -c
+      - |
+        ./linux-build-libs.sh
+        ./linux-build-sbagen+.sh
+        ./windows-build-libs.sh
+        ./windows-build-sbagen+.sh

@@ -11,6 +11,9 @@ section_header "Building SBaGen+ universal binary (ARM64 + x86_64) with MP3 and 
 # Create libs directory if it doesn't exist
 create_dir_if_not_exists "libs"
 
+# Check distribution directory
+create_dir_if_not_exists "dist"
+
 # Check if libraries exist instead of building them automatically
 LIB_PATH="libs/macos-universal-libmad.a"
 OGG_LIB_PATH="libs/macos-universal-libogg.a"
@@ -48,12 +51,12 @@ section_header "Starting sbagen+ compilation..."
 info "Compilation flags: $CFLAGS"
 info "Libraries: $LIBS"
 
-gcc -w $CFLAGS sbagen+.c -o sbagen+-macOS $LIBS
+gcc -w $CFLAGS sbagen+.c -o dist/sbagen+-macos-universal $LIBS
 
 if [ $? -eq 0 ]; then
-    success "Compilation successful! Universal binary created: sbagen+-macOS"
-    info "Supported architectures:"
-    lipo -info sbagen+-macOS
+    success "Compilation successful! Universal binary created: dist/sbagen+-macos-universal"
+    # info "Supported architectures:"
+    # lipo -info dist/sbagen+-macOS
 else
     error "Compilation failed!"
 fi
