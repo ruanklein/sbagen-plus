@@ -58,8 +58,6 @@ docker compose up
 
 This will automatically build the Docker image and run all necessary build scripts to generate the binaries for Linux and Windows. All compiled binaries will be placed in the `dist` directory.
 
-**Note**: If your host is Linux ARM64, only the `sbagen+-linux-arm64` binary will be generated.
-
 #### Option 2: Manual Docker Build
 
 If you prefer more control over the build process, you can use the following steps:
@@ -70,8 +68,7 @@ If you prefer more control over the build process, you can use the following ste
 # Build the Docker image
 docker build . --no-cache -t build-sbagen-plus:latest
 
-# Tip for Mac users with Apple Silicon - build an x86_64 image:
-# (This is only for building Linux and Windows versions, not macOS versions)
+# Force build an x86_64 image on Apple Silicon or Linux ARM64:
 docker build --platform linux/amd64 . --no-cache -t build-sbagen-plus:x86_64
 ```
 
@@ -81,8 +78,7 @@ docker build --platform linux/amd64 . --no-cache -t build-sbagen-plus:x86_64
 # Start a container with the current directory mounted
 docker run --rm -v .:/sbagen-plus -w /sbagen-plus -it build-sbagen-plus:latest bash
 
-# For Mac users with Apple Silicon who need an x86_64 container:
-# (Remember: This is only for building Linux and Windows versions)
+# Start a container in x86_64 mode (for Linux ARM64 users and Apple Silicon users)
 docker run --rm --platform linux/amd64 -v .:/sbagen-plus -w /sbagen-plus -it build-sbagen-plus:x86_64 bash
 ```
 
