@@ -12,9 +12,9 @@ INSTALL_DIR_WIN32="$TEMP_DIR/win32"
 INSTALL_DIR_WIN64="$TEMP_DIR/win64"
 SRC_DIR="$PWD/build"
 OUTPUT_DIR="$TEMP_DIR/windows"
-LIBOGG_VERSION="1.3.5"         # Adjust as per available version
-LIBVORBISIDEC_VERSION="sezero" # Using branch name as version identifier
-LIBMAD_VERSION="0.15.1b"       # Adjust as per available version
+LIBOGG_VERSION="1.3.5"
+LIBVORBISIDEC_VERSION="1.0.2+svn16259"
+LIBMAD_VERSION="0.15.1b"
 
 # Check for required tools
 check_required_tools curl make automake autoconf libtool
@@ -26,7 +26,6 @@ create_dir_if_not_exists "$INSTALL_DIR_WIN32"
 create_dir_if_not_exists "$INSTALL_DIR_WIN64"
 create_dir_if_not_exists "$SRC_DIR"
 create_dir_if_not_exists "$OUTPUT_DIR"
-create_dir_if_not_exists "libs"
 
 # Toolchain settings for cross-compilation
 WIN32_CC="i686-w64-mingw32-gcc"
@@ -36,19 +35,28 @@ WIN64_CC="x86_64-w64-mingw32-gcc"
 cd "$SRC_DIR"
 section_header "Downloading libogg..."
 if [ ! -f "libogg-$LIBOGG_VERSION.tar.gz" ]; then
-    curl -L -O "https://downloads.xiph.org/releases/ogg/libogg-$LIBOGG_VERSION.tar.gz"
-    tar -xzf "libogg-$LIBOGG_VERSION.tar.gz"
+    curl -L -O -s "https://downloads.xiph.org/releases/ogg/libogg-$LIBOGG_VERSION.tar.gz" > /dev/null
+    check_error "Failed to download libogg"
+    info "Extracting libogg..."
+    tar -xzf "libogg-$LIBOGG_VERSION.tar.gz" > /dev/null
+    check_error "Failed to extract libogg"
 fi
 section_header "Downloading libvorbisidec (Tremor)..."
-if [ ! -f "tremor-$LIBVORBISIDEC_VERSION.zip" ]; then
-    curl -L -o "tremor-$LIBVORBISIDEC_VERSION.zip" "https://github.com/sezero/tremor/archive/refs/heads/sezero.zip"
-    unzip "tremor-$LIBVORBISIDEC_VERSION.zip"
-    mv "tremor-sezero" "libvorbisidec-$LIBVORBISIDEC_VERSION"
+if [ ! -f "libvorbisidec_$LIBVORBISIDEC_VERSION.orig.tar.gz" ]; then
+    curl -L -o "libvorbisidec_$LIBVORBISIDEC_VERSION.orig.tar.gz" -s "https://launchpadlibrarian.net/35151187/libvorbisidec_$LIBVORBISIDEC_VERSION.orig.tar.gz" > /dev/null
+    check_error "Failed to download libvorbisidec"
+    info "Extracting libvorbisidec..."
+    tar -xzf "libvorbisidec_$LIBVORBISIDEC_VERSION.orig.tar.gz" > /dev/null
+    check_error "Failed to extract libvorbisidec"
+    mv "libvorbisidec-$LIBVORBISIDEC_VERSION" "libvorbisidec_$LIBVORBISIDEC_VERSION"
 fi
 section_header "Downloading libmad..."
 if [ ! -f "libmad-$LIBMAD_VERSION.tar.gz" ]; then
-    curl -L -O "https://downloads.sourceforge.net/project/mad/libmad/$LIBMAD_VERSION/libmad-$LIBMAD_VERSION.tar.gz"
-    tar -xzf "libmad-$LIBMAD_VERSION.tar.gz"
+    curl -L -O -s "https://downloads.sourceforge.net/project/mad/libmad/$LIBMAD_VERSION/libmad-$LIBMAD_VERSION.tar.gz" > /dev/null
+    check_error "Failed to download libmad"
+    info "Extracting libmad..."
+    tar -xzf "libmad-$LIBMAD_VERSION.tar.gz" > /dev/null
+    check_error "Failed to extract libmad"
 fi
 
 # Update config.sub and config.guess for libmad to support MinGW
@@ -100,8 +108,16 @@ info "Compiling libogg for Win64..."
 make clean >> "$TEMP_DIR/libogg-win64.log" 2>&1 && make -j$(nproc) >> "$TEMP_DIR/libogg-win64.log" 2>&1 && make install >> "$TEMP_DIR/libogg-win64.log" 2>&1
 check_error "libogg compilation for Win64 failed" "$TEMP_DIR/libogg-win64.log"
 
+# Copy required header files to libvorbisidec source directory
+cd "$SRC_DIR/libvorbisidec_$LIBVORBISIDEC_VERSION"
+section_header "Copying required header files to libvorbisidec source directory..."
+cp "$ORIGINAL_DIR/libs/_G_config.h" ./
+cp "$ORIGINAL_DIR/libs/os_types.h" ./
+cp "$ORIGINAL_DIR/libs/ogg.h" ./
+cp "$ORIGINAL_DIR/libs/config_types.h" ./
+check_error "Failed to copy header files to libvorbisidec source directory"
+
 # Generate configure for libvorbisidec (Tremor) using autogen.sh
-cd "$SRC_DIR/libvorbisidec-$LIBVORBISIDEC_VERSION"
 info "Generating configure script for libvorbisidec..."
 if [ ! -f "configure" ]; then
     ./autogen.sh > "$TEMP_DIR/libvorbisidec.log" 2>&1
@@ -110,7 +126,7 @@ fi
 
 # Compile libvorbisidec (Tremor) for Win32
 info "Configuring libvorbisidec for Win32..."
-./configure --host=i686-w64-mingw32 --prefix="$INSTALL_DIR_WIN32" --enable-static --disable-shared --with-ogg="$INSTALL_DIR_WIN32" > "$TEMP_DIR/libvorbisidec-win32.log" 2>&1
+CPPFLAGS="-I. -I$ORIGINAL_DIR/libs -I$INSTALL_DIR_WIN32/include" ./configure --host=i686-w64-mingw32 --prefix="$INSTALL_DIR_WIN32" --enable-static --disable-shared --with-ogg="$INSTALL_DIR_WIN32" > "$TEMP_DIR/libvorbisidec-win32.log" 2>&1
 check_error "libvorbisidec configuration for Win32 failed" "$TEMP_DIR/libvorbisidec-win32.log"
 info "Compiling libvorbisidec for Win32..."
 make clean >> "$TEMP_DIR/libvorbisidec-win32.log" 2>&1 && make -j$(nproc) >> "$TEMP_DIR/libvorbisidec-win32.log" 2>&1 && make install >> "$TEMP_DIR/libvorbisidec-win32.log" 2>&1
@@ -118,7 +134,7 @@ check_error "libvorbisidec compilation for Win32 failed" "$TEMP_DIR/libvorbiside
 
 # Compile libvorbisidec (Tremor) for Win64
 info "Configuring libvorbisidec for Win64..."
-./configure --host=x86_64-w64-mingw32 --prefix="$INSTALL_DIR_WIN64" --enable-static --disable-shared --with-ogg="$INSTALL_DIR_WIN64" > "$TEMP_DIR/libvorbisidec-win64.log" 2>&1
+CPPFLAGS="-I. -I$ORIGINAL_DIR/libs -I$INSTALL_DIR_WIN64/include" ./configure --host=x86_64-w64-mingw32 --prefix="$INSTALL_DIR_WIN64" --enable-static --disable-shared --with-ogg="$INSTALL_DIR_WIN64" > "$TEMP_DIR/libvorbisidec-win64.log" 2>&1
 check_error "libvorbisidec configuration for Win64 failed" "$TEMP_DIR/libvorbisidec-win64.log"
 info "Compiling libvorbisidec for Win64..."
 make clean >> "$TEMP_DIR/libvorbisidec-win64.log" 2>&1 && make -j$(nproc) >> "$TEMP_DIR/libvorbisidec-win64.log" 2>&1 && make install >> "$TEMP_DIR/libvorbisidec-win64.log" 2>&1

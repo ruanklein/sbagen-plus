@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# SBaGen Windows build script
+# SBaGen+ Windows build script
 # Builds 32-bit and 64-bit Windows binaries with MP3 and OGG support using MinGW
 
 # Source common library
@@ -62,10 +62,10 @@ fi
 info "Compiling 32-bit version with flags: $CFLAGS_32"
 info "Libraries: $LIBS_32"
 
-i686-w64-mingw32-gcc $CFLAGS_32 sbagen+.c -o sbagen+-win32.exe $LIBS_32
+i686-w64-mingw32-gcc -w $CFLAGS_32 sbagen+.c -o sbagen+-win32.exe $LIBS_32
 
 if [ $? -eq 0 ]; then
-    success "32-bit compilation successful! Binary created: sbagen+-win32.exe"
+    success "32-bit compilation successful! Created 32-bit binary: sbagen+-win32.exe"
 else
     error "32-bit compilation failed!"
 fi
@@ -104,10 +104,10 @@ fi
 info "Compiling 64-bit version with flags: $CFLAGS_64"
 info "Libraries: $LIBS_64"
 
-x86_64-w64-mingw32-gcc $CFLAGS_64 sbagen+.c -o sbagen+-win64.exe $LIBS_64
+x86_64-w64-mingw32-gcc -w $CFLAGS_64 sbagen+.c -o sbagen+-win64.exe $LIBS_64
 
 if [ $? -eq 0 ]; then
-    success "64-bit compilation successful! Binary created: sbagen+-win64.exe"
+    success "64-bit compilation successful! Created 64-bit binary: sbagen+-win64.exe"
 else
     error "64-bit compilation failed!"
 fi

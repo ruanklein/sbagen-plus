@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# SBaGen macOS build script
+# SBaGen+ macOS build script
 # Builds a universal binary (ARM64 + x86_64) with MP3 and OGG support
 
 # Source common library
@@ -35,7 +35,7 @@ fi
 if [ -f "$OGG_LIB_PATH" ] && [ -f "$TREMOR_LIB_PATH" ]; then
     info "Including OGG support using: $OGG_LIB_PATH and $TREMOR_LIB_PATH"
     CFLAGS="$CFLAGS -DOGG_DECODE"
-    # Ordem é importante: primeiro tremor, depois ogg
+    # Order is important: first tremor, then ogg
     LIBS="$LIBS $TREMOR_LIB_PATH $OGG_LIB_PATH"
 else
     warning "OGG libraries not found at $OGG_LIB_PATH or $TREMOR_LIB_PATH"
@@ -48,7 +48,7 @@ section_header "Starting sbagen+ compilation..."
 info "Compilation flags: $CFLAGS"
 info "Libraries: $LIBS"
 
-gcc $CFLAGS sbagen+.c -o sbagen+-macOS $LIBS
+gcc -w $CFLAGS sbagen+.c -o sbagen+-macOS $LIBS
 
 if [ $? -eq 0 ]; then
     success "Compilation successful! Universal binary created: sbagen+-macOS"
