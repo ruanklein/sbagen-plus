@@ -1602,12 +1602,22 @@ outChunk() {
           ch->off2 += ch->inc2;  // Modulator (pulse frequency)
           ch->off2 &= (ST_SIZ << 16) - 1;
           
-          // Amplitude modulation using a sine wave for pulsing
-          // Normalize to 0-1 and then multiply by the carrier
+          // Change the modulator to create a true isochronic tone with space between pulses
           {
             int mod_val = sin_table[ch->off2 >> 16];
-            // Convert from -ST_AMP to +ST_AMP to 0 to 1
-            double mod_factor = (mod_val + ST_AMP) / (double)(2 * ST_AMP);
+            // Apply a threshold to create distinct pulses with space between them
+            // Only produce sound when the modulation value is above a certain threshold
+            double mod_factor = 0.0;
+            
+            // Use only the positive part of the sine wave and apply a threshold
+            // to create a space between pulses
+            if (mod_val > ST_AMP * 0.3) {  // Threshold of 30% of the maximum value
+              // Normalize from ST_AMP*0.3 to ST_AMP to 0 to 1
+              mod_factor = (mod_val - (ST_AMP * 0.3)) / (double)(ST_AMP * 0.7);
+              // Smooth the edges of the pulse to avoid clicks
+              mod_factor = mod_factor * mod_factor * (3 - 2 * mod_factor);  // Cubic smoothing
+            }
+            
             // Apply the modulation to the carrier
             val = ch->amp * sin_table[ch->off1 >> 16] * mod_factor;
             tot1 += val;
