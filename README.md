@@ -79,11 +79,11 @@ docker build --platform linux/amd64 . --no-cache -t build-sbagen-plus:x86_64
 
 ```bash
 # Start a container with the current directory mounted
-docker run --rm -v .:/app -w /app -it build-sbagen-plus:latest bash
+docker run --rm -v .:/sbagen-plus -w /sbagen-plus -it build-sbagen-plus:latest bash
 
 # For Mac users with Apple Silicon who need an x86_64 container:
 # (Remember: This is only for building Linux and Windows versions)
-docker run --rm --platform linux/amd64 -v .:/app -w /app -it build-sbagen-plus:x86_64 bash
+docker run --rm --platform linux/amd64 -v .:/sbagen-plus -w /sbagen-plus -it build-sbagen-plus:x86_64 bash
 ```
 
 ##### 3. Inside the container, run the build scripts:
