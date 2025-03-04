@@ -4,9 +4,11 @@
 # Contains shared functions and variables for all build scripts
 
 # Define colors for terminal output
-export GREEN='\033[0;32m'
+export GREEN='\033[1;32m'
+export BLUE='\033[1;34m'
+export CYAN='\033[1;36m'
 export YELLOW='\033[1;33m'
-export RED='\033[0;31m'
+export RED='\033[1;31m'
 export NC='\033[0m' # No Color
 
 # Function to check for errors and exit if any
@@ -31,7 +33,7 @@ create_dir_if_not_exists() {
 
 # Function to display section header
 section_header() {
-    echo -e "${GREEN}==> $1${NC}"
+    echo -e "${CYAN}==> $1${NC}"
 }
 
 # Function to display warning
@@ -51,7 +53,7 @@ success() {
 
 # Function to display info
 info() {
-    echo -e "${YELLOW}==> $1${NC}"
+    echo -e "${BLUE}==> $1${NC}"
 }
 
 # Function to check if a command exists
@@ -148,6 +150,18 @@ check_required_tools() {
     done
 }
 
+copy_or_skip() {
+    local src_dir="$1"
+    local dest_dir="$2"
+    
+    cp "$src_dir" "$dest_dir" 2>/dev/null
+    if [ $? -eq 0 ]; then
+        success "File copied to $dest_dir"
+    else
+        warning "File not found at $src_dir, skipping..."
+    fi
+}
+
 # Function to copy libraries with proper naming
 copy_libs() {
     local src_dir="$1"
@@ -162,43 +176,41 @@ copy_libs() {
     case "$prefix" in
         macos-universal)
             # For macOS, we have universal libraries
-            cp "$src_dir/libmad.a" "$dest_dir/${prefix}-libmad.a" 2>/dev/null
-            cp "$src_dir/libvorbisidec.a" "$dest_dir/${prefix}-libvorbisidec.a" 2>/dev/null
-            cp "$src_dir/libogg.a" "$dest_dir/${prefix}-libogg.a" 2>/dev/null
+            copy_or_skip "$src_dir/libmad.a" "$dest_dir/${prefix}-libmad.a"
+            copy_or_skip "$src_dir/libvorbisidec.a" "$dest_dir/${prefix}-libvorbisidec.a"
+            copy_or_skip "$src_dir/libogg.a" "$dest_dir/${prefix}-libogg.a"
             ;;
         linux)
-            # For Linux, we have both x86 and x86_64 libraries
-            cp "$src_dir/libmad-x86.a" "$dest_dir/${prefix}-x86-libmad.a" 2>/dev/null
-            cp "$src_dir/libvorbisidec-x86.a" "$dest_dir/${prefix}-x86-libvorbisidec.a" 2>/dev/null
-            cp "$src_dir/libogg-x86.a" "$dest_dir/${prefix}-x86-libogg.a" 2>/dev/null
+            # For Linux, we have x86, x86_64 and arm64 libraries
+            copy_or_skip "$src_dir/libmad-x86.a" "$dest_dir/${prefix}-x86-libmad.a"
+            copy_or_skip "$src_dir/libvorbisidec-x86.a" "$dest_dir/${prefix}-x86-libvorbisidec.a"
+            copy_or_skip "$src_dir/libogg-x86.a" "$dest_dir/${prefix}-x86-libogg.a"
             
-            cp "$src_dir/libmad-x86_64.a" "$dest_dir/${prefix}-x86_64-libmad.a" 2>/dev/null
-            cp "$src_dir/libvorbisidec-x86_64.a" "$dest_dir/${prefix}-x86_64-libvorbisidec.a" 2>/dev/null
-            cp "$src_dir/libogg-x86_64.a" "$dest_dir/${prefix}-x86_64-libogg.a" 2>/dev/null
+            copy_or_skip "$src_dir/libmad-x86_64.a" "$dest_dir/${prefix}-x86_64-libmad.a"
+            copy_or_skip "$src_dir/libvorbisidec-x86_64.a" "$dest_dir/${prefix}-x86_64-libvorbisidec.a"
+            copy_or_skip "$src_dir/libogg-x86_64.a" "$dest_dir/${prefix}-x86_64-libogg.a"
+            
+            copy_or_skip "$src_dir/libmad-arm64.a" "$dest_dir/${prefix}-arm64-libmad.a"
+            copy_or_skip "$src_dir/libvorbisidec-arm64.a" "$dest_dir/${prefix}-arm64-libvorbisidec.a"
+            copy_or_skip "$src_dir/libogg-arm64.a" "$dest_dir/${prefix}-arm64-libogg.a"
             ;;
         windows)
             # For Windows, we have both win32 and win64 libraries
-            cp "$src_dir/libmad-win32.a" "$dest_dir/${prefix}-win32-libmad.a" 2>/dev/null
-            cp "$src_dir/libvorbisidec-win32.a" "$dest_dir/${prefix}-win32-libvorbisidec.a" 2>/dev/null
-            cp "$src_dir/libogg-win32.a" "$dest_dir/${prefix}-win32-libogg.a" 2>/dev/null
+            copy_or_skip "$src_dir/libmad-win32.a" "$dest_dir/${prefix}-win32-libmad.a"
+            copy_or_skip "$src_dir/libvorbisidec-win32.a" "$dest_dir/${prefix}-win32-libvorbisidec.a"
+            copy_or_skip "$src_dir/libogg-win32.a" "$dest_dir/${prefix}-win32-libogg.a"
             
-            cp "$src_dir/libmad-win64.a" "$dest_dir/${prefix}-win64-libmad.a" 2>/dev/null
-            cp "$src_dir/libvorbisidec-win64.a" "$dest_dir/${prefix}-win64-libvorbisidec.a" 2>/dev/null
-            cp "$src_dir/libogg-win64.a" "$dest_dir/${prefix}-win64-libogg.a" 2>/dev/null
+            copy_or_skip "$src_dir/libmad-win64.a" "$dest_dir/${prefix}-win64-libmad.a"
+            copy_or_skip "$src_dir/libvorbisidec-win64.a" "$dest_dir/${prefix}-win64-libvorbisidec.a"
+            copy_or_skip "$src_dir/libogg-win64.a" "$dest_dir/${prefix}-win64-libogg.a"
             ;;
         *)
             # Generic case for other platforms
-            cp "$src_dir/libmad.a" "$dest_dir/${prefix}-libmad.a" 2>/dev/null
-            cp "$src_dir/libvorbisidec.a" "$dest_dir/${prefix}-libvorbisidec.a" 2>/dev/null
-            cp "$src_dir/libogg.a" "$dest_dir/${prefix}-libogg.a" 2>/dev/null
+            copy_or_skip "$src_dir/libmad.a" "$dest_dir/${prefix}-libmad.a"
+            copy_or_skip "$src_dir/libvorbisidec.a" "$dest_dir/${prefix}-libvorbisidec.a"
+            copy_or_skip "$src_dir/libogg.a" "$dest_dir/${prefix}-libogg.a"
             ;;
     esac
-    
-    if [ $? -ne 0 ]; then
-        error "Error copying libraries. Check if they were compiled correctly."
-        return 1
-    fi
-    
-    success "Libraries copied successfully!"
+
     return 0
 } 
