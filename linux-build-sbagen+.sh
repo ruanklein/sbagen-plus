@@ -1,12 +1,12 @@
 #!/bin/bash
 
 # SBaGen+ Linux build script
-# Builds 32-bit, 64-bit and ARM64 binaries with MP3 and OGG support
+# Builds 32-bit, 64-bit and ARM64 binaries with MP3, OGG and ALSA support
 
 # Source common library
 . ./lib.sh
 
-section_header "Building SBaGen+ for Linux (32-bit, 64-bit and ARM64) with MP3 and OGG support..."
+section_header "Building SBaGen+ for Linux (32-bit, 64-bit and ARM64) with MP3, OGG and ALSA support..."
 
 # Create libs directory if it doesn't exist
 create_dir_if_not_exists "libs"
@@ -40,8 +40,8 @@ if [ -z "$SKIP_32BIT" ]; then
     section_header "Building 32-bit version..."
 
     # Set up compilation flags for 32-bit
-    CFLAGS_32="-DT_LINUX -m32 -Wall -O3 -I."
-    LIBS_32="-lm -lpthread"
+    CFLAGS_32="-DT_LINUX_ALSA -m32 -Wall -O3 -I."
+    LIBS_32="-lm -lpthread -lasound"
 
     # Check for MP3 support (32-bit)
     if [ -f "$LIB_PATH_32" ]; then
@@ -77,9 +77,9 @@ if [ -z "$SKIP_32BIT" ]; then
         success "32-bit compilation successful! Binary created: sbagen+-linux32"
     else
         error "32-bit compilation failed! You may need to install 32-bit development libraries."
-        info "On Debian/Ubuntu: sudo apt-get install gcc-multilib g++-multilib libc6-dev-i386"
-        info "On Fedora: sudo dnf install glibc-devel.i686 libstdc++-devel.i686"
-        info "On Arch: sudo pacman -S multilib-devel"
+        info "On Debian/Ubuntu: sudo apt-get install gcc-multilib g++-multilib libc6-dev-i386 libasound2-dev:i386"
+        info "On Fedora: sudo dnf install glibc-devel.i686 libstdc++-devel.i686 alsa-lib-devel.i686"
+        info "On Arch: sudo pacman -S multilib-devel lib32-alsa-lib"
     fi
 else
     warning "Skipping 32-bit build..."
@@ -91,12 +91,12 @@ section_header "Building 64-bit version..."
 # Set up compilation flags for 64-bit
 if [ "$HOST_ARCH" = "aarch64" ]; then
     # On ARM64, don't use -m64 flag as it's not supported
-    CFLAGS_64="-DT_LINUX -Wall -O3 -I."
+    CFLAGS_64="-DT_LINUX_ALSA -Wall -O3 -I."
     info "Running on ARM64, using native gcc for 64-bit compilation"
 else
-    CFLAGS_64="-DT_LINUX -m64 -Wall -O3 -I."
+    CFLAGS_64="-DT_LINUX_ALSA -m64 -Wall -O3 -I."
 fi
-LIBS_64="-lm -lpthread"
+LIBS_64="-lm -lpthread -lasound"
 
 # Check for MP3 support (64-bit)
 if [ -f "$LIB_PATH_64" ]; then
@@ -135,6 +135,9 @@ if [ $? -eq 0 ]; then
     fi
 else
     error "64-bit compilation failed!"
+    info "On Debian/Ubuntu: sudo apt-get install libasound2-dev"
+    info "On Fedora: sudo dnf install alsa-lib-devel"
+    info "On Arch: sudo pacman -S alsa-lib"
 fi
 
 # Build ARM64 version
@@ -159,8 +162,8 @@ if [ "$HOST_ARCH" != "aarch64" ]; then
 
     if [ "$SKIP_ARM64" -eq 0 ]; then
         # Set up compilation flags for ARM64
-        CFLAGS_ARM64="-DT_LINUX -Wall -O3 -I."
-        LIBS_ARM64="-lm -lpthread"
+        CFLAGS_ARM64="-DT_LINUX_ALSA -Wall -O3 -I."
+        LIBS_ARM64="-lm -lpthread -lasound"
 
         # Check for MP3 support (ARM64)
         if [ -f "$LIB_PATH_ARM64" ]; then
@@ -195,6 +198,7 @@ if [ "$HOST_ARCH" != "aarch64" ]; then
             success "ARM64 compilation successful! Binary created: sbagen+-linux-arm64"
         else
             error "ARM64 compilation failed!"
+            warning "You may need to install ARM64 ALSA development libraries for cross-compilation"
         fi
     else
         warning "Skipping ARM64 build due to missing tools or libraries."

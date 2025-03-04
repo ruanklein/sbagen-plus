@@ -45,6 +45,7 @@
 // Ogg and MP3 support is handled separately from the T_* macros.
 
 // Define OSS_AUDIO to use /dev/dsp for audio output
+// Define ALSA_AUDIO to use ALSA for audio output
 // Define WIN_AUDIO to use Win32 calls
 // Define MAC_AUDIO to use Mac CoreAudio calls
 // Define NO_AUDIO if no audio output device is usable
@@ -60,6 +61,13 @@
 
 #ifdef T_LINUX
 #define OSS_AUDIO
+#define UNIX_TIME
+#define UNIX_MISC
+#define ANSI_TTY
+#endif
+
+#ifdef T_LINUX_ALSA
+#define ALSA_AUDIO
 #define UNIX_TIME
 #define UNIX_MISC
 #define ANSI_TTY
@@ -96,7 +104,9 @@
 #ifndef OSS_AUDIO
 #ifndef MAC_AUDIO
 #ifndef WIN_AUDIO
+#ifndef ALSA_AUDIO
 #define NO_AUDIO
+#endif
 #endif
 #endif
 #endif
@@ -145,6 +155,9 @@
 #ifdef OSS_AUDIO
  #include <linux/soundcard.h>
  //WAS: #include <sys/soundcard.h>
+#endif
+#ifdef ALSA_AUDIO
+ #include <alsa/asoundlib.h>
 #endif
 #ifdef WIN_AUDIO
  #include <windows.h>
@@ -294,6 +307,9 @@ help() {
 #ifdef OSS_AUDIO
 	  NL "          -d dev    Select a different output device instead of /dev/dsp"
 #endif
+#ifdef ALSA_AUDIO
+	  NL "          -d dev    Select a different ALSA device instead of 'default'"
+#endif
 	  NL "          -c spec   Compensate for low-frequency headphone roll-off; see docs"
 	  NL
 	  );
@@ -421,18 +437,21 @@ int fast_mult= 0;		// 0 to sync to clock (adjusting as necessary), or else sync 
 S64 byte_count= -1;		// Number of bytes left to output, or -1 if unlimited
 int tty_erase;			// Chars to erase from current line (for ESC[K emulation)
 
+int opt_Q;			// Quiet mode
 int opt_D;
-int opt_M;
-int opt_Q;
-int opt_S;
-int opt_E;
-int opt_W;
+int opt_M, opt_S, opt_E;
+char *opt_o, *opt_m;
 int opt_O;
-int opt_L= -1;			// Length in ms, or -1
-int opt_T= -1;			// Start time in ms, or -1
-char *opt_o;			// File name to output to, or 0
-char *opt_m;			// File name to read mix data from, or 0
+int opt_W;
+#ifdef OSS_AUDIO
 char *opt_d= "/dev/dsp";	// Output device
+#elif defined(ALSA_AUDIO)
+char *opt_d= "default";	// Output device to ALSA
+#else
+char *opt_d= "/dev/dsp";	// Output device
+#endif
+int opt_L= -1;			// Length of WAV file in ms
+int opt_T= -1;			// Time to start at (for -S option)
 
 FILE *mix_in;			// Input stream for mix sound data, or 0
 int mix_cnt;			// Version number from mix filename (#<digits>), or -1
@@ -629,6 +648,18 @@ inbuf_start(int(*rout)(int*,int), int len) {
 #endif
 }
 
+#ifdef ALSA_AUDIO
+snd_pcm_t *alsa_handle;         // ALSA PCM handle
+snd_pcm_hw_params_t *alsa_params; // ALSA hardware parameters
+
+// Function to clean up ALSA resources
+void cleanup_alsa() {
+  if (alsa_handle) {
+    snd_pcm_close(alsa_handle);
+    alsa_handle = NULL;
+  }
+}
+#endif
 
 //
 //	Time-keeping functions
@@ -764,6 +795,11 @@ main(int argc, char **argv) {
    }
    
    loop();
+   
+#ifdef ALSA_AUDIO
+   cleanup_alsa();
+#endif
+
    return 0;
 }
 
@@ -855,6 +891,12 @@ scanOptions(int *acp, char ***avp) {
 #ifdef OSS_AUDIO
 	  case 'd':
 	     if (argc-- < 1) error("Expecting device filename after -d");
+	     opt_d= *argv++;
+	     break;
+#endif
+#ifdef ALSA_AUDIO
+	  case 'd':
+	     if (argc-- < 1) error("Expecting ALSA device name after -d");
 	     opt_d= *argv++;
 	     break;
 #endif
@@ -1177,6 +1219,9 @@ error(char *fmt, ...) {
   fprintf(stderr, "Press <RETURN> to continue: ");
   fflush(stderr);
   getchar();
+#endif
+#ifdef ALSA_AUDIO
+  cleanup_alsa();
 #endif
   exit(1);
 }
@@ -1625,6 +1670,9 @@ outChunk() {
   if (byte_count > 0) {
     if (byte_count <= out_bsiz) {
       writeOut((char*)out_buf, byte_count);
+#ifdef ALSA_AUDIO
+      cleanup_alsa();
+#endif
       exit(0);		// All done
     }
     else {
@@ -1685,6 +1733,31 @@ writeOut(char *buf, int siz) {
     memcpy(aud_buf[aud_wr], buf, siz);
     aud_wr= new_wr;
 
+    return;
+  }
+#endif
+
+#ifdef ALSA_AUDIO
+  if (out_fd == -9998) {
+    int err;
+    int frames = siz / (out_mode ? 4 : 2); // Number of frames (stereo samples)
+    
+    // Write data to the ALSA device
+    if ((err = snd_pcm_writei(alsa_handle, buf, frames)) < 0) {
+      if (err == -EPIPE) {
+        // Underflow occurred, try to recover
+        if ((err = snd_pcm_prepare(alsa_handle)) < 0) {
+          error("Unable to recover from underrun: %s", snd_strerror(err));
+        }
+        // Try to write again
+        if ((err = snd_pcm_writei(alsa_handle, buf, frames)) < 0) {
+          error("Failed to write to ALSA device after recovery: %s", snd_strerror(err));
+        }
+      } else {
+        error("Failed to write to ALSA device: %s", snd_strerror(err));
+      }
+    }
+    
     return;
   }
 #endif
@@ -1936,6 +2009,93 @@ setup_device(void) {
 	    out_mode ? 16 : 8, out_rate, out_blen/2, out_buf_ms);
     return;
   }
+
+#ifdef ALSA_AUDIO
+  // ALSA audio output
+  {
+    int err;
+    unsigned int rate = out_rate;
+    snd_pcm_format_t format;
+    snd_pcm_uframes_t buffer_size;
+    snd_pcm_uframes_t period_size;
+    
+    // Open the PCM device for playback
+    if ((err = snd_pcm_open(&alsa_handle, opt_d, SND_PCM_STREAM_PLAYBACK, 0)) < 0) {
+      error("Unable to open ALSA device %s: %s", opt_d, snd_strerror(err));
+    }
+    
+    // Allocate hardware parameters
+    snd_pcm_hw_params_alloca(&alsa_params);
+    
+    // Fill with default values
+    if ((err = snd_pcm_hw_params_any(alsa_handle, alsa_params)) < 0) {
+      error("Unable to configure default parameters: %s", snd_strerror(err));
+    }
+    
+    // Configure access
+    if ((err = snd_pcm_hw_params_set_access(alsa_handle, alsa_params, SND_PCM_ACCESS_RW_INTERLEAVED)) < 0) {
+      error("Unable to configure access: %s", snd_strerror(err));
+    }
+    
+    // Configure format (16 bits or 8 bits)
+    format = out_mode ? SND_PCM_FORMAT_S16 : SND_PCM_FORMAT_U8;
+    if ((err = snd_pcm_hw_params_set_format(alsa_handle, alsa_params, format)) < 0) {
+      error("Unable to configure format %s: %s", 
+            out_mode ? "16-bit" : "8-bit", snd_strerror(err));
+    }
+    
+    // Configure channels (stereo)
+    if ((err = snd_pcm_hw_params_set_channels(alsa_handle, alsa_params, 2)) < 0) {
+      error("Unable to configure stereo channels: %s", snd_strerror(err));
+    }
+    
+    // Configure sampling rate
+    if ((err = snd_pcm_hw_params_set_rate_near(alsa_handle, alsa_params, &rate, 0)) < 0) {
+      error("Unable to configure sampling rate %d: %s", 
+            out_rate, snd_strerror(err));
+    }
+    
+    // Update sampling rate if it was changed
+    out_rate = rate;
+    
+    // Configure buffer and period size
+    period_size = 1024; // Initial value
+    if ((err = snd_pcm_hw_params_set_period_size_near(alsa_handle, alsa_params, &period_size, 0)) < 0) {
+      error("Unable to configure period size: %s", snd_strerror(err));
+    }
+    
+    buffer_size = period_size * 4; // Buffer of 4 periods
+    if ((err = snd_pcm_hw_params_set_buffer_size_near(alsa_handle, alsa_params, &buffer_size)) < 0) {
+      error("Unable to configure buffer size: %s", snd_strerror(err));
+    }
+    
+    // Apply hardware parameters
+    if ((err = snd_pcm_hw_params(alsa_handle, alsa_params)) < 0) {
+      error("Unable to apply hardware parameters: %s", snd_strerror(err));
+    }
+    
+    // Get the actual period size
+    snd_pcm_hw_params_get_period_size(alsa_params, &period_size, 0);
+    
+    // Configure output buffer size
+    out_blen = period_size * 2; // Stereo
+    out_bsiz = out_blen * (out_mode ? 2 : 1); // 16 bits or 8 bits
+    out_bps = out_mode ? 4 : 2;
+    out_buf = (short*)Alloc(out_blen * sizeof(short));
+    out_buf_lo = (int)(0x10000 * 1000.0 * 0.5 * out_blen / out_rate);
+    out_buf_ms = out_buf_lo >> 16;
+    out_buf_lo &= 0xFFFF;
+    tmp_buf = (int*)Alloc(out_blen * sizeof(int));
+    
+    // Mark that we are using ALSA
+    out_fd = -9998; // Special value for ALSA
+    
+    if (!opt_Q)
+      warn("ALSA audio output %d-bit at %d Hz with period of %lu samples, %d ms per period",
+           out_mode ? 16 : 8, out_rate, period_size, out_buf_ms);
+    return;
+  }
+#endif
 
 #ifdef OSS_AUDIO
   // Normal /dev/dsp output
