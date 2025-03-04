@@ -47,7 +47,24 @@ Using Docker is the recommended method for building SBaGen+ for Linux and Window
 
 **Note**: macOS users will still need to use the native build scripts (`macos-build-*.sh`) on their local machine. Docker is only used to compile Linux and Windows versions, not macOS versions.
 
-#### 1. Build the Docker image:
+#### Option 1: Using Docker Compose (Simplest Method)
+
+The easiest way to build SBaGen+ for Linux and Windows is using Docker Compose:
+
+```bash
+# Build all Linux and Windows binaries with a single command
+docker compose up
+```
+
+This will automatically build the Docker image and run all necessary build scripts to generate the binaries for Linux and Windows. All compiled binaries will be placed in the `dist` directory.
+
+**Note**: If your host is Linux ARM64, only the `sbagen+-linux-arm64` binary will be generated.
+
+#### Option 2: Manual Docker Build
+
+If you prefer more control over the build process, you can use the following steps:
+
+##### 1. Build the Docker image:
 
 ```bash
 # Build the Docker image
@@ -58,7 +75,7 @@ docker build . --no-cache -t build-sbagen-plus:latest
 docker build --platform linux/amd64 . --no-cache -t build-sbagen-plus:x86_64
 ```
 
-#### 2. Run the Docker container:
+##### 2. Run the Docker container:
 
 ```bash
 # Start a container with the current directory mounted
@@ -69,7 +86,7 @@ docker run --rm -v .:/app -w /app -it build-sbagen-plus:latest bash
 docker run --rm --platform linux/amd64 -v .:/app -w /app -it build-sbagen-plus:x86_64 bash
 ```
 
-#### 3. Inside the container, run the build scripts:
+##### 3. Inside the container, run the build scripts:
 
 ```bash
 # Build libraries and binaries for Linux
@@ -81,7 +98,7 @@ docker run --rm --platform linux/amd64 -v .:/app -w /app -it build-sbagen-plus:x
 ./windows-build-sbagen+.sh  # Compiles SBaGen+ for win32/win64
 ```
 
-#### 4. After compilation, you'll have the following executables:
+##### 4. After compilation, you'll find the following executables in the `dist` directory:
 
 - `sbagen+-linux32`
 - `sbagen+-linux64`
@@ -106,6 +123,10 @@ If you prefer to build without Docker, you can use the build scripts directly on
 ./macos-build-sbagen+.sh
 ```
 
+After compilation, you'll find the universal binary (works on both Intel and Apple Silicon) in the `dist` directory:
+
+- `sbagen+-macos-universal`
+
 #### Building for Linux
 
 ```bash
@@ -126,25 +147,170 @@ If you prefer to build without Docker, you can use the build scripts directly on
 ./windows-build-sbagen+.sh
 ```
 
-## Usage
+## Installation
 
-Example with macOS:
+You can either compile SBaGen+ from source as described above or download pre-built binaries from the [releases page](https://github.com/ruanklein/sbagen-plus/releases).
+
+### Download Pre-built Binaries
+
+The latest release (v1.5.0) can be downloaded directly from the following links:
+
+- Linux ARM64: [sbagen+-linux-arm64](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.0/sbagen+-linux-arm64)
+- Linux 32-bit: [sbagen+-linux32](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.0/sbagen+-linux32)
+- Linux 64-bit: [sbagen+-linux64](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.0/sbagen+-linux64)
+- macOS (Universal): [sbagen+-macos-universal](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.0/sbagen+-macos-universal)
+- Windows 32-bit: [sbagen+-win32.exe](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.0/sbagen+-win32.exe)
+- Windows 64-bit: [sbagen+-win64.exe](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.0/sbagen+-win64.exe)
+
+**Important**: Always verify the SHA256 checksum of downloaded binaries against those listed on the [releases page](https://github.com/ruanklein/sbagen-plus/releases) to ensure file integrity and security.
+
+### Installing on Linux
+
+1. Download the appropriate binary for your system:
+
+   ```bash
+   # For 64-bit systems
+   wget https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.0/sbagen+-linux64
+
+   # For 32-bit systems
+   wget https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.0/sbagen+-linux32
+
+   # For ARM64 systems
+   wget https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.0/sbagen+-linux-arm64
+   ```
+
+2. Verify the SHA256 checksum:
+
+   ```bash
+   sha256sum sbagen+-linux64  # Replace with your downloaded file
+   # Compare the output with the checksum on the releases page
+   ```
+
+3. Make the binary executable:
+
+   ```bash
+   chmod +x sbagen+-linux64  # Replace with your downloaded file
+   ```
+
+4. Move the binary to a directory in your PATH:
+
+   ```bash
+   sudo mv sbagen+-linux64 /usr/local/bin/sbagen+  # Replace with your downloaded file
+   ```
+
+5. Verify the installation:
+
+   ```bash
+   sbagen+ -h
+   ```
+
+### Installing on macOS
+
+1. Download the macOS universal binary:
+
+   ```bash
+   curl -L -o sbagen+-macos-universal https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.0/sbagen+-macos-universal
+   ```
+
+2. Verify the SHA256 checksum:
+
+   ```bash
+   shasum -a 256 sbagen+-macos-universal
+   # Compare the output with the checksum on the releases page
+   ```
+
+3. Make the binary executable:
+
+   ```bash
+   chmod +x sbagen+-macos-universal
+   ```
+
+4. Move the binary to a directory in your PATH:
+
+   ```bash
+   sudo mv sbagen+-macos-universal /usr/local/bin/sbagen+
+   ```
+
+5. Verify the installation:
+
+   ```bash
+   sbagen+ -h
+   ```
+
+### Installing on Windows
+
+1. Download the appropriate binary for your system from the [releases page](https://github.com/ruanklein/sbagen-plus/releases):
+
+   - [sbagen+-win32.exe](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.0/sbagen+-win32.exe) for 32-bit systems
+   - [sbagen+-win64.exe](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.0/sbagen+-win64.exe) for 64-bit systems
+
+2. Verify the SHA256 checksum (using PowerShell):
+
+   ```powershell
+   Get-FileHash -Algorithm SHA256 .\sbagen+-win64.exe  # Replace with your downloaded file
+   # Compare the output with the checksum on the releases page
+   ```
+
+3. Create a directory for the application (if it doesn't exist):
+
+   ```powershell
+   mkdir -Force "C:\Program Files\sbagen+"
+   ```
+
+4. Move the executable to this directory:
+
+   ```powershell
+   Move-Item .\sbagen+-win64.exe "C:\Program Files\sbagen+\sbagen+.exe"  # Replace with your downloaded file
+   ```
+
+5. Add the directory to your system PATH:
+
+   ```powershell
+   # Add to system PATH (requires administrator privileges)
+   [Environment]::SetEnvironmentVariable("Path", $env:Path + ";C:\Program Files\sbagen+", "Machine")
+
+   # Refresh the current PowerShell session's PATH
+   $env:Path = [Environment]::GetEnvironmentVariable("Path", "Machine")
+   ```
+
+6. Verify the installation:
+
+   ```powershell
+   sbagen+ -h
+   ```
+
+## Basic Usage
+
+After installation, you can use SBaGen+ from the command line. If you've installed it to your PATH as suggested, you can simply use the `sbagen+` command. Otherwise, you'll need to specify the path to the executable.
 
 ```bash
 # Play a simple sequence with brown noise
-./sbagen+-macOS -i brown/80 200@10/08
+sbagen+ -i brown/80 200@10/08
 
 # Play a simple sequence with white noise
-./sbagen+-macOS -i white/20 200@10/08
+sbagen+ -i white/20 200@10/08
 
 # Play a simple sequence with pink noise
-./sbagen+-macOS -i pink/80 200@10/08
+sbagen+ -i pink/80 200@10/08
 
 # Play with an MP3 background file
-./sbagen+-macOS -m background.mp3 -i mix/80 200@10/08
+sbagen+ -m background.mp3 -i mix/80 200@10/08
 
 # Play with an OGG background file
-./sbagen+-macOS -m background.ogg -i mix/80 200@10/08
+sbagen+ -m background.ogg -i mix/80 200@10/08
+```
+
+If you're running the executable directly from the `dist` directory without installing it, use the appropriate binary for your system:
+
+```bash
+# For Linux 64-bit
+./dist/sbagen+-linux64 -i brown/80 200@10/08
+
+# For macOS
+./dist/sbagen+-macos-universal -i brown/80 200@10/08
+
+# For Windows 64-bit
+.\dist\sbagen+-win64.exe -i brown/80 200@10/08
 ```
 
 ## Documentation
