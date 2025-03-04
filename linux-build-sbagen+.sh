@@ -12,6 +12,9 @@ section_header "Building SBaGen+ for Linux with MP3, OGG and ALSA support..."
 # Check for required tools
 check_required_tools gcc
 
+# Check distribution directory
+create_dir_if_not_exists "dist"
+
 # Detect host architecture
 HOST_ARCH=$(uname -m)
 info "Detected host architecture: $HOST_ARCH"
@@ -70,7 +73,7 @@ if [ $SKIP_32BIT = 0 ]; then
     info "Libraries: $LIBS_32"
 
     # Try to compile with 32-bit support
-    gcc -w $CFLAGS_32 sbagen+.c -o sbagen+-linux32 $LIBS_32
+    gcc -w $CFLAGS_32 sbagen+.c -o dist/sbagen+-linux32 $LIBS_32
 
     if [ $? -eq 0 ]; then
         success "32-bit compilation successful! Binary created: sbagen+-linux32"
@@ -147,9 +150,9 @@ info "Compiling 64-bit version with flags: $CFLAGS_64"
 info "Libraries: $LIBS_64"
 
 if [ "$HOST_ARCH" = "aarch64" ]; then
-    gcc -w $CFLAGS_64 sbagen+.c -o sbagen+-linux-arm64 $LIBS_64
+    gcc -w $CFLAGS_64 sbagen+.c -o dist/sbagen+-linux-arm64 $LIBS_64
 else
-    gcc -w $CFLAGS_64 sbagen+.c -o sbagen+-linux64 $LIBS_64
+    gcc -w $CFLAGS_64 sbagen+.c -o dist/sbagen+-linux64 $LIBS_64
 fi
 
 if [ $? -eq 0 ]; then
