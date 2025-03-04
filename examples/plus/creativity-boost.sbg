@@ -1,0 +1,23 @@
+## Creativity Boost - 40 minutes
+## Combines alpha and theta frequencies to enhance creative thinking
+
+-SE
+
+# Define tone sets
+ts-relax: pink/40 200+10/20
+ts-creative: pink/40 200+8/15 300@6/10
+ts-deep-creative: pink/40 150+6/20 250@7/15
+ts-return: pink/40 200+10/20
+off: -
+
+# Timeline
+00:00:00 off ->
+00:00:15 ts-relax
+00:09:00 ts-relax ->
+00:10:00 ts-creative
+00:19:00 ts-creative ->
+00:20:00 ts-deep-creative
+00:34:00 ts-deep-creative ->
+00:35:00 ts-return
+00:39:00 ts-return ->
+00:40:00 off
