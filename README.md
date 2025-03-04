@@ -108,4 +108,5 @@ SBaGen+ is distributed under the GPL license. See the [COPYING.txt](COPYING.txt)
 ## Credits
 
 Original SBaGen was developed by Jim Peters. See [SBaGen project](https://uazu.net/sbagen/).
-ALSA support is based from this [patch](https://github.com/jave/sbagen-alsa/blob/master/sbagen.c)
+
+ALSA support is based from this [patch](https://github.com/jave/sbagen-alsa/blob/master/sbagen.c).
