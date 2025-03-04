@@ -2,6 +2,24 @@
 
 SBaGen+ is a command-line tool for generating binaural beats and isochronic tones, designed to assist with meditation, relaxation, and altering states of consciousness.
 
+## Table of Contents
+
+- [About This Project](#about-this-project)
+- [Features and Bug Fixes](#features-and-bug-fixes)
+- [Compilation](#compilation)
+  - [Build Scripts Structure](#build-scripts-structure)
+  - [Building with Docker](#building-with-docker-recommended-for-linux-and-windows-builds)
+  - [Building Natively](#building-natively)
+- [Installation](#installation)
+  - [Download Pre-built Binaries](#download-pre-built-binaries)
+  - [Installing on Linux](#installing-on-linux)
+  - [Installing on macOS](#installing-on-macos)
+  - [Installing on Windows](#installing-on-windows)
+- [Basic Usage](#basic-usage)
+- [Documentation](#documentation)
+- [License](#license)
+- [Credits](#credits)
+
 ## About This Project
 
 SBaGen+ is a fork of the original SBaGen (Sequenced Binaural Beat Generator) created by Jim Peters. The original project was classified as "bitrotted" by its author, and this fork aims to continue its development by adding new features while maintaining compatibility with the original.
