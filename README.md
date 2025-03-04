@@ -309,6 +309,8 @@ If you're running the executable directly from the `dist` directory without inst
 .\dist\sbagen+-win64.exe -i brown/80 200@10/08
 ```
 
+See [USAGE.md](USAGE.md) for more information on how to use SBaGen+.
+
 ## Documentation
 
 For detailed information on all features, see the [SBAGEN+.txt](docs/SBAGEN+.txt) file.
