@@ -3305,8 +3305,9 @@ void
 create_drop(int ac, char **av) {
    char *fmt;
    char *p, *q;
+   char signal;
    int a;
-   int slide, n_step, islong, wakeup;
+   int slide, n_step, islong, wakeup, isisochronic;
    double carr, amp, c0, c2;
    double beat_target;
    double beat[40];
@@ -3364,6 +3365,9 @@ create_drop(int ac, char **av) {
    wakeup= 0;
    if (*p == '^') { wakeup= 1; p++; }
 
+   isisochronic= 0;
+   if (*p == '@') { isisochronic= 1; p++; }
+
    amp= 1.0;
    if (*p == '/') {
       p++; q= p;
@@ -3390,13 +3394,13 @@ create_drop(int ac, char **av) {
    if (slide) {
       warn(" Carrier slides from %gHz to %gHz over %d minutes", 
 	   c0, c2, len/60);
-      warn(" Beat frequency slides from %gHz to %gHz over %d minutes", 
-	   beat[0], beat[n_step-1], len0/60);
+      warn(" %s frequency slides from %gHz to %gHz over %d minutes", 
+	   isisochronic ? "Pulse" : "Beat", beat[0], beat[n_step-1], len0/60);
    } else {
       warn(" Carrier steps from %gHz to %gHz over %d minutes", 
 	   c0, c2, len/60);
-      warn(" Beat frequency steps from %gHz to %gHz over %d minutes:", 
-	   beat[0], beat[n_step-1], len0/60);
+      warn(" %s frequency steps from %gHz to %gHz over %d minutes:", 
+	   isisochronic ? "Pulse" : "Beat", beat[0], beat[n_step-1], len0/60);
       fprintf(stderr, "   ");
       for (a= 0; a<n_step; a++) fprintf(stderr, " %.2f", beat[a]);
       fprintf(stderr, "\n");
@@ -3412,19 +3416,20 @@ create_drop(int ac, char **av) {
    formatNameDef("off: -");
    formatTimeLine(86395, "== off ->");		// 23:59:55
    
+   signal= isisochronic ? '@' : '+';
    if (slide) {
       // Slide version
       for (a= 0; a<n_step; a++) {
 	 int tim= a * len0 / (n_step-1);
-	 formatNameDef("ts%02d: %g+%g/%g %s", a, 
+	 formatNameDef("ts%02d: %g%c%g/%g %s", a, 
 		       c0 + (c2-c0) * tim * 1.0 / len,
-		       beat[a], amp, extra);
+		       signal, beat[a], amp, extra);
 	 formatTimeLine(tim, "== ts%02d ->", a);
       }
 
       if (islong) {
-	 formatNameDef("tsend: %g+%g/%g %s",
-		       c2, beat[n_step-1], amp, extra);
+	 formatNameDef("tsend: %g%c%g/%g %s",
+		       c2, signal, beat[n_step-1], amp, extra);
 	 formatTimeLine(len, "== tsend ->");
       }
       end= len;
@@ -3435,9 +3440,9 @@ create_drop(int ac, char **av) {
       for (a= 0; a<lim; a++) {
 	 int tim0= a * steplen;
 	 int tim1= (a+1) * steplen;
-	 formatNameDef("ts%02d: %g+%g/%g %s", a,
+	 formatNameDef("ts%02d: %g%c%g/%g %s", a,
 		       c0 + (c2-c0) * tim1/len,
-		       beat[(a>=n_step) ? n_step-1 : a], 
+		       signal, beat[(a>=n_step) ? n_step-1 : a], 
 		       amp, extra);
 	 formatTimeLine(tim0, "== ts%02d ->", a);
 	 formatTimeLine(tim1-stepslide, "== ts%02d ->", a);
@@ -3447,8 +3452,8 @@ create_drop(int ac, char **av) {
    
    // Wake-up and ending
    if (wakeup) {
-      formatNameDef("tswake: %g+%g/%g %s",
-		    c0, beat[0], amp, extra);
+      formatNameDef("tswake: %g%c%g/%g %s",
+		    c0, signal, beat[0], amp, extra);
       formatTimeLine(end+len2, "== tswake ->");
       end += len2;
    } 
@@ -3472,13 +3477,13 @@ bad_slide() {
 	 NL "The optional <time-spec> is t<slide-time>, giving length of session in"
 	 NL "  minutes (the default is equivalent to 't30')."
 	 NL "The optional <tone-specs...> let you mix other stuff with the drop"
-	 NL "  sequence like pink noise or a mix soundtrack, e.g 'pink/20' or 'mix/60'");
+	 NL "  sequence like white/pink/brown noise or a mix soundtrack, e.g 'pink/20', 'white/20', 'brown/20', or 'mix/60'");
 }
 
 void 
 create_slide(int ac, char **av) {
    int len= 1800;
-   char *p, dmy;
+   char *p, dmy, signal;
    double val, c0, c1, beat, amp;
    char extra[256];
 
@@ -3494,7 +3499,10 @@ create_slide(int ac, char **av) {
    }
 
    if (ac < 1) BAD;
-   if (3 != sscanf(av[0], "%lf%lf/%lf %c", &c0, &beat, &amp, &dmy)) BAD;
+   if (4 != sscanf(av[0], "%lf%c%lf/%lf %c", &c0, &signal, &beat, &amp, &dmy)) BAD;
+
+   if (signal != '+' && signal != '-' && signal != '@') BAD;
+
    c1= beat/2;
    ac--; av++;
 
@@ -3513,7 +3521,7 @@ create_slide(int ac, char **av) {
    warn("SLIDE summary:");
    warn(" Sliding carrier from %gHz to %gHz over %g minutes",
 	c0, c1, len/60.0);
-   warn(" Holding beat constant at %gHz", beat);
+   warn(" Holding %s constant at %gHz", signal == '@' ? "pulse" : "beat", beat);
 
    // Generate sequence
    handleOptions("-SE");
@@ -3521,9 +3529,9 @@ create_slide(int ac, char **av) {
 
    formatNameDef("off: -");
    formatTimeLine(86395, "== off ->");		// 23:59:55
-   formatNameDef("ts0: %g%+g/%g %s", c0, beat, amp, extra);
+   formatNameDef("ts0: %g%c%g/%g %s", c0, signal, beat, amp, extra);
    formatTimeLine(0, "== ts0 ->");
-   formatNameDef("ts1: %g%+g/%g %s", c1, beat, amp, extra);
+   formatNameDef("ts1: %g%c%g/%g %s", c1, signal, beat, amp, extra);
    formatTimeLine(len, "== ts1 ->");
    formatTimeLine(len+10, "== off");
    

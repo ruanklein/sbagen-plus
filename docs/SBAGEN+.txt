@@ -747,13 +747,18 @@ example, 00d is a good starting point.  To this you add "s+" to
 indicate sliding and an hour-long sequence.  It is best to also mix
 these with river sounds, for example:
 
-  sbagen -m river1.ogg -p drop 00ds+ mix/100
+  sbagen+ -m river1.ogg -p drop 00ds+ mix/100
 
 If you are doing sessions in the middle of the day, you may want to
 add a 'wake-up' at the end using '^', which brings you up to alpha
 again at the end:
 
-  sbagen -m river1.ogg -p drop 00ds+^ mix/100
+  sbagen+ -m river1.ogg -p drop 00ds+^ mix/100
+
+If you want to use a isochronic instead of a binaural tone, you can use
+'@' on the end of the level specification:
+
+  sbagen+ -m river1.ogg -p drop 00ds+@/3 white/10
 
 Once you have completed level 00, you can move onto the next (01, 02,
 03, etc).  However if you like, instead you can try increasing the
@@ -772,14 +777,15 @@ lots of practice.
 
 Usage: 
 
-  -p drop <digit><digit>[.<digit>...]<a-l>[s|k][+][^][/<amp>] <tone-specs> ...
+  -p drop <digit><digit>[.<digit>...]<a-l>[s|k][+][^][@][/<amp>] <tone-specs> ...
 
 Examples:
 
   -p drop 00a
   -p drop 00ds+
   -p drop 20fs+^/2 mix/98
-  -p drop 34.5dk+/1.5 pink/30 
+  -p drop 34.5dk+/1.5 pink/30
+  -p drop 00d@/3 brown/15
 
 The argument after the "drop" gives the level and depth of the
 sequence to run.  The digits 00 to 99 select the level, based on
@@ -792,7 +798,7 @@ fine-tune the level, you can include a decimal point (e.g. 20.5a for
 halfway between 20a and 21a).
 
 The letter a-l (or A-L if you prefer) selects the depth of the beat
-frequencies.  Beat frequencies always start at 10Hz, and then drop
+frequencies.  Beat/Pulse frequencies always start at 10Hz, and then drop
 exponentially to a target, which is as follows for letters A-L: 4.4,
 3.7, 3.1, 2.5, 2.0, 1.5, 1.2, 0.9, 0.7, 0.5, 0.4, 0.3.  Using A, you
 never get down to delta frequencies.  The deeper beats (i.e. later
@@ -831,9 +837,10 @@ The optional '/<amp>' on the end lets you change the amplitude of the
 waves if necessary (e.g. 00ds+/2).  By default, the level is set to 1.
 
 After the spec comes an optional list of normal tone-sets.  These can
-be used to add mix sounds (e.g. mix/100) or pink noise (pink/30) or
-other sounds to the beats.  Anything you add here will automatically
-be faded in and out at the start and end of the session.
+be used to add mix sounds (e.g. mix/100) or pink noise (pink/30), or
+brown noise (brown/15), or white noise (white/10), or other sounds to
+the beats.  Anything you add here will automatically be faded in and
+out at the start and end of the session.
 
 
 2.6.2: Adjusting the length of a -p drop session
@@ -873,6 +880,7 @@ Example:
 
   -p slide 200+10/1
   -p slide t60 200+10/1 mix/100
+  -p slide 200@10/1
 
 This provides a series of sequences that hold the beat frequency
 constant whilst dropping the carrier tone from the initial value right

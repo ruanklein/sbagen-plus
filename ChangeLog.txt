@@ -1,3 +1,5 @@
+1.5.1 Isochronic added to -p drop/slide option
+
 1.5.0 Rebranded as SBaGen+ to indicate the fork from the original project   
 	Added support for white noise and brown noise types
 	Added support for isochronic tones
