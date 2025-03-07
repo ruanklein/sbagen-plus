@@ -22,11 +22,9 @@ SBaGen+ is a command-line tool for generating binaural beats and isochronic tone
 
 ## About This Project
 
-SBaGen+ is a fork of the original SBaGen (Sequenced Binaural Beat Generator) created by Jim Peters. The original project was classified as "bitrotted" by its author, and this fork aims to continue its development by adding new features while maintaining compatibility with the original.
+SBaGen+ is a fork of the original SBaGen (Sequenced Binaural Beat Generator) created by Jim Peters. The original project has not been maintained for many years, and this fork aims to keep it functional on modern systems while preserving its original structure. Updates focus on compatibility fixes and minor feature additions requested by longtime users, without major refactoring of the original code.
 
-SBaGen+ is not intended to be a significantly different software from the original SBaGen. Instead, it's a project dedicated to keeping SBaGen alive and functional. The primary goal is to ensure that SBaGen continues to run on modern operating systems, with occasional additions of features that users have requested in the past.
-
-The name was changed from "Sequenced Binaural Beat Generator" to "Sequenced Brainwave Generator" to better reflect the expanded capabilities of SBaGen+. With the addition of isochronic tones, which are not binaural beats, the original name would be too limiting.
+The name has been changed from **“Sequenced Binaural Beat Generator”** to **“Sequenced Brainwave Generator”** to better reflect its expanded functionality. Since SBaGen+ now supports isochronic tones in addition to binaural beats, the original name no longer fully represented its capabilities.
 
 ## Features and Bug Fixes
 
@@ -71,7 +69,10 @@ The easiest way to build SBaGen+ for Linux and Windows is using Docker Compose:
 
 ```bash
 # Build all Linux and Windows binaries with a single command
-docker compose up
+docker compose up build
+
+# Build for Linux ARM64
+docker compose up build-arm64
 ```
 
 This will automatically build the Docker image and run all necessary build scripts to generate the binaries for Linux and Windows. All compiled binaries will be placed in the `dist` directory.
@@ -167,14 +168,14 @@ You can either compile SBaGen+ from source as described above or download pre-bu
 
 ### Download Pre-built Binaries
 
-The latest release (v1.5.0) can be downloaded directly from the following links:
+The latest release (v1.5.1) can be downloaded directly from the following links:
 
-- Linux ARM64: [sbagen+-linux-arm64](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.0/sbagen+-linux-arm64)
-- Linux 32-bit: [sbagen+-linux32](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.0/sbagen+-linux32)
-- Linux 64-bit: [sbagen+-linux64](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.0/sbagen+-linux64)
-- macOS (Universal): [sbagen+-macos-universal](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.0/sbagen+-macos-universal)
-- Windows 32-bit: [sbagen+-win32.exe](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.0/sbagen+-win32.exe)
-- Windows 64-bit: [sbagen+-win64.exe](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.0/sbagen+-win64.exe)
+- Linux ARM64: [sbagen+-linux-arm64](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.1/sbagen+-linux-arm64)
+- Linux 32-bit: [sbagen+-linux32](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.1/sbagen+-linux32)
+- Linux 64-bit: [sbagen+-linux64](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.1/sbagen+-linux64)
+- macOS (Universal): [sbagen+-macos-universal](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.1/sbagen+-macos-universal)
+- Windows 32-bit: [sbagen+-win32.exe](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.1/sbagen+-win32.exe)
+- Windows 64-bit: [sbagen+-win64.exe](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.1/sbagen+-win64.exe)
 
 **Important**: Always verify the SHA256 checksum of downloaded binaries against those listed on the [releases page](https://github.com/ruanklein/sbagen-plus/releases) to ensure file integrity and security.
 
@@ -184,13 +185,13 @@ The latest release (v1.5.0) can be downloaded directly from the following links:
 
    ```bash
    # For 64-bit systems
-   wget https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.0/sbagen+-linux64
+   wget https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.1/sbagen+-linux64
 
    # For 32-bit systems
-   wget https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.0/sbagen+-linux32
+   wget https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.1/sbagen+-linux32
 
    # For ARM64 systems
-   wget https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.0/sbagen+-linux-arm64
+   wget https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.1/sbagen+-linux-arm64
    ```
 
 2. Verify the SHA256 checksum:
@@ -223,7 +224,7 @@ The latest release (v1.5.0) can be downloaded directly from the following links:
 1. Download the macOS universal binary:
 
    ```bash
-   curl -L -o sbagen+-macos-universal https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.0/sbagen+-macos-universal
+   curl -L -o sbagen+-macos-universal https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.1/sbagen+-macos-universal
    ```
 
 2. Verify the SHA256 checksum:
@@ -255,8 +256,8 @@ The latest release (v1.5.0) can be downloaded directly from the following links:
 
 1. Download the appropriate binary for your system from the [releases page](https://github.com/ruanklein/sbagen-plus/releases):
 
-   - [sbagen+-win32.exe](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.0/sbagen+-win32.exe) for 32-bit systems
-   - [sbagen+-win64.exe](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.0/sbagen+-win64.exe) for 64-bit systems
+   - [sbagen+-win32.exe](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.1/sbagen+-win32.exe) for 32-bit systems
+   - [sbagen+-win64.exe](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.1/sbagen+-win64.exe) for 64-bit systems
 
 2. Verify the SHA256 checksum (using PowerShell):
 
