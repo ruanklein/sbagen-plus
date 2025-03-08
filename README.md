@@ -8,8 +8,8 @@ SBaGen+ is a command-line tool for generating binaural beats and isochronic tone
 - [Features and Bug Fixes](#features-and-bug-fixes)
 - [Compilation](#compilation)
   - [Build Scripts Structure](#build-scripts-structure)
-  - [Building with Docker](#building-with-docker-recommended-for-linux-and-windows-builds)
-  - [Building Natively](#building-natively)
+  - [Building with Docker](#option-1-using-docker-compose-simplest-method)
+  - [Building Natively](#option-2-building-natively)
 - [Installation](#installation)
   - [Download Pre-built Binaries](#download-pre-built-binaries)
   - [Installing on Linux](#installing-on-linux)
@@ -49,19 +49,13 @@ SBaGen+ can be compiled for macOS, Linux and Windows. The build process is divid
 - **Library build scripts**:
 
   - `macos-build-libs.sh`: Builds libraries for macOS (universal binary - ARM64 + x86_64)
-  - `linux-build-libs.sh`: Builds libraries for Linux (32-bit and 64-bit)
+  - `linux-build-libs.sh`: Builds libraries for Linux (32-bit, 64-bit, ARM64 [if native])
   - `windows-build-libs.sh`: Builds libraries for Windows using MinGW (cross-compilation)
 
 - **Main program build scripts**:
-  - `macos-build-sbagen+.sh`: Builds SBaGen+ for macOS
-  - `linux-build-sbagen+.sh`: Builds SBaGen+ for Linux (with ALSA support)
+  - `macos-build-sbagen+.sh`: Builds SBaGen+ for macOS (universal binary - ARM64 + x86_64)
+  - `linux-build-sbagen+.sh`: Builds SBaGen+ for Linux (32-bit, 64-bit, ARM64 [if native])
   - `windows-build-sbagen+.sh`: Builds SBaGen+ for Windows using MinGW (cross-compilation)
-
-### Building with Docker (Recommended for Linux and Windows builds)
-
-Using Docker is the recommended method for building SBaGen+ for Linux and Windows platforms. This approach ensures a consistent build environment with all necessary dependencies.
-
-**Note**: macOS users will still need to use the native build scripts (`macos-build-*.sh`) on their local machine. Docker is only used to compile Linux and Windows versions, not macOS versions.
 
 #### Option 1: Using Docker Compose (Simplest Method)
 
@@ -77,58 +71,11 @@ docker compose up build-arm64
 
 This will automatically build the Docker image and run all necessary build scripts to generate the binaries for Linux and Windows. All compiled binaries will be placed in the `dist` directory.
 
-#### Option 2: Manual Docker Build
-
-If you prefer more control over the build process, you can use the following steps:
-
-##### 1. Build the Docker image:
-
-```bash
-# Build the Docker image
-docker build . --no-cache -t build-sbagen-plus:latest
-
-# Force build an x86_64 image on Apple Silicon or Linux ARM64:
-docker build --platform linux/amd64 . --no-cache -t build-sbagen-plus:x86_64
-```
-
-##### 2. Run the Docker container:
-
-```bash
-# Start a container with the current directory mounted
-docker run --rm -v .:/sbagen-plus -w /sbagen-plus -it build-sbagen-plus:latest bash
-
-# Start a container in x86_64 mode (for Linux ARM64 users and Apple Silicon users)
-docker run --rm --platform linux/amd64 -v .:/sbagen-plus -w /sbagen-plus -it build-sbagen-plus:x86_64 bash
-```
-
-##### 3. Inside the container, run the build scripts:
-
-```bash
-# Build libraries and binaries for Linux
-./linux-build-libs.sh     # Compiles libraries for x86/x86_64 or ARM64 (if native)
-./linux-build-sbagen+.sh  # Compiles SBaGen+ for x86/x86_64 or ARM64 (if native)
-
-# Build libraries and binaries for Windows
-./windows-build-libs.sh     # Compiles libraries for win32/win64
-./windows-build-sbagen+.sh  # Compiles SBaGen+ for win32/win64
-```
-
-##### 4. After compilation, you'll find the following executables in the `dist` directory:
-
-- `sbagen+-linux32`
-- `sbagen+-linux64`
-- `sbagen+-win32.exe`
-- `sbagen+-win64.exe`
-
-For Linux ARM64 users, only one executable will be generated:
-
-- `sbagen+-linux-arm64`
-
-### Building Natively
+#### Option 2: Building Natively
 
 If you prefer to build without Docker, you can use the build scripts directly on your system, provided you have all the necessary dependencies installed.
 
-#### Building for macOS
+##### Building for macOS
 
 ```bash
 # Build the libraries (only needed for MP3 and OGG support)
@@ -142,7 +89,7 @@ After compilation, you'll find the universal binary (works on both Intel and App
 
 - `sbagen+-macos-universal`
 
-#### Building for Linux
+##### Building for Linux
 
 ```bash
 # Build the libraries (only needed for MP3 and OGG support)
@@ -152,7 +99,7 @@ After compilation, you'll find the universal binary (works on both Intel and App
 ./linux-build-sbagen+.sh
 ```
 
-#### Building for Windows (cross-compilation on Linux/macOS)
+##### Building for Windows (cross-compilation on Linux/macOS)
 
 ```bash
 # Build the libraries (only needed for MP3 and OGG support)
