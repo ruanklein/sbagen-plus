@@ -164,11 +164,7 @@
  #include <mmsystem.h>
 #endif
 #ifdef MAC_AUDIO
-#ifndef NO_CARBON
-#include <Carbon.h>
-#endif
 #include <CoreAudio/CoreAudio.h>
-#include <CoreAudio/AudioHardware.h>
 #endif
 #ifdef UNIX_TIME
  #include <sys/ioctl.h>
@@ -2279,31 +2275,43 @@ setup_device(void) {
 
     // Find default device
     propertySize= sizeof(aud_dev);
-    if ((err= AudioHardwareGetProperty(kAudioHardwarePropertyDefaultOutputDevice,
-				       &propertySize, &aud_dev)))
-      error("Get default output device failed, status = %d", (int)err);
+    AudioObjectPropertyAddress propertyAddress = {
+        kAudioHardwarePropertyDefaultOutputDevice,
+        kAudioObjectPropertyScopeGlobal,
+        kAudioObjectPropertyElementMaster
+    };
+    if ((err = AudioObjectGetPropertyData(kAudioObjectSystemObject, &propertyAddress, 0, NULL, &propertySize, &aud_dev)))
+    {
+        error("Get default output device failed, status = %d", (int)err);
+    }
     
     if (aud_dev == kAudioDeviceUnknown)
       error("No default audio device found");
     
     // Get device name
-    propertySize= sizeof(deviceName);
-    if ((err= AudioDeviceGetProperty(aud_dev, 1, 0,
-				     kAudioDevicePropertyDeviceName,
-				     &propertySize, deviceName)))
-      error("Get audio device name failed, status = %d", (int)err);
+    propertySize = sizeof(deviceName);
+    propertyAddress.mSelector = kAudioDevicePropertyDeviceName;
+    propertyAddress.mScope = kAudioObjectPropertyScopeGlobal;
+    propertyAddress.mElement = kAudioObjectPropertyElementMaster;
+    if ((err = AudioObjectGetPropertyData(aud_dev, &propertyAddress, 0, NULL, &propertySize, deviceName)))
+    {
+        error("Get audio device name failed, status = %d", (int)err);
+    }
     
     // Get device properties
-    propertySize= sizeof(streamDesc);
-    if ((err= AudioDeviceGetProperty(aud_dev, 1, 0,
-				     kAudioDevicePropertyStreamFormat,
-				     &propertySize, &streamDesc))) 
-      error("Get audio device properties failed, status = %d", (int)err);
+    propertySize = sizeof(streamDesc);
+    propertyAddress.mSelector = kAudioDevicePropertyStreamFormat;
+    propertyAddress.mScope = kAudioObjectPropertyScopeOutput; // Adjusted for output
+    propertyAddress.mElement = kAudioObjectPropertyElementMaster;
+    if ((err = AudioObjectGetPropertyData(aud_dev, &propertyAddress, 0, NULL, &propertySize, &streamDesc)))
+    {
+        error("Get audio device properties failed, status = %d", (int)err);
+    }
 
     out_rate= (int)streamDesc.mSampleRate;
 
     if (streamDesc.mChannelsPerFrame != 2) 
-      error("SBaGen requires a stereo output device -- \n"
+      error("SBaGen+ requires a stereo output device -- \n"
 	    "default output has %d channels",
 	    streamDesc.mChannelsPerFrame);
 
@@ -2313,12 +2321,15 @@ setup_device(void) {
 	    "default output uses another format");
 
     // Set buffer size
-    bufferByteCount= BUFFER_SIZE / 2 * sizeof(float);
-    propertySize= sizeof(bufferByteCount);
-    if ((err= AudioDeviceSetProperty(aud_dev, 0, 0, 0,
-				     kAudioDevicePropertyBufferSize,
-				     propertySize, &bufferByteCount))) 
-      error("Set audio output buffer size failed, status = %d", (int)err);
+    bufferByteCount = BUFFER_SIZE / 2 * sizeof(float);
+    propertySize = sizeof(bufferByteCount);
+    propertyAddress.mSelector = kAudioDevicePropertyBufferSize;
+    propertyAddress.mScope = kAudioObjectPropertyScopeGlobal;
+    propertyAddress.mElement = kAudioObjectPropertyElementMaster;
+    if ((err = AudioObjectSetPropertyData(aud_dev, &propertyAddress, 0, NULL, propertySize, &bufferByteCount)))
+    {
+        error("Set audio output buffer size failed, status = %d", (int)err);
+    }
 
     // Setup callback and start it
     err= AudioDeviceAddIOProc(aud_dev, mac_callback, (void *)1);

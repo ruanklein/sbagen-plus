@@ -20,7 +20,7 @@ OGG_LIB_PATH="libs/macos-universal-libogg.a"
 TREMOR_LIB_PATH="libs/macos-universal-libvorbisidec.a"
 
 # Define compilation flags
-CFLAGS="-DT_MACOSX -arch arm64 -arch x86_64 -mmacosx-version-min=11.0 -DNO_CARBON -Wno-deprecated-declarations -I."
+CFLAGS="-DT_MACOSX -arch arm64 -arch x86_64 -mmacosx-version-min=11.0 -I."
 LIBS="-framework CoreAudio"
 
 # Check for MP3 support
