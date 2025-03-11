@@ -227,6 +227,7 @@ extern int out_rate, out_rate_def;
 void create_drop(int ac, char **av);
 void create_slide(int ac, char **av);
 void validateTotalAmplitude(Voice *voices, int numChannels, const char *line, int lineNum);
+void printSequenceDuration();
 
 #define ALLOC_ARR(cnt, type) ((type*)Alloc((cnt) * sizeof(type)))
 #define uint unsigned int
@@ -1445,8 +1446,7 @@ loop() {
     byte_count= out_bps * (S64)(duration * 0.001 * out_rate /
                 (fast ? fast_mult : 1));
     if (!opt_Q) {
-      fprintf(stderr, "*** Sequence duration: %02d:%02d:%02d (hh:mm:ss) ***\n", 
-              duration/3600000, (duration/60000)%60, (duration/1000)%60);
+      printSequenceDuration();
     }
   }
 
@@ -2820,6 +2820,11 @@ correctPeriods() {
       while (per->prv->tim < per->tim) per= per->nxt;
 
     pp= per;
+
+    if(!opt_Q) {
+      printSequenceDuration();
+    }
+
     do {
       dispCurrPer(stdout);
       per= per->nxt;
@@ -3565,6 +3570,12 @@ void validateTotalAmplitude(Voice *voices, int numChannels, const char *line, in
     error("Total amplitude exceeds 100%% (%.2f%%) at line %d:\n  %s\nPlease reduce amplitudes to prevent audio distortion.", 
           totalAmplitude, lineNum, line);
   }
+}
+
+void printSequenceDuration() {
+  int duration = t_per0(fast_tim0, fast_tim1);
+  fprintf(stdout, "\n*** Sequence duration: %02d:%02d:%02d (hh:mm:ss) ***\n\n", 
+          duration/3600000, (duration/60000)%60, (duration/1000)%60);
 }
 
 // END //
