@@ -274,6 +274,9 @@ help() {
 	  NL "          -r rate   Select the output rate (default is 44100 Hz, or from -m)"
 #ifndef MAC_AUDIO
 	  NL "          -b bits   Select the number bits for output (8 or 16, default 16)"
+#else
+	  NL "          -B size   Force buffer size (in samples) for audio output."
+    NL "                     (e.g. 1024, 2048, 4096, etc.)"
 #endif
 	  NL "          -L time   Select the length of time (hh:mm or hh:mm:ss) to output"
 	  NL "                     for.  Default is to output forever."
@@ -449,6 +452,9 @@ char *opt_d= "/dev/dsp";	// Output device
 #endif
 int opt_L= -1;			// Length of WAV file in ms
 int opt_T= -1;			// Time to start at (for -S option)
+#ifdef MAC_AUDIO
+int opt_B= -1;		// Buffer size override (-1 = auto)
+#endif
 
 FILE *mix_in;			// Input stream for mix sound data, or 0
 int mix_cnt;			// Version number from mix filename (#<digits>), or -1
@@ -845,6 +851,17 @@ scanOptions(int *acp, char ***avp) {
 	     if (argc-- < 1 || 1 != sscanf(*argv++, "%d %c", &fade_int, &dmy)) 
 		error("-F expects fade-time in ms");
 	     break;
+#ifdef MAC_AUDIO
+	  case 'B':
+	     if (argc-- < 1 || 1 != sscanf(*argv++, "%d %c", &opt_B, &dmy)) 
+		      error("-B expects buffer size in samples");
+       if (opt_B < 1024 || opt_B > BUFFER_SIZE / 2)
+          error("Buffer size must be between 1024 and %d samples.", BUFFER_SIZE / 2);
+       if ((opt_B & (opt_B - 1)) != 0)
+          error("Buffer size must be a power of 2. (e.g. 1024, 2048, 4096, etc.)");
+       opt_B *= 2;
+	     break;
+#endif
 	  case 'c':
 	     if (argc-- < 1) error("-c expects argument");
 	     setupOptC(*argv++);
@@ -2256,9 +2273,11 @@ setup_device(void) {
     OSStatus err;
     UInt32 propertySize, bufferByteCount;
     struct AudioStreamBasicDescription streamDesc;
+    
     int old_out_rate= out_rate;
+    int buffer_size= opt_B > 0 ? opt_B : BUFFER_SIZE;
 
-    out_bsiz= BUFFER_SIZE;
+    out_bsiz= buffer_size;
     out_blen= out_mode ? out_bsiz/2 : out_bsiz;
     out_bps= out_mode ? 4 : 2;
     out_buf= (short*)Alloc(out_blen * sizeof(short));
@@ -2321,7 +2340,7 @@ setup_device(void) {
 	    "default output uses another format");
 
     // Set buffer size
-    bufferByteCount = BUFFER_SIZE / 2 * sizeof(float);
+    bufferByteCount = buffer_size * sizeof(float);
     propertySize = sizeof(bufferByteCount);
     propertyAddress.mSelector = kAudioDevicePropertyBufferSize;
     propertyAddress.mScope = kAudioObjectPropertyScopeGlobal;
@@ -2401,7 +2420,7 @@ OSStatus mac_callback(AudioDeviceID inDevice,
 		      void *inClientData) 
 {
   float *fp= outOutputData->mBuffers[0].mData;
-  int cnt= BUFFER_SIZE / 2;
+  int cnt= opt_B > 0 ? opt_B / 2 : BUFFER_SIZE / 2;
   short *sp;
 
   if (aud_rd == aud_wr) {
