@@ -2340,7 +2340,7 @@ setup_device(void) {
 	    "default output uses another format");
 
     // Set buffer size
-    bufferByteCount = buffer_size * sizeof(float);
+    bufferByteCount = (float) buffer_size / 2 * sizeof(float);
     propertySize = sizeof(bufferByteCount);
     propertyAddress.mSelector = kAudioDevicePropertyBufferSize;
     propertyAddress.mScope = kAudioObjectPropertyScopeGlobal;
