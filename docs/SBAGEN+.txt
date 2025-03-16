@@ -194,6 +194,11 @@ While headphones are essential for binaural beats, isochronic tones can be
 effective with or without headphones, though headphones may still provide 
 a more immersive experience.
 
+The white noise generates a random signal with equal energy at all frequencies.
+It can be used for masking background sounds or as a meditation aid. The
+amplitude <amp> controls the volume level. For example, white/10 generates
+white noise at 10% amplitude.
+
 
 Some more theory -- the oscillations in the brain are split into four
 'bands' according to frequency:
@@ -351,6 +356,16 @@ While you're at it, try the alternate 'spin' effect.  Not everyone
 likes this, but in any case it's there if you want to use it:
 
 >> sbagen -i spin:300+4.2/80
+
+You can also try the 'mixspin' effect, which applies a spatial rotation to
+audio input instead of to pink noise:
+
+>> sbagen -m river1.ogg -i mix/80 mixspin:500+8.0/50
+
+The mixspin effect creates an immersive spatial experience where the sound
+appears to rotate around your head. The width parameter (500μs in this example)
+controls how wide the rotation effect is, the frequency (8.0Hz) controls how
+fast it rotates, and the intensity (50%) controls the strength of the effect.
 
 If you're having trouble with your soundcard or CPU usage on a very
 old machine, use the -r or -b options to run at a lower output rate or
@@ -1064,6 +1079,7 @@ Here are the different types:
   <carrier>/<amp>		# Sine-wave (a binaural tone with 0Hz beat)
   bell+<freq>/<amp>             # Bell sound
   spin:<width>+<freq>/<amp>     # Spinning variable-delay pink noise
+  mixspin:<width>+<freq>/<amp>  # Spinning effect on mix input
   <carrier>@<pulse>/<amp>       # Isochronic tones
   wave<num>:<carrier><sign><freq>/<amp>
                                 # Binaural tones using a user-defined 
@@ -1121,6 +1137,17 @@ this case, the first number is the width of the maximum delay from
 centre in microseconds.  Values from 100 to 500 seem good to me,
 although you might want to experiment with this.  The second number is
 the beat frequency and the third is the amplitude, as above.
+
+The mixspin effect creates a spatial rotation effect on the audio input stream
+(specified with mix/<amp>). The <width> parameter controls the amplitude of 
+the rotation effect in microseconds (typically 100-500μs), <freq> determines 
+the rotation speed in Hz, and <amp> controls the intensity of the effect 
+(0-100%). For example, mixspin:500+8.0/50 creates a spinning effect with 
+500μs width, rotating at 8Hz with 50% intensity. This creates an immersive 
+spatial effect where the sound appears to rotate around the listener's head.
+The mixspin effect must be used in conjunction with a mix/<amp> specification
+in the same tone set, as it processes the audio input rather than generating
+its own tones. Higher intensity values create more pronounced rotation effects.
 
 Binaural tones generated using wave<num> work just the same way as
 normal binaural tones.  See the section later on for details.
