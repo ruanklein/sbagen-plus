@@ -46,9 +46,14 @@ SBaGen+ uses a specific syntax to define tones:
 
   - Example: `300@10/20` - A 300Hz carrier pulsing at 10Hz at 20% amplitude
 
-- **Mixspin**: `mixspin:[width]+[frequency]/[amplitude]`
+- **Mixspin**: `mixspin:[width]+[frequency]/[intensity]`
 
   - Example: `mixspin:500+8.0/50` - A spinning effect with 500μs width, rotating at 8Hz with 50% intensity
+  - Note: Requires `mix/<amplitude>` to be specified in the same tone set
+
+- **Mixpulse**: `mixpulse:[pulse]/[intensity]`
+
+  - Example: `mixpulse:10/50` - A pulse effect with a rate of 10Hz and 50% intensity
   - Note: Requires `mix/<amplitude>` to be specified in the same tone set
 
 - **Noise**: `[type]/[amplitude]`
@@ -69,6 +74,12 @@ mix/80 mixspin:500+8.0/50
 ```
 
 This creates a spinning effect on the audio input (mix) at 80% amplitude, with the spin rotating at 8Hz and an intensity of 50%.
+
+```
+mix/80 mixpulse:10/50
+```
+
+This creates a pulse effect on the audio input (mix) at 80% amplitude, with the pulse rate of 10Hz and an intensity of 50%.
 
 ## Command Line Basics
 

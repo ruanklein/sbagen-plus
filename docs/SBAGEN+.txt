@@ -367,6 +367,14 @@ appears to rotate around your head. The width parameter (500μs in this example)
 controls how wide the rotation effect is, the frequency (8.0Hz) controls how
 fast it rotates, and the intensity (50%) controls the strength of the effect.
 
+You can also try the 'mixpulse' effect, which applies a pulse effect to the
+audio input instead of to pink noise:
+
+>> sbagen -m river1.ogg -i mix/80 mixpulse:10/50
+
+The mixpulse effect creates a rhythmic pulse effect where the sound intensity
+fluctuates at the given rate. The pulse rate is 10Hz and the intensity is 50%.
+
 If you're having trouble with your soundcard or CPU usage on a very
 old machine, use the -r or -b options to run at a lower output rate or
 bit-width.  For example:
@@ -1070,20 +1078,21 @@ adjusted in the source code -- search for N_CH).
 
 Here are the different types:
 
-  -                             # Channel not in use
-  pink/<amp>                    # Pink noise
-  white/<amp>                   # White noise
-  brown/<amp>                   # Brown noise
-  mix/<amp>                     # Soundtrack input mix
-  <carrier><sign><freq>/<amp>   # Binaural tones
-  <carrier>/<amp>		# Sine-wave (a binaural tone with 0Hz beat)
-  bell+<freq>/<amp>             # Bell sound
-  spin:<width>+<freq>/<amp>     # Spinning variable-delay pink noise
-  mixspin:<width>+<freq>/<amp>  # Spinning effect on mix input
-  <carrier>@<pulse>/<amp>       # Isochronic tones
+  -                                   # Channel not in use
+  pink/<amp>                          # Pink noise
+  white/<amp>                         # White noise
+  brown/<amp>                         # Brown noise
+  mix/<amp>                           # Soundtrack input mix
+  <carrier><sign><freq>/<amp>         # Binaural tones
+  <carrier>/<amp>		                  # Sine-wave (a binaural tone with 0Hz beat)
+  bell+<freq>/<amp>                   # Bell sound
+  spin:<width>+<freq>/<amp>           # Spinning variable-delay pink noise
+  mixspin:<width>+<freq>/<intensity>  # Spinning effect on mix input
+  mixpulse:<pulse>/<intensity>        # Pulse effect on mix input
+  <carrier>@<pulse>/<amp>             # Isochronic tones
   wave<num>:<carrier><sign><freq>/<amp>
-                                # Binaural tones using a user-defined 
-                                # waveform (*EXPERIMENTAL*, see later)
+                                      # Binaural tones using a user-defined 
+                                      # waveform (*EXPERIMENTAL*, see later)
 
 The amplitudes are expressed on a scale 0-100.  The total of all the
 amplitudes <amp> in a tone-set should not exceed 100, or else there
@@ -1141,13 +1150,19 @@ the beat frequency and the third is the amplitude, as above.
 The mixspin effect creates a spatial rotation effect on the audio input stream
 (specified with mix/<amp>). The <width> parameter controls the amplitude of 
 the rotation effect in microseconds (typically 100-500μs), <freq> determines 
-the rotation speed in Hz, and <amp> controls the intensity of the effect 
+the rotation speed in Hz, and <intensity> controls the intensity of the effect 
 (0-100%). For example, mixspin:500+8.0/50 creates a spinning effect with 
 500μs width, rotating at 8Hz with 50% intensity. This creates an immersive 
 spatial effect where the sound appears to rotate around the listener's head.
 The mixspin effect must be used in conjunction with a mix/<amp> specification
 in the same tone set, as it processes the audio input rather than generating
 its own tones. Higher intensity values create more pronounced rotation effects.
+
+The mixpulse effect creates a pulse effect on the audio input stream
+(specified with mix/<amp>). The <pulse> parameter controls the pulse rate in Hz,
+and <intensity> controls the intensity of the effect (0-100%). For example, mixpulse:10/50
+creates a pulse effect with a rate of 10Hz and 50% intensity. This creates a rhythmic
+pulse effect where the sound intensity fluctuates at the given rate.
 
 Binaural tones generated using wave<num> work just the same way as
 normal binaural tones.  See the section later on for details.
