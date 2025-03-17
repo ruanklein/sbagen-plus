@@ -36,7 +36,7 @@
 // defined, which selects options for that platform, or else with some
 // of the individual named flags #defined as listed later.
 //
-//  T_LINUX	To build the LINUX version with /dev/dsp support
+//  T_LINUX	To build the LINUX version with ALSA support
 //  T_MINGW	To build for Windows using MinGW and Win32 calls
 //  T_MSVC	To build for Windows using MSVC and Win32 calls
 //  T_MACOSX	To build for MacOSX using CoreAudio
@@ -44,7 +44,6 @@
 //
 // Ogg and MP3 support is handled separately from the T_* macros.
 
-// Define OSS_AUDIO to use /dev/dsp for audio output
 // Define ALSA_AUDIO to use ALSA for audio output
 // Define WIN_AUDIO to use Win32 calls
 // Define MAC_AUDIO to use Mac CoreAudio calls
@@ -60,13 +59,6 @@
 // Define MP3_DECODE to include MP3 support code
 
 #ifdef T_LINUX
-#define OSS_AUDIO
-#define UNIX_TIME
-#define UNIX_MISC
-#define ANSI_TTY
-#endif
-
-#ifdef T_LINUX_ALSA
 #define ALSA_AUDIO
 #define UNIX_TIME
 #define UNIX_MISC
@@ -101,12 +93,10 @@
 #endif
 
 // Make sure NO_AUDIO is set if necessary
-#ifndef OSS_AUDIO
 #ifndef MAC_AUDIO
 #ifndef WIN_AUDIO
 #ifndef ALSA_AUDIO
 #define NO_AUDIO
-#endif
 #endif
 #endif
 #endif
@@ -152,10 +142,6 @@
  #define vsnprintf _vsnprintf
 #endif
 
-#ifdef OSS_AUDIO
- #include <linux/soundcard.h>
- //WAS: #include <sys/soundcard.h>
-#endif
 #ifdef ALSA_AUDIO
  #include <alsa/asoundlib.h>
 #endif
@@ -287,7 +273,7 @@ help() {
 	  NL "                     instead of outputting forever."
 	  NL "          -T time   Start at the given clock-time (hh:mm)"
 	  NL
-	  NL "          -o file   Output raw data to the given file instead of /dev/dsp"
+	  NL "          -o file   Output raw data to the given file instead of default device"
 	  NL "          -O        Output raw data to the standard output"
 	  NL "          -W        Output a WAV-format file instead of raw data"
 	  NL "          -m file   Read audio data from the given file and mix it with the"
@@ -305,9 +291,6 @@ help() {
 	  NL "          -R rate   Select rate in Hz that frequency changes are recalculated"
 	  NL "                     (for file/pipe output only, default is 10Hz)"
 	  NL "          -F fms    Fade in/out time in ms (default 60000ms, or 1min)"
-#ifdef OSS_AUDIO
-	  NL "          -d dev    Select a different output device instead of /dev/dsp"
-#endif
 #ifdef ALSA_AUDIO
 	  NL "          -d dev    Select a different ALSA device instead of 'default'"
 #endif
@@ -436,12 +419,8 @@ int opt_M, opt_S, opt_E;
 char *opt_o, *opt_m;
 int opt_O;
 int opt_W;
-#ifdef OSS_AUDIO
-char *opt_d= "/dev/dsp";	// Output device
-#elif defined(ALSA_AUDIO)
+#ifdef ALSA_AUDIO
 char *opt_d= "default";	// Output device to ALSA
-#else
-char *opt_d= "/dev/dsp";	// Output device
 #endif
 int opt_L= -1;			// Length of WAV file in ms
 int opt_T= -1;			// Time to start at (for -S option)
@@ -896,12 +875,6 @@ scanOptions(int *acp, char ***avp) {
 	     opt_o= *argv++;
 	     if (!fast_mult) fast_mult= 1;		// Don't try to sync with real time
 	     break;
-#ifdef OSS_AUDIO
-	  case 'd':
-	     if (argc-- < 1) error("Expecting device filename after -d");
-	     opt_d= *argv++;
-	     break;
-#endif
 #ifdef ALSA_AUDIO
 	  case 'd':
 	     if (argc-- < 1) error("Expecting ALSA device name after -d");
@@ -2228,73 +2201,6 @@ setup_device(void) {
   }
 #endif
 
-#ifdef OSS_AUDIO
-  // Normal /dev/dsp output
-  {
-    int stereo, rate, fragsize, numfrags, enc;
-    int targ_ms= 400;	// How much buffering we want, ideally
-    int afmt_req, afmt;
-    int test= 1;
-    audio_buf_info info;
-    int retry= 0;
-
-    fragsize= 14;  // Ask for fragments of 2^14 == 16384 bytes == 4096 samples
-
-    while (1) {
-       if (0 > (out_fd= open(opt_d, O_WRONLY)))
-	  error("Can't open %s, errno %d", opt_d, errno);
-       
-       afmt= afmt_req= ((out_mode == 0) ? AFMT_U8 : 
-			((char*)&test)[0] ? AFMT_S16_LE : AFMT_S16_BE);
-       stereo= 1;
-       rate= out_rate;
-       numfrags= (out_rate * 4 * targ_ms / 1000) >> fragsize;
-       if (numfrags < 1) numfrags= 1;
-       enc= (numfrags<<16) | fragsize;
-       
-       if (0 > ioctl(out_fd, SNDCTL_DSP_SETFRAGMENT, &enc) ||
-	   0 > ioctl(out_fd, SNDCTL_DSP_SAMPLESIZE, &afmt) ||
-	   0 > ioctl(out_fd, SNDCTL_DSP_STEREO, &stereo) ||
-	   0 > ioctl(out_fd, SNDCTL_DSP_SPEED, &rate))
-	  error("Can't configure %s, errno %d", opt_d, errno);
-       
-       if (afmt != afmt_req) 
-	  error("Can't open device in %d-bit mode", out_mode ? 16 : 8);
-       if (!stereo)
-	  error("Can't open device in stereo");
-       
-       out_rate= rate;
-       
-       if (-1 == ioctl(out_fd, SNDCTL_DSP_GETOSPACE, &info))
-	  error("Can't get audio buffer info, errno %d", errno);
-
-       if (!retry && info.fragsize != (1<<fragsize)) {
-	  // We've received a different fragment size to what we asked
-	  // for.  This means that the numfrags calculation is wrong.
-	  // Re-open based on this fragsize.
-	  close(out_fd);
-	  for (fragsize= 1; (1<<fragsize) < info.fragsize; fragsize++) ;
-	  retry= 1;
-	  //warn("Retrying /dev/dsp open for fragsize %d", fragsize);
-	  continue;
-       }
-       break;
-    }
-    
-    out_bsiz= info.fragsize;
-    out_blen= out_mode ? out_bsiz/2 : out_bsiz;
-    out_bps= out_mode ? 4 : 2;
-    out_buf= (short*)Alloc(out_blen * sizeof(short));
-    out_buf_lo= (int)(0x10000 * 1000.0 * 0.5 * out_blen / out_rate);
-    out_buf_ms= out_buf_lo >> 16;
-    out_buf_lo &= 0xFFFF;
-    tmp_buf= (int*)Alloc(out_blen * sizeof(int));
-    
-    if (!opt_Q)
-       warn("Outputting %d-bit audio at %d Hz with %d %d-sample fragments, %d ms per fragment",
-	    out_mode ? 16 : 8, out_rate, info.fragstotal, out_blen/2, out_buf_ms);
-  }
-#endif
 #ifdef WIN_AUDIO
   // Output using Win32 calls
   {
