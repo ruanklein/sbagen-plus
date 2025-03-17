@@ -2,7 +2,7 @@
 //	SBaGen+ - Sequenced Brainwave Generator
 //
 //	Original version (c) 1999-2011 Jim Peters <jim@uazu.net>
-//	Current fork maintained by Ruan <https://ruan.sh/>
+//	This fork maintained by Ruan <https://ruan.sh/>
 //
 //	For latest version see http://sbagen.sf.net/ or
 //	http://uazu.net/sbagen/. Released under the GNU GPL version 2.
@@ -30,7 +30,7 @@
 //	FINK project's patches to ESounD, by Shawn Hsiao and Masanori
 //	Sekino.  See: http://fink.sf.net
 
-#define VERSION "1.5.0"
+#define VERSION "1.5.2"
 
 // This should be built with one of the following target macros
 // defined, which selects options for that platform, or else with some
@@ -255,12 +255,12 @@ void
 help() {
    printf("SBaGen+ - Sequenced Brainwave Generator, version " VERSION
      NL "Original version (c) 1999-2011 Jim Peters, http://uazu.net/"
-     NL "Current fork maintained by Ruan, https://ruan.sh/"
+     NL "This fork maintained by Ruan, https://ruan.sh/"
 	  NL "Released under the GNU GPL v2. See file COPYING."
 	  NL 
-	  NL "Usage: sbagen [options] seq-file ..."
-	  NL "       sbagen [options] -i tone-specs ..."
-	  NL "       sbagen [options] -p pre-programmed-sequence-specs ..."
+	  NL "Usage: sbagen+ [options] seq-file ..."
+	  NL "       sbagen+ [options] -i tone-specs ..."
+	  NL "       sbagen+ [options] -p pre-programmed-sequence-specs ..."
 	  NL
 	  NL "Options:  -h        Display this help-text"
 	  NL "          -Q        Quiet - don't display running status"
@@ -321,30 +321,24 @@ void
 usage() {
   error("SBaGen+ - Sequenced Brainwave Generator, version " VERSION 
 	NL "Original version (c) 1999-2011 Jim Peters, http://uazu.net/"
-	NL "Current fork maintained by Ruan, https://ruan.sh/"
+	NL "This fork maintained by Ruan, https://ruan.sh/"
 	NL "Released under the GNU GPL v2. See file COPYING."
 	NL 
-	NL "Usage: sbagen [options] seq-file ..."
-	NL "       sbagen [options] -i tone-specs ..."
-	NL "       sbagen [options] -p pre-programmed-sequence-specs ..."
+	NL "Usage: sbagen+ [options] seq-file ..."
+	NL "       sbagen+ [options] -i tone-specs ..."
+	NL "       sbagen+ [options] -p pre-programmed-sequence-specs ..."
 	NL
-	NL "For full usage help, type 'sbagen -h'."
 	NL "SBaGen+ is a fork of the original SBaGen with added features."
+	NL "For full usage help, type 'sbagen+ -h'."
 #ifdef EXIT_KEY
 	NL
 	NL "Windows users please note that this utility is designed to be run as the"
 	NL "associated application for SBG files.  This should have been set up for you by"
 	NL "the installer.  You can run all the SBG files directly from the desktop by"
 	NL "double-clicking on them, and edit them using NotePad from the right-click menu."
-	NL "Alternatively, SBaGen may be run from the MS-DOS prompt (CMD on WinXP), or from"
-	NL "BAT files.  SBaGen is powerful software -- it is worth the effort of figuring"
-	NL "all this out.  See SBAGEN.TXT for the full documentation."
-	NL
-	NL "Editing the SBG files gives you access to the full tweakable power of SBaGen, "
-	NL "but if you want a simple GUI interface to the most basic features, you could "
-	NL "look at a user-contributed tool called SBaGUI:"
-	NL
-	NL "  http://sbagen.opensrc.org/wiki.php?page=SBaGUI"
+	NL "Alternatively, SBaGen+ may be run from the command line, or from"
+	NL "BAT/PS1 files.  SBaGen+ is powerful software -- it is worth the effort of figuring"
+	NL "all this out.  See SBAGEN+.TXT for the full documentation."
 #endif
 	NL);
 }
@@ -919,7 +913,7 @@ scanOptions(int *acp, char ***avp) {
 		error("Expecting integer after -R");
 	     break;
 	  default:
-	     error("Option -%c not known; run 'sbagen -h' for help", opt);
+	     error("Option -%c not known; run 'sbagen+ -h' for help", opt);
 	 }
       }
    }
