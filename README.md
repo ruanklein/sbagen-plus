@@ -115,14 +115,14 @@ You can either compile SBaGen+ from source as described above or download pre-bu
 
 ### Download Pre-built Binaries
 
-The latest release (v1.5.1) can be downloaded directly from the following links:
+The latest release (v1.5.2) can be downloaded directly from the following links:
 
-- Linux ARM64: [sbagen+-linux-arm64](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.1/sbagen+-linux-arm64)
-- Linux 32-bit: [sbagen+-linux32](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.1/sbagen+-linux32)
-- Linux 64-bit: [sbagen+-linux64](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.1/sbagen+-linux64)
-- macOS (Universal): [sbagen+-macos-universal](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.1/sbagen+-macos-universal)
-- Windows 32-bit: [sbagen+-win32.exe](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.1/sbagen+-win32.exe)
-- Windows 64-bit: [sbagen+-win64.exe](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.1/sbagen+-win64.exe)
+- Linux ARM64: [sbagen+-linux-arm64](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.2/sbagen+-linux-arm64)
+- Linux 32-bit: [sbagen+-linux32](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.2/sbagen+-linux32)
+- Linux 64-bit: [sbagen+-linux64](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.2/sbagen+-linux64)
+- macOS (Universal): [sbagen+-macos-universal](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.2/sbagen+-macos-universal)
+- Windows 32-bit: [sbagen+-win32.exe](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.2/sbagen+-win32.exe)
+- Windows 64-bit: [sbagen+-win64.exe](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.2/sbagen+-win64.exe)
 
 **Important**: Always verify the SHA256 checksum of downloaded binaries against those listed on the [releases page](https://github.com/ruanklein/sbagen-plus/releases) to ensure file integrity and security.
 
@@ -132,13 +132,13 @@ The latest release (v1.5.1) can be downloaded directly from the following links:
 
    ```bash
    # For 64-bit systems
-   wget https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.1/sbagen+-linux64
+   wget https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.2/sbagen+-linux64
 
    # For 32-bit systems
-   wget https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.1/sbagen+-linux32
+   wget https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.2/sbagen+-linux32
 
    # For ARM64 systems
-   wget https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.1/sbagen+-linux-arm64
+   wget https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.2/sbagen+-linux-arm64
    ```
 
 2. Verify the SHA256 checksum:
@@ -171,7 +171,7 @@ The latest release (v1.5.1) can be downloaded directly from the following links:
 1. Download the macOS universal binary:
 
    ```bash
-   curl -L -o sbagen+-macos-universal https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.1/sbagen+-macos-universal
+   curl -L -o sbagen+-macos-universal https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.2/sbagen+-macos-universal
    ```
 
 2. Verify the SHA256 checksum:
@@ -203,8 +203,8 @@ The latest release (v1.5.1) can be downloaded directly from the following links:
 
 1. Download the appropriate binary for your system from the [releases page](https://github.com/ruanklein/sbagen-plus/releases):
 
-   - [sbagen+-win32.exe](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.1/sbagen+-win32.exe) for 32-bit systems
-   - [sbagen+-win64.exe](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.1/sbagen+-win64.exe) for 64-bit systems
+   - [sbagen+-win32.exe](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.2/sbagen+-win32.exe) for 32-bit systems
+   - [sbagen+-win64.exe](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.2/sbagen+-win64.exe) for 64-bit systems
 
 2. Verify the SHA256 checksum (using PowerShell):
 
