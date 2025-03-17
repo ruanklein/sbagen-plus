@@ -356,7 +356,7 @@ usage() {
 #define N_CH 16			// Number of channels
 
 struct Voice {
-  int typ;			// Voice type: 0 off, 1 binaural, 2 pink noise, 3 bell, 4 spin, 5 mix, 6 mixspin, 7 mixbeat, 8 isochronic, 9 white noise, 10 brown noise, -1 to -100 wave00 to wave99
+  int typ;			// Voice type: 0 off, 1 binaural, 2 pink noise, 3 bell, 4 spin, 5 mix, 6 mixspin, 7 mixpulse, 8 isochronic, 9 white noise, 10 brown noise, -1 to -100 wave00 to wave99
   double amp;			// Amplitude level (0-4096 for 0-100%)
   double carr;			// Carrier freq (for binaural/bell/isochronic), width (for spin)
   double res;			// Resonance freq (-ve or +ve) (for binaural/spin/isochronic)
@@ -364,7 +364,7 @@ struct Voice {
 
 struct Channel {
   Voice v;			// Current voice setting (updated from current period)
-  int typ;			// Current type: 0 off, 1 binaural, 2 pink noise, 3 bell, 4 spin, 5 mix, 6 mixspin, 7 mixbeat, 8 isochronic, 9 white noise, 10 brown noise, -1 to -100 wave00 to wave99
+  int typ;			// Current type: 0 off, 1 binaural, 2 pink noise, 3 bell, 4 spin, 5 mix, 6 mixspin, 7 mixpulse, 8 isochronic, 9 white noise, 10 brown noise, -1 to -100 wave00 to wave99
   int amp, amp2;		// Current state, according to current type
   int inc1, off1;		//  ::  (for binaural tones, offset + increment into sine 
   int inc2, off2;		//  ::   table * 65536)
@@ -459,7 +459,7 @@ FILE *mix_in;			// Input stream for mix sound data, or 0
 int mix_cnt;			// Version number from mix filename (#<digits>), or -1
 int bigendian;			// Is this platform Big-endian?
 int mix_flag= 0;		// Has 'mix/*' been used in the sequence?
-double *mix_amp= NULL; // Amplitude of mix sound data to use with mixspin/mixbeat/mixpulse. Default is 100%
+double *mix_amp= NULL; // Amplitude of mix sound data to use with mixspin/mixpulse. Default is 100%
 
 int opt_c;			// Number of -c option points provided (max 16)
 struct AmpAdj { 
@@ -1208,6 +1208,10 @@ sprintVoice(char *p, Voice *vp, Voice *dup) {
       if (dup && vp->carr == dup->carr && vp->res == dup->res && vp->amp == dup->amp)
 	return sprintf(p, "  ::");
       return sprintf(p, " mixspin:%.2f%+.2f/%.2f", vp->carr, vp->res, AMP_AD(vp->amp));
+    case 7:  // Mixpulse - mix stream with pulse effect
+      if (dup && vp->res == dup->res && vp->amp == dup->amp)
+	return sprintf(p, "  ::");
+      return sprintf(p, " mixpulse:%.2f/%.2f", vp->res, AMP_AD(vp->amp));
     default:
       if (vp->typ < -100 || vp->typ > -1)
 	return sprintf(p, " ???");
@@ -1654,6 +1658,42 @@ outChunk() {
 	    tot2 += base_amp * mix_r;
 	  }
 	  break;
+       case 7:	// Mixpulse - mix stream with pulse effect
+          ch->off2 += ch->inc2;  // Modulator (pulse frequency)
+          ch->off2 &= (ST_SIZ << 16) - 1;
+          
+          // Create the isochronic pulse effect in the audio stream
+          {
+            int mod_val = sin_table[ch->off2 >> 16];
+            // Apply a threshold to create distinct pulses with space between them
+            double mod_factor = 0.0;
+            
+            // Use only the positive part of the sine wave and apply a threshold
+            // to create a space between pulses
+            if (mod_val > ST_AMP * 0.3) {  // Threshold of 30% of the maximum value
+              // Normalize from ST_AMP*0.3 to ST_AMP to 0 to 1
+              mod_factor = (mod_val - (ST_AMP * 0.3)) / (double)(ST_AMP * 0.7);
+              // Smooth the edges of the pulse to avoid clicks
+              mod_factor = mod_factor * mod_factor * (3 - 2 * mod_factor);  // Cubic smoothing
+            }
+            
+            // Apply the modulation factor to the audio stream
+            // Use base_amp as in mixspin (70% of amplitude for volume)
+            int base_amp = (int) (mix_amp != NULL ? *mix_amp : 4096.0) * 0.7;
+            
+            // Calculate the intensity of the effect based on amplitude (ch->amp)
+            // When ch->amp is 0, there is no effect (only the original audio)
+            // When ch->amp is 4096 (100%), the effect is maximum
+            double effect_intensity = (ch->amp / 4096.0) * 1.5;
+            
+            // Apply the modulation to the audio stream with variable intensity
+            // When effect_intensity is 0, only the original audio is reproduced
+            // When effect_intensity is 1, the audio is fully modulated by the pulse
+            double gain = (1.0 - effect_intensity) + (effect_intensity * mod_factor);
+            tot1 += base_amp * mix1 * gain;
+            tot2 += base_amp * mix2 * gain;
+          }
+          break;
        case 8:  // Isochronic tones
           ch->off1 += ch->inc1;  // Carrier (tone frequency)
           ch->off1 &= (ST_SIZ << 16) - 1;
@@ -1904,7 +1944,7 @@ corrVal(int running) {
       v1= &per->v1[a];
       vv= &ch->v;
 
-      // Pointer to the amplitude of the mix to use with mixspin/mixbeat/mixpulse
+      // Pointer to the amplitude of the mix to use with mixspin/mixpulse
       if(vv->typ == 5 && mix_amp == NULL)
         mix_amp= &vv->amp;
       
@@ -1923,6 +1963,8 @@ corrVal(int running) {
 	  case 8:  // Isochronic tones
 	     ch->off1= ch->off2= 0; break;
 	  case 6:  // Mixspin
+	     ch->off1= ch->off2= 0; break;
+	  case 7:  // Mixpulse
 	     ch->off1= ch->off2= 0; break;
 	  default:
 	     ch->off1= ch->off2= 0; break;
@@ -1964,6 +2006,10 @@ corrVal(int running) {
           vv->res= rat0 * v0->res + rat1 * v1->res;
           if (vv->carr > spin_carr_max) vv->carr= spin_carr_max; // Clipping sweep width
           if (vv->carr < -spin_carr_max) vv->carr= -spin_carr_max;
+          break;
+       case 7:  // Mixpulse
+          vv->amp= rat0 * v0->amp + rat1 * v1->amp;
+          vv->res= rat0 * v0->res + rat1 * v1->res;
           break;
        default:		// Waveform based binaural
 	  vv->amp= rat0 * v0->amp + rat1 * v1->amp;
@@ -2049,6 +2095,11 @@ corrVal(int running) {
           ch->amp= (int)vv->amp;
           ch->inc1= (int)(vv->res / out_rate * ST_SIZ * 65536);
           ch->inc2= (int)(vv->carr * 1E-6 * out_rate * (1<<24) / ST_AMP);
+          break;
+       case 7:  // Mixpulse
+          ch->amp= (int)vv->amp;
+          // Modulator (pulse frequency)
+          ch->inc2= (int)(vv->res / out_rate * ST_SIZ * 65536);
           break;
        default:		// Waveform based binaural
 	  ch->amp= (int)vv->amp;
@@ -3143,6 +3194,13 @@ readNameDef() {
       nd->vv[ch].amp= AMP_DA(amp);	
       continue;
     }
+    if (2 == sscanf(p, "mixpulse:%lf/%lf %c", &res, &amp, &dmy)) {
+      checkMixInSequence();
+      nd->vv[ch].typ= 7;
+      nd->vv[ch].res= res;
+      nd->vv[ch].amp= AMP_DA(amp);	
+      continue;
+    }
     badSeq();
   }
   
@@ -3649,17 +3707,17 @@ void validateTotalAmplitude(Voice *voices, int numChannels, const char *line, in
   double totalAmplitude = 0.0;
   
   for (int ch = 0; ch < numChannels; ch++) {
-    // Check if voice is mixspin or mixbeat to check if effect intensity is over 100%
+    // Check if voice is mixspin or mixpulse to check if effect intensity is over 100%
     if (voices[ch].typ == 6 || voices[ch].typ == 7) {
       double ampPercentage = voices[ch].amp / 40.96;
 
       if (ampPercentage > 100.0) {
-        error("Total intensity of mixspin or mixbeat exceeds 100%% (%.2f%%) at line %d:\n  %s\nPlease reduce intensity to prevent audio distortion.", 
+        error("Total intensity of mixspin/mixpulse exceeds 100%% (%.2f%%) at line %d:\n  %s\nPlease reduce intensity to prevent audio distortion.", 
               ampPercentage, lineNum, line);
       }
     }
 
-    if (voices[ch].typ != 0 && voices[ch].typ != 6 && voices[ch].typ != 7) { // If voice is active. Mixspin and Mixbeat are not included
+    if (voices[ch].typ != 0 && voices[ch].typ != 6 && voices[ch].typ != 7) { // If voice is active. Mixspin and Mixpulse are not included
       // Convert from internal amplitude format back to percentage
       double ampPercentage = voices[ch].amp / 40.96;
       totalAmplitude += ampPercentage;
@@ -3691,7 +3749,7 @@ void checkMixInSequence() {
   }
 
   if(!mix_exists)
-    error("mixspin/mixbeat/mixpulse without mix/<amp> specified, line %d:\n  %s", in_lin, lin_copy);
+    error("mixspin/mixpulse without mix/<amp> specified, line %d:\n  %s", in_lin, lin_copy);
 }
 
 // END //
