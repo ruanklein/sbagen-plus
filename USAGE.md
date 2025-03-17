@@ -46,6 +46,16 @@ SBaGen+ uses a specific syntax to define tones:
 
   - Example: `300@10/20` - A 300Hz carrier pulsing at 10Hz at 20% amplitude
 
+- **Mixspin**: `mixspin:[width]+[frequency]/[intensity]`
+
+  - Example: `mixspin:500+8.0/50` - A spinning effect with 500μs width, rotating at 8Hz with 50% intensity
+  - Note: Requires `mix/<amplitude>` to be specified in the same tone set
+
+- **Mixpulse**: `mixpulse:[pulse]/[intensity]`
+
+  - Example: `mixpulse:10/50` - A pulse effect with a rate of 10Hz and 50% intensity
+  - Note: Requires `mix/<amplitude>` to be specified in the same tone set
+
 - **Noise**: `[type]/[amplitude]`
   - Examples: `pink/40`, `white/30`, `brown/50`
 
@@ -58,6 +68,18 @@ pink/40 200+10/20 300@8/15
 ```
 
 This combines pink noise at 40% amplitude, a binaural beat with a 200Hz carrier and 10Hz beat at 20% amplitude, and an isochronic tone with a 300Hz carrier pulsing at 8Hz at 15% amplitude.
+
+```
+mix/80 mixspin:500+8.0/50
+```
+
+This creates a spinning effect on the audio input (mix) at 80% amplitude, with the spin rotating at 8Hz and an intensity of 50%.
+
+```
+mix/80 mixpulse:10/50
+```
+
+This creates a pulse effect on the audio input (mix) at 80% amplitude, with the pulse rate of 10Hz and an intensity of 50%.
 
 ## Command Line Basics
 
@@ -72,6 +94,9 @@ sbagen+ -i pink/40 300@6/20
 
 # Play a combination of brown noise and delta binaural beat for deep relaxation
 sbagen+ -i brown/50 100+3/25
+
+# Create a spinning effect on background music
+sbagen+ -m ambient-music.mp3 -i mix/80 mixspin:500+8.0/50
 
 # Play a sequence file
 sbagen+ my-sequence.sbg
@@ -211,5 +236,7 @@ Remember that brainwave entrainment is a tool to help you achieve certain mental
 ## Conclusion
 
 SBaGen+ is a powerful tool for exploring altered states of consciousness, enhancing meditation, improving focus, and aiding relaxation. This guide covers the basics to get you started, but there's much more to explore. As you become more familiar with the program, you can create increasingly sophisticated sequences tailored to your specific needs.
+
+For more technical details, see the [SBaGen+ Manual](docs/SBAGEN+.txt).
 
 Happy exploring!

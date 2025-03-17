@@ -54,6 +54,7 @@ Contents of this document:
 2.6.1: More detailed notes on -p drop options
 2.6.2: Adjusting the length of a -p drop session
 2.7: The 'slide' sequences
+2.8: Buffer Size Configuration for Bluetooth Devices on macOS
 
 3: Writing sequence files
 3.1: The sequence-file format
@@ -192,6 +193,11 @@ brainwave entrainment experiences.
 While headphones are essential for binaural beats, isochronic tones can be 
 effective with or without headphones, though headphones may still provide 
 a more immersive experience.
+
+The white noise generates a random signal with equal energy at all frequencies.
+It can be used for masking background sounds or as a meditation aid. The
+amplitude <amp> controls the volume level. For example, white/10 generates
+white noise at 10% amplitude.
 
 
 Some more theory -- the oscillations in the brain are split into four
@@ -350,6 +356,24 @@ While you're at it, try the alternate 'spin' effect.  Not everyone
 likes this, but in any case it's there if you want to use it:
 
 >> sbagen -i spin:300+4.2/80
+
+You can also try the 'mixspin' effect, which applies a spatial rotation to
+audio input instead of to pink noise:
+
+>> sbagen -m river1.ogg -i mix/80 mixspin:500+8.0/50
+
+The mixspin effect creates an immersive spatial experience where the sound
+appears to rotate around your head. The width parameter (500μs in this example)
+controls how wide the rotation effect is, the frequency (8.0Hz) controls how
+fast it rotates, and the intensity (50%) controls the strength of the effect.
+
+You can also try the 'mixpulse' effect, which applies a pulse effect to the
+audio input instead of to pink noise:
+
+>> sbagen -m river1.ogg -i mix/80 mixpulse:10/50
+
+The mixpulse effect creates a rhythmic pulse effect where the sound intensity
+fluctuates at the given rate. The pulse rate is 10Hz and the intensity is 50%.
 
 If you're having trouble with your soundcard or CPU usage on a very
 old machine, use the -r or -b options to run at a lower output rate or
@@ -909,6 +933,39 @@ experiment with the -c amplitude-compensation option (see the section
 above).
 
 
+2.8: Buffer Size Configuration for Bluetooth Devices on macOS
+------------------------------------------------------------
+
+Usage:
+
+  -B size
+
+Example:
+
+  sbagen+ -B 2048 -i 200+10/1
+  
+  or in a sequence file:
+  
+  -B 2048 # optional comment
+
+On macOS, some users may experience audio distortion when using Bluetooth devices. This occurs because the default audio buffer size may not be suitable for the higher latency of these wireless devices.
+
+The -B option allows you to set a custom buffer size (in samples) for audio output on macOS. Larger values generally result in fewer distortions on Bluetooth devices, but may slightly increase latency.
+
+Important points about this option:
+
+1. The value must be a power of 2 (e.g., 1024, 2048, 4096, 8192)
+2. The value must be between 1024 and the 8192
+3. This option is only available for macOS users
+4. Recommended values for Bluetooth devices: 2048 or 4096
+
+If you're using Bluetooth headphones or wireless speakers and notice distortions, crackling, or interruptions in the audio, try adding the -B option with a larger value. For example:
+
+  sbagen+ -m river1.ogg -B 2048 -p drop 00ds+ mix/99
+
+This option can also be included directly in sequence files, as shown in the example above. This is useful for creating sequences optimized for Bluetooth devices without having to specify the option on the command line.
+
+
 3: Writing sequence files
 -------------------------
 
@@ -1021,19 +1078,21 @@ adjusted in the source code -- search for N_CH).
 
 Here are the different types:
 
-  -                             # Channel not in use
-  pink/<amp>                    # Pink noise
-  white/<amp>                   # White noise
-  brown/<amp>                   # Brown noise
-  mix/<amp>                     # Soundtrack input mix
-  <carrier><sign><freq>/<amp>   # Binaural tones
-  <carrier>/<amp>		# Sine-wave (a binaural tone with 0Hz beat)
-  bell+<freq>/<amp>             # Bell sound
-  spin:<width>+<freq>/<amp>     # Spinning variable-delay pink noise
-  <carrier>@<pulse>/<amp>       # Isochronic tones
+  -                                   # Channel not in use
+  pink/<amp>                          # Pink noise
+  white/<amp>                         # White noise
+  brown/<amp>                         # Brown noise
+  mix/<amp>                           # Soundtrack input mix
+  <carrier><sign><freq>/<amp>         # Binaural tones
+  <carrier>/<amp>		                  # Sine-wave (a binaural tone with 0Hz beat)
+  bell+<freq>/<amp>                   # Bell sound
+  spin:<width>+<freq>/<amp>           # Spinning variable-delay pink noise
+  mixspin:<width>+<freq>/<intensity>  # Spinning effect on mix input
+  mixpulse:<pulse>/<intensity>        # Pulse effect on mix input
+  <carrier>@<pulse>/<amp>             # Isochronic tones
   wave<num>:<carrier><sign><freq>/<amp>
-                                # Binaural tones using a user-defined 
-                                # waveform (*EXPERIMENTAL*, see later)
+                                      # Binaural tones using a user-defined 
+                                      # waveform (*EXPERIMENTAL*, see later)
 
 The amplitudes are expressed on a scale 0-100.  The total of all the
 amplitudes <amp> in a tone-set should not exceed 100, or else there
@@ -1087,6 +1146,23 @@ this case, the first number is the width of the maximum delay from
 centre in microseconds.  Values from 100 to 500 seem good to me,
 although you might want to experiment with this.  The second number is
 the beat frequency and the third is the amplitude, as above.
+
+The mixspin effect creates a spatial rotation effect on the audio input stream
+(specified with mix/<amp>). The <width> parameter controls the amplitude of 
+the rotation effect in microseconds (typically 100-500μs), <freq> determines 
+the rotation speed in Hz, and <intensity> controls the intensity of the effect 
+(0-100%). For example, mixspin:500+8.0/50 creates a spinning effect with 
+500μs width, rotating at 8Hz with 50% intensity. This creates an immersive 
+spatial effect where the sound appears to rotate around the listener's head.
+The mixspin effect must be used in conjunction with a mix/<amp> specification
+in the same tone set, as it processes the audio input rather than generating
+its own tones. Higher intensity values create more pronounced rotation effects.
+
+The mixpulse effect creates a pulse effect on the audio input stream
+(specified with mix/<amp>). The <pulse> parameter controls the pulse rate in Hz,
+and <intensity> controls the intensity of the effect (0-100%). For example, mixpulse:10/50
+creates a pulse effect with a rate of 10Hz and 50% intensity. This creates a rhythmic
+pulse effect where the sound intensity fluctuates at the given rate.
 
 Binaural tones generated using wave<num> work just the same way as
 normal binaural tones.  See the section later on for details.

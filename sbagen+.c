@@ -2,7 +2,7 @@
 //	SBaGen+ - Sequenced Brainwave Generator
 //
 //	Original version (c) 1999-2011 Jim Peters <jim@uazu.net>
-//	Current fork maintained by Ruan <https://ruan.sh/>
+//	This fork maintained by Ruan <https://ruan.sh/>
 //
 //	For latest version see http://sbagen.sf.net/ or
 //	http://uazu.net/sbagen/. Released under the GNU GPL version 2.
@@ -30,7 +30,7 @@
 //	FINK project's patches to ESounD, by Shawn Hsiao and Masanori
 //	Sekino.  See: http://fink.sf.net
 
-#define VERSION "1.5.0"
+#define VERSION "1.5.2"
 
 // This should be built with one of the following target macros
 // defined, which selects options for that platform, or else with some
@@ -164,11 +164,7 @@
  #include <mmsystem.h>
 #endif
 #ifdef MAC_AUDIO
-#ifndef NO_CARBON
-#include <Carbon.h>
-#endif
 #include <CoreAudio/CoreAudio.h>
-#include <CoreAudio/AudioHardware.h>
 #endif
 #ifdef UNIX_TIME
  #include <sys/ioctl.h>
@@ -231,6 +227,8 @@ extern int out_rate, out_rate_def;
 void create_drop(int ac, char **av);
 void create_slide(int ac, char **av);
 void validateTotalAmplitude(Voice *voices, int numChannels, const char *line, int lineNum);
+void printSequenceDuration();
+void checkMixInSequence(); // Check if mix/<amp> is specified
 
 #define ALLOC_ARR(cnt, type) ((type*)Alloc((cnt) * sizeof(type)))
 #define uint unsigned int
@@ -257,12 +255,12 @@ void
 help() {
    printf("SBaGen+ - Sequenced Brainwave Generator, version " VERSION
      NL "Original version (c) 1999-2011 Jim Peters, http://uazu.net/"
-     NL "Current fork maintained by Ruan, https://ruan.sh/"
+     NL "This fork maintained by Ruan, https://ruan.sh/"
 	  NL "Released under the GNU GPL v2. See file COPYING."
 	  NL 
-	  NL "Usage: sbagen [options] seq-file ..."
-	  NL "       sbagen [options] -i tone-specs ..."
-	  NL "       sbagen [options] -p pre-programmed-sequence-specs ..."
+	  NL "Usage: sbagen+ [options] seq-file ..."
+	  NL "       sbagen+ [options] -i tone-specs ..."
+	  NL "       sbagen+ [options] -p pre-programmed-sequence-specs ..."
 	  NL
 	  NL "Options:  -h        Display this help-text"
 	  NL "          -Q        Quiet - don't display running status"
@@ -277,6 +275,9 @@ help() {
 	  NL "          -r rate   Select the output rate (default is 44100 Hz, or from -m)"
 #ifndef MAC_AUDIO
 	  NL "          -b bits   Select the number bits for output (8 or 16, default 16)"
+#else
+	  NL "          -B size   Force buffer size (in samples) for audio output."
+    NL "                     (e.g. 1024, 2048, 4096, etc.)"
 #endif
 	  NL "          -L time   Select the length of time (hh:mm or hh:mm:ss) to output"
 	  NL "                     for.  Default is to output forever."
@@ -320,30 +321,24 @@ void
 usage() {
   error("SBaGen+ - Sequenced Brainwave Generator, version " VERSION 
 	NL "Original version (c) 1999-2011 Jim Peters, http://uazu.net/"
-	NL "Current fork maintained by Ruan, https://ruan.sh/"
+	NL "This fork maintained by Ruan, https://ruan.sh/"
 	NL "Released under the GNU GPL v2. See file COPYING."
 	NL 
-	NL "Usage: sbagen [options] seq-file ..."
-	NL "       sbagen [options] -i tone-specs ..."
-	NL "       sbagen [options] -p pre-programmed-sequence-specs ..."
+	NL "Usage: sbagen+ [options] seq-file ..."
+	NL "       sbagen+ [options] -i tone-specs ..."
+	NL "       sbagen+ [options] -p pre-programmed-sequence-specs ..."
 	NL
-	NL "For full usage help, type 'sbagen -h'."
 	NL "SBaGen+ is a fork of the original SBaGen with added features."
+	NL "For full usage help, type 'sbagen+ -h'."
 #ifdef EXIT_KEY
 	NL
 	NL "Windows users please note that this utility is designed to be run as the"
 	NL "associated application for SBG files.  This should have been set up for you by"
 	NL "the installer.  You can run all the SBG files directly from the desktop by"
 	NL "double-clicking on them, and edit them using NotePad from the right-click menu."
-	NL "Alternatively, SBaGen may be run from the MS-DOS prompt (CMD on WinXP), or from"
-	NL "BAT files.  SBaGen is powerful software -- it is worth the effort of figuring"
-	NL "all this out.  See SBAGEN.TXT for the full documentation."
-	NL
-	NL "Editing the SBG files gives you access to the full tweakable power of SBaGen, "
-	NL "but if you want a simple GUI interface to the most basic features, you could "
-	NL "look at a user-contributed tool called SBaGUI:"
-	NL
-	NL "  http://sbagen.opensrc.org/wiki.php?page=SBaGUI"
+	NL "Alternatively, SBaGen+ may be run from the command line, or from"
+	NL "BAT/PS1 files.  SBaGen+ is powerful software -- it is worth the effort of figuring"
+	NL "all this out.  See SBAGEN+.TXT for the full documentation."
 #endif
 	NL);
 }
@@ -355,8 +350,7 @@ usage() {
 #define N_CH 16			// Number of channels
 
 struct Voice {
-  int typ;			// Voice type: 0 off, 1 binaural, 2 pink noise, 3 bell, 4 spin,
-   				//   5 mix, 6 mixspin, 7 mixbeat, 8 isochronic, 9 white noise, 10 brown noise, -1 to -100 wave00 to wave99
+  int typ;			// Voice type: 0 off, 1 binaural, 2 pink noise, 3 bell, 4 spin, 5 mix, 6 mixspin, 7 mixpulse, 8 isochronic, 9 white noise, 10 brown noise, -1 to -100 wave00 to wave99
   double amp;			// Amplitude level (0-4096 for 0-100%)
   double carr;			// Carrier freq (for binaural/bell/isochronic), width (for spin)
   double res;			// Resonance freq (-ve or +ve) (for binaural/spin/isochronic)
@@ -364,8 +358,7 @@ struct Voice {
 
 struct Channel {
   Voice v;			// Current voice setting (updated from current period)
-  int typ;			// Current type: 0 off, 1 binaural, 2 pink noise, 3 bell, 4 spin,
-   				//   5 mix, 6 mixspin, 7 mixbeat, 8 isochronic, 9 white noise, 10 brown noise, -1 to -100 wave00 to wave99
+  int typ;			// Current type: 0 off, 1 binaural, 2 pink noise, 3 bell, 4 spin, 5 mix, 6 mixspin, 7 mixpulse, 8 isochronic, 9 white noise, 10 brown noise, -1 to -100 wave00 to wave99
   int amp, amp2;		// Current state, according to current type
   int inc1, off1;		//  ::  (for binaural tones, offset + increment into sine 
   int inc2, off2;		//  ::   table * 65536)
@@ -452,11 +445,15 @@ char *opt_d= "/dev/dsp";	// Output device
 #endif
 int opt_L= -1;			// Length of WAV file in ms
 int opt_T= -1;			// Time to start at (for -S option)
+#ifdef MAC_AUDIO
+int opt_B= -1;		// Buffer size override (-1 = auto)
+#endif
 
 FILE *mix_in;			// Input stream for mix sound data, or 0
 int mix_cnt;			// Version number from mix filename (#<digits>), or -1
 int bigendian;			// Is this platform Big-endian?
 int mix_flag= 0;		// Has 'mix/*' been used in the sequence?
+double *mix_amp= NULL; // Amplitude of mix sound data to use with mixspin/mixpulse. Default is 100%
 
 int opt_c;			// Number of -c option points provided (max 16)
 struct AmpAdj { 
@@ -848,6 +845,17 @@ scanOptions(int *acp, char ***avp) {
 	     if (argc-- < 1 || 1 != sscanf(*argv++, "%d %c", &fade_int, &dmy)) 
 		error("-F expects fade-time in ms");
 	     break;
+#ifdef MAC_AUDIO
+	  case 'B':
+	     if (argc-- < 1 || 1 != sscanf(*argv++, "%d %c", &opt_B, &dmy)) 
+		      error("-B expects buffer size in samples");
+       if (opt_B < 1024 || opt_B > BUFFER_SIZE / 2)
+          error("Buffer size must be between 1024 and %d samples.", BUFFER_SIZE / 2);
+       if ((opt_B & (opt_B - 1)) != 0)
+          error("Buffer size must be a power of 2. (e.g. 1024, 2048, 4096, etc.)");
+       opt_B *= 2;
+	     break;
+#endif
 	  case 'c':
 	     if (argc-- < 1) error("-c expects argument");
 	     setupOptC(*argv++);
@@ -905,7 +913,7 @@ scanOptions(int *acp, char ***avp) {
 		error("Expecting integer after -R");
 	     break;
 	  default:
-	     error("Option -%c not known; run 'sbagen -h' for help", opt);
+	     error("Option -%c not known; run 'sbagen+ -h' for help", opt);
 	 }
       }
    }
@@ -1190,6 +1198,14 @@ sprintVoice(char *p, Voice *vp, Voice *dup) {
       if (dup && vp->carr == dup->carr && vp->res == dup->res && vp->amp == dup->amp)
 	return sprintf(p, "  ::");
       return sprintf(p, " %.2f@%.2f/%.2f", vp->carr, vp->res, AMP_AD(vp->amp));
+    case 6:  // Mixspin - spinning mix stream
+      if (dup && vp->carr == dup->carr && vp->res == dup->res && vp->amp == dup->amp)
+	return sprintf(p, "  ::");
+      return sprintf(p, " mixspin:%.2f%+.2f/%.2f", vp->carr, vp->res, AMP_AD(vp->amp));
+    case 7:  // Mixpulse - mix stream with pulse effect
+      if (dup && vp->res == dup->res && vp->amp == dup->amp)
+	return sprintf(p, "  ::");
+      return sprintf(p, " mixpulse:%.2f/%.2f", vp->res, AMP_AD(vp->amp));
     default:
       if (vp->typ < -100 || vp->typ > -1)
 	return sprintf(p, " ???");
@@ -1449,8 +1465,7 @@ loop() {
     byte_count= out_bps * (S64)(duration * 0.001 * out_rate /
                 (fast ? fast_mult : 1));
     if (!opt_Q) {
-      fprintf(stderr, "*** Sequence duration: %02d:%02d:%02d (hh:mm:ss) ***\n", 
-              duration/3600000, (duration/60000)%60, (duration/1000)%60);
+      printSequenceDuration();
     }
   }
 
@@ -1596,6 +1611,83 @@ outChunk() {
 	  tot1 += mix1 * ch->amp;
 	  tot2 += mix2 * ch->amp;
 	  break;
+       case 6:	// Mixspin - spinning mix stream
+	  ch->off1 += ch->inc1;
+	  ch->off1 &= (ST_SIZ << 16) - 1;
+	  val= (ch->inc2 * sin_table[ch->off1 >> 16]) >> 24;
+	  
+	  // Mixspin intensity control
+	  {
+	    // Calculate intensity factor based on amplitude
+	    // Amplitude varies from 0 to 4096 (0-100%)
+	    // Normalize to a factor between 0.5 and 4.0
+	    double intensity_factor = 0.5 + (ch->amp / 4096.0) * 3.5;
+
+	    // Apply intensity factor to rotation value
+	    int amplified_val = (int)(val * intensity_factor);
+	    
+	    // Limit value between -128 and 127
+	    if (amplified_val > 127) amplified_val = 127;
+	    if (amplified_val < -128) amplified_val = -128;
+	    
+	    // Use absolute value for calculations
+	    int pos_val = amplified_val < 0 ? -amplified_val : amplified_val;
+	    int mix_l, mix_r;
+	    
+	    // When val is close to 0, channels are played normally
+	    // When val approaches +/-128, channels are swapped or muted
+	    if (amplified_val >= 0) {
+	      // Rotation to the right: left channel decreases, right channel receives part of the left channel
+	      mix_l = (mix1 * (128 - pos_val)) >> 7;
+	      mix_r = mix2 + ((mix1 * pos_val) >> 7);
+	    } else {
+	      // Rotation to the left: right channel decreases, left channel receives part of the right channel
+	      mix_l = mix1 + ((mix2 * pos_val) >> 7);
+	      mix_r = (mix2 * (128 - pos_val)) >> 7;
+	    }
+
+	    // Apply base volume (using 70% of amplitude for volume)
+	    int base_amp = (int) (mix_amp != NULL ? *mix_amp : 4096.0) * 0.7;
+	    tot1 += base_amp * mix_l;
+	    tot2 += base_amp * mix_r;
+	  }
+	  break;
+       case 7:	// Mixpulse - mix stream with pulse effect
+          ch->off2 += ch->inc2;  // Modulator (pulse frequency)
+          ch->off2 &= (ST_SIZ << 16) - 1;
+          
+          // Create the isochronic pulse effect in the audio stream
+          {
+            int mod_val = sin_table[ch->off2 >> 16];
+            // Apply a threshold to create distinct pulses with space between them
+            double mod_factor = 0.0;
+            
+            // Use only the positive part of the sine wave and apply a threshold
+            // to create a space between pulses
+            if (mod_val > ST_AMP * 0.3) {  // Threshold of 30% of the maximum value
+              // Normalize from ST_AMP*0.3 to ST_AMP to 0 to 1
+              mod_factor = (mod_val - (ST_AMP * 0.3)) / (double)(ST_AMP * 0.7);
+              // Smooth the edges of the pulse to avoid clicks
+              mod_factor = mod_factor * mod_factor * (3 - 2 * mod_factor);  // Cubic smoothing
+            }
+            
+            // Apply the modulation factor to the audio stream
+            // Use base_amp as in mixspin (70% of amplitude for volume)
+            int base_amp = (int) (mix_amp != NULL ? *mix_amp : 4096.0) * 0.7;
+            
+            // Calculate the intensity of the effect based on amplitude (ch->amp)
+            // When ch->amp is 0, there is no effect (only the original audio)
+            // When ch->amp is 4096 (100%), the effect is maximum
+            double effect_intensity = (ch->amp / 4096.0) * 1.5;
+            
+            // Apply the modulation to the audio stream with variable intensity
+            // When effect_intensity is 0, only the original audio is reproduced
+            // When effect_intensity is 1, the audio is fully modulated by the pulse
+            double gain = (1.0 - effect_intensity) + (effect_intensity * mod_factor);
+            tot1 += base_amp * mix1 * gain;
+            tot2 += base_amp * mix2 * gain;
+          }
+          break;
        case 8:  // Isochronic tones
           ch->off1 += ch->inc1;  // Carrier (tone frequency)
           ch->off1 &= (ST_SIZ << 16) - 1;
@@ -1845,6 +1937,10 @@ corrVal(int running) {
       v0= &per->v0[a];
       v1= &per->v1[a];
       vv= &ch->v;
+
+      // Pointer to the amplitude of the mix to use with mixspin/mixpulse
+      if(vv->typ == 5 && mix_amp == NULL)
+        mix_amp= &vv->amp;
       
       if (vv->typ != v0->typ) {
 	 switch (vv->typ= ch->typ= v0->typ) {
@@ -1859,6 +1955,10 @@ corrVal(int running) {
 	  case 5:
 	     break;
 	  case 8:  // Isochronic tones
+	     ch->off1= ch->off2= 0; break;
+	  case 6:  // Mixspin
+	     ch->off1= ch->off2= 0; break;
+	  case 7:  // Mixpulse
 	     ch->off1= ch->off2= 0; break;
 	  default:
 	     ch->off1= ch->off2= 0; break;
@@ -1892,6 +1992,17 @@ corrVal(int running) {
        case 8:  // Isochronic tones
           vv->amp= rat0 * v0->amp + rat1 * v1->amp;
           vv->carr= rat0 * v0->carr + rat1 * v1->carr;
+          vv->res= rat0 * v0->res + rat1 * v1->res;
+          break;
+       case 6:  // Mixspin
+          vv->amp= rat0 * v0->amp + rat1 * v1->amp;
+          vv->carr= rat0 * v0->carr + rat1 * v1->carr;
+          vv->res= rat0 * v0->res + rat1 * v1->res;
+          if (vv->carr > spin_carr_max) vv->carr= spin_carr_max; // Clipping sweep width
+          if (vv->carr < -spin_carr_max) vv->carr= -spin_carr_max;
+          break;
+       case 7:  // Mixpulse
+          vv->amp= rat0 * v0->amp + rat1 * v1->amp;
           vv->res= rat0 * v0->res + rat1 * v1->res;
           break;
        default:		// Waveform based binaural
@@ -1971,6 +2082,16 @@ corrVal(int running) {
           ch->amp= (int)vv->amp;
           // Carrier (tone frequency)
           ch->inc1= (int)(vv->carr / out_rate * ST_SIZ * 65536);
+          // Modulator (pulse frequency)
+          ch->inc2= (int)(vv->res / out_rate * ST_SIZ * 65536);
+          break;
+       case 6:  // Mixspin
+          ch->amp= (int)vv->amp;
+          ch->inc1= (int)(vv->res / out_rate * ST_SIZ * 65536);
+          ch->inc2= (int)(vv->carr * 1E-6 * out_rate * (1<<24) / ST_AMP);
+          break;
+       case 7:  // Mixpulse
+          ch->amp= (int)vv->amp;
           // Modulator (pulse frequency)
           ch->inc2= (int)(vv->res / out_rate * ST_SIZ * 65536);
           break;
@@ -2260,9 +2381,11 @@ setup_device(void) {
     OSStatus err;
     UInt32 propertySize, bufferByteCount;
     struct AudioStreamBasicDescription streamDesc;
+    
     int old_out_rate= out_rate;
+    int buffer_size= opt_B > 0 ? opt_B : BUFFER_SIZE;
 
-    out_bsiz= BUFFER_SIZE;
+    out_bsiz= buffer_size;
     out_blen= out_mode ? out_bsiz/2 : out_bsiz;
     out_bps= out_mode ? 4 : 2;
     out_buf= (short*)Alloc(out_blen * sizeof(short));
@@ -2279,31 +2402,43 @@ setup_device(void) {
 
     // Find default device
     propertySize= sizeof(aud_dev);
-    if ((err= AudioHardwareGetProperty(kAudioHardwarePropertyDefaultOutputDevice,
-				       &propertySize, &aud_dev)))
-      error("Get default output device failed, status = %d", (int)err);
+    AudioObjectPropertyAddress propertyAddress = {
+        kAudioHardwarePropertyDefaultOutputDevice,
+        kAudioObjectPropertyScopeGlobal,
+        kAudioObjectPropertyElementMaster
+    };
+    if ((err = AudioObjectGetPropertyData(kAudioObjectSystemObject, &propertyAddress, 0, NULL, &propertySize, &aud_dev)))
+    {
+        error("Get default output device failed, status = %d", (int)err);
+    }
     
     if (aud_dev == kAudioDeviceUnknown)
       error("No default audio device found");
     
     // Get device name
-    propertySize= sizeof(deviceName);
-    if ((err= AudioDeviceGetProperty(aud_dev, 1, 0,
-				     kAudioDevicePropertyDeviceName,
-				     &propertySize, deviceName)))
-      error("Get audio device name failed, status = %d", (int)err);
+    propertySize = sizeof(deviceName);
+    propertyAddress.mSelector = kAudioDevicePropertyDeviceName;
+    propertyAddress.mScope = kAudioObjectPropertyScopeGlobal;
+    propertyAddress.mElement = kAudioObjectPropertyElementMaster;
+    if ((err = AudioObjectGetPropertyData(aud_dev, &propertyAddress, 0, NULL, &propertySize, deviceName)))
+    {
+        error("Get audio device name failed, status = %d", (int)err);
+    }
     
     // Get device properties
-    propertySize= sizeof(streamDesc);
-    if ((err= AudioDeviceGetProperty(aud_dev, 1, 0,
-				     kAudioDevicePropertyStreamFormat,
-				     &propertySize, &streamDesc))) 
-      error("Get audio device properties failed, status = %d", (int)err);
+    propertySize = sizeof(streamDesc);
+    propertyAddress.mSelector = kAudioDevicePropertyStreamFormat;
+    propertyAddress.mScope = kAudioObjectPropertyScopeOutput; // Adjusted for output
+    propertyAddress.mElement = kAudioObjectPropertyElementMaster;
+    if ((err = AudioObjectGetPropertyData(aud_dev, &propertyAddress, 0, NULL, &propertySize, &streamDesc)))
+    {
+        error("Get audio device properties failed, status = %d", (int)err);
+    }
 
     out_rate= (int)streamDesc.mSampleRate;
 
     if (streamDesc.mChannelsPerFrame != 2) 
-      error("SBaGen requires a stereo output device -- \n"
+      error("SBaGen+ requires a stereo output device -- \n"
 	    "default output has %d channels",
 	    streamDesc.mChannelsPerFrame);
 
@@ -2313,12 +2448,15 @@ setup_device(void) {
 	    "default output uses another format");
 
     // Set buffer size
-    bufferByteCount= BUFFER_SIZE / 2 * sizeof(float);
-    propertySize= sizeof(bufferByteCount);
-    if ((err= AudioDeviceSetProperty(aud_dev, 0, 0, 0,
-				     kAudioDevicePropertyBufferSize,
-				     propertySize, &bufferByteCount))) 
-      error("Set audio output buffer size failed, status = %d", (int)err);
+    bufferByteCount = (float) buffer_size / 2 * sizeof(float);
+    propertySize = sizeof(bufferByteCount);
+    propertyAddress.mSelector = kAudioDevicePropertyBufferSize;
+    propertyAddress.mScope = kAudioObjectPropertyScopeGlobal;
+    propertyAddress.mElement = kAudioObjectPropertyElementMaster;
+    if ((err = AudioObjectSetPropertyData(aud_dev, &propertyAddress, 0, NULL, propertySize, &bufferByteCount)))
+    {
+        error("Set audio output buffer size failed, status = %d", (int)err);
+    }
 
     // Setup callback and start it
     err= AudioDeviceAddIOProc(aud_dev, mac_callback, (void *)1);
@@ -2390,7 +2528,7 @@ OSStatus mac_callback(AudioDeviceID inDevice,
 		      void *inClientData) 
 {
   float *fp= outOutputData->mBuffers[0].mData;
-  int cnt= BUFFER_SIZE / 2;
+  int cnt= opt_B > 0 ? opt_B / 2 : BUFFER_SIZE / 2;
   short *sp;
 
   if (aud_rd == aud_wr) {
@@ -2809,6 +2947,11 @@ correctPeriods() {
       while (per->prv->tim < per->tim) per= per->nxt;
 
     pp= per;
+
+    if(!opt_Q) {
+      printSequenceDuration();
+    }
+
     do {
       dispCurrPer(stdout);
       per= per->nxt;
@@ -3033,6 +3176,21 @@ readNameDef() {
     if (3 == sscanf(p, "spin:%lf%lf/%lf %c", &carr, &res, &amp, &dmy)) {
       nd->vv[ch].typ= 4;
       nd->vv[ch].carr= carr;
+      nd->vv[ch].res= res;
+      nd->vv[ch].amp= AMP_DA(amp);	
+      continue;
+    }
+    if (3 == sscanf(p, "mixspin:%lf%lf/%lf %c", &carr, &res, &amp, &dmy)) {
+      checkMixInSequence();
+      nd->vv[ch].typ= 6;
+      nd->vv[ch].carr= carr;
+      nd->vv[ch].res= res;
+      nd->vv[ch].amp= AMP_DA(amp);	
+      continue;
+    }
+    if (2 == sscanf(p, "mixpulse:%lf/%lf %c", &res, &amp, &dmy)) {
+      checkMixInSequence();
+      nd->vv[ch].typ= 7;
       nd->vv[ch].res= res;
       nd->vv[ch].amp= AMP_DA(amp);	
       continue;
@@ -3543,7 +3701,17 @@ void validateTotalAmplitude(Voice *voices, int numChannels, const char *line, in
   double totalAmplitude = 0.0;
   
   for (int ch = 0; ch < numChannels; ch++) {
-    if (voices[ch].typ != 0) { // If voice is active
+    // Check if voice is mixspin or mixpulse to check if effect intensity is over 100%
+    if (voices[ch].typ == 6 || voices[ch].typ == 7) {
+      double ampPercentage = voices[ch].amp / 40.96;
+
+      if (ampPercentage > 100.0) {
+        error("Total intensity of mixspin/mixpulse exceeds 100%% (%.2f%%) at line %d:\n  %s\nPlease reduce intensity to prevent audio distortion.", 
+              ampPercentage, lineNum, line);
+      }
+    }
+
+    if (voices[ch].typ != 0 && voices[ch].typ != 6 && voices[ch].typ != 7) { // If voice is active. Mixspin and Mixpulse are not included
       // Convert from internal amplitude format back to percentage
       double ampPercentage = voices[ch].amp / 40.96;
       totalAmplitude += ampPercentage;
@@ -3554,6 +3722,28 @@ void validateTotalAmplitude(Voice *voices, int numChannels, const char *line, in
     error("Total amplitude exceeds 100%% (%.2f%%) at line %d:\n  %s\nPlease reduce amplitudes to prevent audio distortion.", 
           totalAmplitude, lineNum, line);
   }
+}
+
+void printSequenceDuration() {
+  int duration = t_per0(fast_tim0, fast_tim1);
+  fprintf(stdout, "\n*** Sequence duration: %02d:%02d:%02d (hh:mm:ss) ***\n\n", 
+          duration/3600000, (duration/60000)%60, (duration/1000)%60);
+}
+
+void checkMixInSequence() {
+  char *ln= lin_copy;
+  int mix_exists= 0;
+
+  while((ln= strstr(ln, "mix/")) != NULL) {
+    if(isdigit(ln[4])) {
+      mix_exists= 1;
+      break;
+    }
+    ln++;
+  }
+
+  if(!mix_exists)
+    error("mixspin/mixpulse without mix/<amp> specified, line %d:\n  %s", in_lin, lin_copy);
 }
 
 // END //
