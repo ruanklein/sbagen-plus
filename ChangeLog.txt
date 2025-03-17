@@ -1,3 +1,7 @@
+1.5.2 Added support for mixpulse and mixspin effects
+     Added -B option for macOS to fix audio in Bluetooth devices (see SBAGEN+.TXT for details)
+	 Deprecated AudioHardware.h and Carbon removed, using AudioObject API instead
+
 1.5.1 Isochronic added to -p drop/slide option
 
 1.5.0 Rebranded as SBaGen+ to indicate the fork from the original project   
