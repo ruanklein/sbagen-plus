@@ -60,8 +60,6 @@ Name: "associatewithfiles"; Description: "Associate .sbg files with {#MyAppName}
 [Files]
 ; Using 32-bit version that works on all architectures
 Source: "dist\sbagen+-win32.exe"; DestDir: "{app}"; DestName: "sbagen+.exe"; Flags: ignoreversion
-; Icon
-Source: "sbagen+.ico"; DestDir: "{app}"; Flags: ignoreversion
 ; Documentation
 Source: "COPYING.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "docs\*"; DestDir: "{app}\docs"; Flags: ignoreversion recursesubdirs createallsubdirs
