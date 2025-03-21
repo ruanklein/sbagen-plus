@@ -9,6 +9,15 @@ if [ ! -f dist/sbagen+-win32.exe ]; then
     exit 1
 fi
 
+# Get the version from the VERSION file
+VERSION=$(cat VERSION)
+
+# Setup name
+SETUP_NAME="sbagen-plus-v${VERSION}-setup.exe"
+
+# Remove the existing installer if it exists
+rm -f dist/${SETUP_NAME}
+
 section_header "Creating Windows Installer..."
 
 # Set up wine environment
@@ -95,11 +104,7 @@ pandoc -f markdown -t plain USAGE.md -o build/USAGE.txt
 # Run ISCC with increased memory limits and in silent mode
 wine "$ISCC" /O+ /Q setup.iss
 
-# Get the version from the VERSION file
-VERSION=$(cat VERSION)
-
-# Setup name
-SETUP_NAME="sbagen-plus-v${VERSION}-setup.exe"
+# Check if the installer was created successfully
 if [ ! -f "dist/${SETUP_NAME}" ]; then
     error "Failed to create installer"
 
