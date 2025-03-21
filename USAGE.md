@@ -156,7 +156,7 @@ This sequence will:
 
 ## Example Sequences for Different Purposes
 
-Here are some example sequences for various purposes. You can save these as `.sbg` files and run them with SBaGen+.
+Here are some example sequences for various purposes in the `examples/plus` directory. You can save these as `.sbg` files and run them with SBaGen+.
 
 - [Deep Sleep Aid](examples/plus/deep-sleep-aid.sbg) - Gradually transitions from alpha to delta to help you fall asleep
 - [Focus and Concentration (Using Isochronic Tones)](examples/plus/focus-and-concentration.sbg) - Helps you focus and concentrate
