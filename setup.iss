@@ -60,6 +60,8 @@ Name: "associatewithfiles"; Description: "Associate .sbg files with {#MyAppName}
 [Files]
 ; Using 32-bit version that works on all architectures
 Source: "dist\sbagen+-win32.exe"; DestDir: "{app}"; DestName: "sbagen+.exe"; Flags: ignoreversion
+; Icon
+Source: "sbagen+.ico"; DestDir: "{app}"; Flags: ignoreversion
 ; Documentation
 Source: "COPYING.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "docs\*"; DestDir: "{app}\docs"; Flags: ignoreversion recursesubdirs createallsubdirs
@@ -124,23 +126,23 @@ Root: HKCU; Subkey: "Software\Classes\{#MyAppAssocKey}"; ValueType: string; Valu
 Root: HKCU; Subkey: "Software\Classes\{#MyAppAssocKey}\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\{#MyAppExeName},0"; Tasks: associatewithfiles
 Root: HKCU; Subkey: "Software\Classes\{#MyAppAssocKey}\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExeName}"" ""%1"""; Tasks: associatewithfiles
 
-; Context menu for .sbg files (User Level)
-Root: HKCU; Subkey: "Software\Classes\{#MyAppAssocExt}\shell\edit"; ValueType: string; ValueName: ""; ValueData: "Edit Sequence File..."; Tasks: associatewithfiles
-Root: HKCU; Subkey: "Software\Classes\{#MyAppAssocExt}\shell\edit"; ValueType: string; ValueName: "Icon"; ValueData: "notepad.exe"; Tasks: associatewithfiles
-Root: HKCU; Subkey: "Software\Classes\{#MyAppAssocExt}\shell\edit"; ValueType: string; ValueName: "Position"; ValueData: "Top"; Tasks: associatewithfiles
-Root: HKCU; Subkey: "Software\Classes\{#MyAppAssocExt}\shell\edit\command"; ValueType: string; ValueName: ""; ValueData: "notepad.exe ""%1"""; Tasks: associatewithfiles
-
-Root: HKCU; Subkey: "Software\Classes\{#MyAppAssocExt}\shell\writewave"; ValueType: string; ValueName: ""; ValueData: "Write file to WAV..."; Tasks: associatewithfiles
-Root: HKCU; Subkey: "Software\Classes\{#MyAppAssocExt}\shell\writewave"; ValueType: string; ValueName: "Icon"; ValueData: "{app}\{#MyAppExeName}"; Tasks: associatewithfiles
-Root: HKCU; Subkey: "Software\Classes\{#MyAppAssocExt}\shell\writewave"; ValueType: string; ValueName: "Position"; ValueData: "Top"; Tasks: associatewithfiles
-Root: HKCU; Subkey: "Software\Classes\{#MyAppAssocExt}\shell\writewave\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExeName}"" -Wo ""%~dpn1.wav"" ""%1"""; Tasks: associatewithfiles
-
-; Windows 11 Context Menu Integration (User Level)
-Root: HKCU; Subkey: "Software\Classes\{#MyAppAssocExt}"; ValueType: string; ValueName: ""; ValueData: "{#MyAppAssocName}"; Tasks: associatewithfiles
-Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\{#MyAppAssocExt}\UserChoice"; ValueType: string; ValueName: "ProgId"; ValueData: "{#MyAppAssocKey}"; Tasks: associatewithfiles
-
 ; Force Windows to refresh shell icons
 Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\{#MyAppAssocExt}"; ValueType: none; ValueName: ""; Flags: deletekey; Tasks: associatewithfiles
+
+; Context menu for .sbg files - Edit option
+Root: HKCU; Subkey: "Software\Classes\{#MyAppAssocKey}\shell\edit"; ValueType: string; ValueName: ""; ValueData: "Edit sequence file"; Flags: uninsdeletekey; Tasks: associatewithfiles
+Root: HKCU; Subkey: "Software\Classes\{#MyAppAssocKey}\shell\edit"; ValueType: string; ValueName: "Icon"; ValueData: """{app}\{#MyAppExeName}"""; Flags: uninsdeletekey; Tasks: associatewithfiles
+Root: HKCU; Subkey: "Software\Classes\{#MyAppAssocKey}\shell\edit\command"; ValueType: string; ValueName: ""; ValueData: "notepad.exe ""%1"""; Flags: uninsdeletekey; Tasks: associatewithfiles
+
+; Context menu for .sbg files - Write to WAV option
+Root: HKCU; Subkey: "Software\Classes\{#MyAppAssocKey}\shell\writetoWAV"; ValueType: string; ValueName: ""; ValueData: "Write file to WAV"; Flags: uninsdeletekey; Tasks: associatewithfiles
+Root: HKCU; Subkey: "Software\Classes\{#MyAppAssocKey}\shell\writetoWAV"; ValueType: string; ValueName: "Icon"; ValueData: """{app}\{#MyAppExeName}"""; Flags: uninsdeletekey; Tasks: associatewithfiles
+Root: HKCU; Subkey: "Software\Classes\{#MyAppAssocKey}\shell\writetoWAV\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExeName}"" -Wo ""output.wav"" ""%1"""; Flags: uninsdeletekey; Tasks: associatewithfiles
+
+; Context menu for .sbg files - Write to WAV option (30 minutes)
+Root: HKCU; Subkey: "Software\Classes\{#MyAppAssocKey}\shell\writetoWAV30"; ValueType: string; ValueName: ""; ValueData: "Write file to WAV (30 minutes)"; Flags: uninsdeletekey; Tasks: associatewithfiles
+Root: HKCU; Subkey: "Software\Classes\{#MyAppAssocKey}\shell\writetoWAV30"; ValueType: string; ValueName: "Icon"; ValueData: """{app}\{#MyAppExeName}"""; Flags: uninsdeletekey; Tasks: associatewithfiles
+Root: HKCU; Subkey: "Software\Classes\{#MyAppAssocKey}\shell\writetoWAV30\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExeName}"" -L 00:30:00 -Wo ""output.wav"" ""%1"""; Flags: uninsdeletekey; Tasks: associatewithfiles
 
 [Run]
 ; empty
