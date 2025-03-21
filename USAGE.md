@@ -46,6 +46,14 @@ SBaGen+ uses a specific syntax to define tones:
 
   - Example: `300@10/20` - A 300Hz carrier pulsing at 10Hz at 20% amplitude
 
+- **Mix**: `mix/[amplitude]`
+
+  - Example: `mix/80` - A mix with 80% amplitude (requires a -m [file] option to be specified)
+
+- **Spin**: `spin:[width]+[frequency]/[amplitude]`
+
+  - Example: `spin:500+8.0/50` - A spinning pink noise effect with 500μs width, rotating at 8Hz with 50% amplitude
+
 - **Mixspin**: `mixspin:[width]+[frequency]/[intensity]`
 
   - Example: `mixspin:500+8.0/50` - A spinning effect with 500μs width, rotating at 8Hz with 50% intensity
@@ -141,7 +149,9 @@ off: -
 00:30:00 off
 ```
 
-Save this as `meditation.sbg` and run it with:
+Save this as `meditation.sbg`:
+
+For Windows users, you can run the sequence by double-clicking the file. For macOS and Linux users, you can run it from the command line:
 
 ```bash
 sbagen+ meditation.sbg
