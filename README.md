@@ -4,21 +4,21 @@ SBaGen+ is a command-line tool for generating binaural beats and isochronic tone
 
 ## 📑 Table of Contents
 
-- [About This Project](#about-this-project)
-- [Installation](#installation)
-  - [Download Pre-built Binaries](#download-pre-built-binaries)
-  - [Installing on Linux](#installing-on-linux)
-  - [Installing on macOS](#installing-on-macos)
-  - [Installing on Windows](#installing-on-windows)
-- [Basic Usage](#basic-usage)
-- [Documentation](#documentation)
-- [Research](#research)
-- [Compilation](#compilation)
-  - [Build Scripts Structure](#build-scripts-structure)
-  - [Building with Docker](#option-1-using-docker-compose-simplest-method)
-  - [Building Natively](#option-2-building-natively)
-- [License](#license)
-- [Credits](#credits)
+- [💡 About This Project](#-about-this-project)
+- [📥 Installation](#-installation)
+  - [⬇️ Download Pre-built Binaries](#️-download-pre-built-binaries)
+  - [🐧 Installing on Linux](#-installing-on-linux)
+  - [🍎 Installing on macOS](#-installing-on-macos)
+  - [🪟 Installing on Windows](#-installing-on-windows)
+- [🚀 Basic Usage](#-basic-usage)
+- [📚 Documentation](#-documentation)
+- [🔍 Research](#-research)
+- [🛠️ Compilation](#️-compilation)
+  - [📁 Build Scripts Structure](#-build-scripts-structure)
+  - [🐳 Building with Docker](#-option-1-using-docker-compose-simplest-method)
+  - [💻 Building Natively](#-option-2-building-natively)
+- [⚖️ License](#️-license)
+- [👏 Credits](#-credits)
 
 ## 💡 About This Project
 
