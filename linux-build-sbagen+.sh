@@ -42,7 +42,7 @@ if [ $SKIP_32BIT = 0 ]; then
     section_header "Building 32-bit version..."
 
     # Set up compilation flags for 32-bit
-    CFLAGS_32="-DT_LINUX_ALSA -m32 -Wall -O3 -I."
+    CFLAGS_32="-DT_LINUX -m32 -Wall -O3 -I."
     LIBS_32="-lm -lpthread -lasound"
 
     # Check for MP3 support (32-bit)
@@ -90,10 +90,10 @@ section_header "Building 64-bit version..."
 # Set up compilation flags for 64-bit
 if [ "$HOST_ARCH" = "aarch64" ]; then
     # On ARM64, don't use -m64 flag as it's not supported
-    CFLAGS_64="-DT_LINUX_ALSA -Wall -O3 -I."
+    CFLAGS_64="-DT_LINUX -Wall -O3 -I."
     info "Running on ARM64, using native gcc for 64-bit compilation"
 else
-    CFLAGS_64="-DT_LINUX_ALSA -m64 -Wall -O3 -I."
+    CFLAGS_64="-DT_LINUX -m64 -Wall -O3 -I."
 fi
 LIBS_64="-lm -lpthread -lasound"
 

@@ -23,6 +23,51 @@ create_dir_if_not_exists "libs"
 # Check distribution directory
 create_dir_if_not_exists "dist"
 
+# Get version from VERSION file
+VERSION=$(cat VERSION)
+VERSION_RC=$(echo $VERSION | sed 's/\./,/g' | sed 's/$/,0/')
+
+# Create resource file with version information
+cat > /tmp/sbagen.rc << EOF
+#include <windows.h>
+
+// Include icon
+1 ICON "sbagen+.ico"
+
+VS_VERSION_INFO VERSIONINFO
+FILEVERSION     $VERSION_RC
+PRODUCTVERSION  $VERSION_RC
+FILEFLAGSMASK   VS_FFI_FILEFLAGSMASK
+FILEFLAGS       0
+FILEOS          VOS__WINDOWS32
+FILETYPE        VFT_APP
+FILESUBTYPE     0
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904E4"
+        BEGIN
+            VALUE "CompanyName",      "SBaGen+"
+            VALUE "FileDescription",  "SBaGen+ Brainwave Generator"
+            VALUE "FileVersion",      "$VERSION"
+            VALUE "InternalName",     "sbagen+"
+            VALUE "LegalCopyright",   "GPLv2"
+            VALUE "OriginalFilename", "sbagen+.exe"
+            VALUE "ProductName",      "SBaGen+"
+            VALUE "ProductVersion",   "$VERSION"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1252
+    END
+END
+EOF
+
+# Compile resource file for both architectures
+i686-w64-mingw32-windres /tmp/sbagen.rc -O coff -o /tmp/sbagen32.res
+x86_64-w64-mingw32-windres /tmp/sbagen.rc -O coff -o /tmp/sbagen64.res
+
 # Define paths for libraries
 LIB_PATH_32="libs/windows-win32-libmad.a"
 LIB_PATH_64="libs/windows-win64-libmad.a"
@@ -53,7 +98,7 @@ fi
 if [ -f "$OGG_LIB_PATH_32" ] && [ -f "$TREMOR_LIB_PATH_32" ]; then
     info "Including OGG support for 32-bit using: $OGG_LIB_PATH_32 and $TREMOR_LIB_PATH_32"
     CFLAGS_32="$CFLAGS_32 -DOGG_DECODE"
-    # Ordem é importante: primeiro tremor, depois ogg
+    # Order is important: first tremor, then ogg
     LIBS_32="$LIBS_32 $TREMOR_LIB_PATH_32 $OGG_LIB_PATH_32"
 else
     warning "OGG libraries not found at $OGG_LIB_PATH_32 or $TREMOR_LIB_PATH_32"
@@ -65,7 +110,7 @@ fi
 info "Compiling 32-bit version with flags: $CFLAGS_32"
 info "Libraries: $LIBS_32"
 
-i686-w64-mingw32-gcc -w $CFLAGS_32 sbagen+.c -o dist/sbagen+-win32.exe $LIBS_32
+i686-w64-mingw32-gcc -w $CFLAGS_32 sbagen+.c /tmp/sbagen32.res -o dist/sbagen+-win32.exe $LIBS_32
 
 if [ $? -eq 0 ]; then
     success "32-bit compilation successful! Created 32-bit binary: dist/sbagen+-win32.exe"
@@ -95,7 +140,7 @@ fi
 if [ -f "$OGG_LIB_PATH_64" ] && [ -f "$TREMOR_LIB_PATH_64" ]; then
     info "Including OGG support for 64-bit using: $OGG_LIB_PATH_64 and $TREMOR_LIB_PATH_64"
     CFLAGS_64="$CFLAGS_64 -DOGG_DECODE"
-    # Ordem é importante: primeiro tremor, depois ogg
+    # Order is important: first tremor, then ogg
     LIBS_64="$LIBS_64 $TREMOR_LIB_PATH_64 $OGG_LIB_PATH_64"
 else
     warning "OGG libraries not found at $OGG_LIB_PATH_64 or $TREMOR_LIB_PATH_64"
@@ -107,12 +152,15 @@ fi
 info "Compiling 64-bit version with flags: $CFLAGS_64"
 info "Libraries: $LIBS_64"
 
-x86_64-w64-mingw32-gcc -w $CFLAGS_64 sbagen+.c -o dist/sbagen+-win64.exe $LIBS_64
+x86_64-w64-mingw32-gcc -w $CFLAGS_64 sbagen+.c /tmp/sbagen64.res -o dist/sbagen+-win64.exe $LIBS_64
 
 if [ $? -eq 0 ]; then
     success "64-bit compilation successful! Created 64-bit binary: dist/sbagen+-win64.exe"
 else
     error "64-bit compilation failed!"
 fi
+
+# Clean up temporary files
+rm -f /tmp/sbagen.rc /tmp/sbagen32.res /tmp/sbagen64.res
 
 section_header "Build process completed!" 

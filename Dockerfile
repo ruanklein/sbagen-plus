@@ -16,7 +16,10 @@ RUN if [ "$(uname -m)" = "x86_64" ]; then \
         apt-get install -y \
             libasound2-dev:i386 \
             gcc-multilib \
-            mingw-w64; \
+            mingw-w64 \
+            wine \
+            xvfb \
+            pandoc; \
     fi
 
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
