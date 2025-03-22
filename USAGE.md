@@ -4,13 +4,13 @@ This guide will help you get started with SBaGen+, a powerful tool for generatin
 
 ## 📑 Table of Contents
 
-1. [Introduction to Brainwave Entrainment](#introduction-to-brainwave-entrainment)
-2. [Basic Concepts](#basic-concepts)
-3. [Command Line Basics](#command-line-basics)
-4. [Creating Simple Sequences](#creating-simple-sequences)
-5. [Example Sequences for Different Purposes](#example-sequences-for-different-purposes)
-6. [Using Background Sounds](#using-background-sounds)
-7. [Advanced Tips](#advanced-tips)
+1. [🧠 Introduction to Brainwave Entrainment](#-introduction-to-brainwave-entrainment)
+2. [💡 Basic Concepts](#-basic-concepts)
+3. [⌨️ Command Line Basics](#️-command-line-basics)
+4. [📝 Creating Simple Sequences](#-creating-simple-sequences)
+5. [📚 Example Sequences for Different Purposes](#-example-sequences-for-different-purposes)
+6. [🎵 Using Background Sounds](#-using-background-sounds)
+7. [🔍 Advanced Tips](#-advanced-tips)
 
 ## 🧠 Introduction to Brainwave Entrainment
 
