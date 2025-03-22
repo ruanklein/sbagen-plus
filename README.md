@@ -5,7 +5,6 @@ SBaGen+ is a command-line tool for generating binaural beats and isochronic tone
 ## Table of Contents
 
 - [About This Project](#about-this-project)
-- [Features and Bug Fixes](#features-and-bug-fixes)
 - [Compilation](#compilation)
   - [Build Scripts Structure](#build-scripts-structure)
   - [Building with Docker](#option-1-using-docker-compose-simplest-method)
@@ -25,17 +24,6 @@ SBaGen+ is a command-line tool for generating binaural beats and isochronic tone
 SBaGen+ is a fork of the original SBaGen (Sequenced Binaural Beat Generator) created by Jim Peters. The original project has not been maintained for many years, and this fork aims to keep it functional on modern systems while preserving its original structure. Updates focus on compatibility fixes and minor feature additions requested by longtime users, without major refactoring of the original code.
 
 The name has been changed from **“Sequenced Binaural Beat Generator”** to **“Sequenced Brainwave Generator”** to better reflect its expanded functionality. Since SBaGen+ now supports isochronic tones in addition to binaural beats, the original name no longer fully represented its capabilities.
-
-## Features and Bug Fixes
-
-- All features of original SBaGen
-- Added support for ALSA output device (Linux)
-- Added build scripts for Linux native ARM64/AArch64
-- Isochronic tone generation (works with or without headphones)
-- White noise and brown noise generation
-- Support for Apple Silicon (ARM64) and Intel (x86_64)
-- Fixed bug with WAV file duration when using -W option with sequence files
-- Added validation for total amplitude to prevent audio distortion when exceeding 100%
 
 ## Compilation
 
@@ -115,16 +103,15 @@ You can either compile SBaGen+ from source as described above or download pre-bu
 
 ### Download Pre-built Binaries
 
-The latest release (v1.5.2) can be downloaded directly from the following links:
+The latest release (v1.5.3) can be downloaded directly from the following links:
 
-- Linux ARM64: [sbagen+-linux-arm64](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.2/sbagen+-linux-arm64)
-- Linux 32-bit: [sbagen+-linux32](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.2/sbagen+-linux32)
-- Linux 64-bit: [sbagen+-linux64](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.2/sbagen+-linux64)
-- macOS (Universal): [sbagen+-macos-universal](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.2/sbagen+-macos-universal)
-- Windows 32-bit: [sbagen+-win32.exe](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.2/sbagen+-win32.exe)
-- Windows 64-bit: [sbagen+-win64.exe](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.2/sbagen+-win64.exe)
+- Linux ARM64: [sbagen+-linux-arm64](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.3/sbagen+-linux-arm64)
+- Linux 32-bit: [sbagen+-linux32](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.3/sbagen+-linux32)
+- Linux 64-bit: [sbagen+-linux64](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.3/sbagen+-linux64)
+- macOS (Universal): [sbagen+-macos-universal](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.3/sbagen+-macos-universal)
+- Windows x86/x86_64 and ARM64: [sbagen+-windows-setup.exe](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.3/sbagen+-windows-setup.exe)
 
-**Important**: Always verify the SHA256 checksum of downloaded binaries against those listed on the [releases page](https://github.com/ruanklein/sbagen-plus/releases) to ensure file integrity and security.
+  **Important**: Always verify the SHA256 checksum of downloaded binaries against those listed on the [releases page](https://github.com/ruanklein/sbagen-plus/releases) to ensure file integrity and security.
 
 ### Installing on Linux
 
@@ -201,79 +188,30 @@ The latest release (v1.5.2) can be downloaded directly from the following links:
 
 ### Installing on Windows
 
-1. Download the appropriate binary for your system from the [releases page](https://github.com/ruanklein/sbagen-plus/releases):
+1. Download the installer:
 
-   - [sbagen+-win32.exe](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.2/sbagen+-win32.exe) for 32-bit systems
-   - [sbagen+-win64.exe](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.2/sbagen+-win64.exe) for 64-bit systems
+   - [sbagen+-windows-setup.exe](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.3/sbagen+-windows-setup.exe)
 
-2. Verify the SHA256 checksum (using PowerShell):
+2. Verify the SHA256 checksum of the installer. You can use PowerShell or Command Prompt to do this:
 
    ```powershell
-   Get-FileHash -Algorithm SHA256 .\sbagen+-win64.exe  # Replace with your downloaded file
+   Get-FileHash -Algorithm SHA256 .\sbagen+-windows-setup.exe
    # Compare the output with the checksum on the releases page
    ```
 
-3. Create a directory for the application (if it doesn't exist):
+3. Run the installer and follow the instructions.
 
-   ```powershell
-   mkdir -Force "C:\Program Files\sbagen+"
-   ```
+⚠️ **Warning about antivirus on Windows**
 
-4. Move the executable to this directory:
+Some versions of Windows Defender or other antivirus software may falsely detect `SBaGen+` as a threat.
 
-   ```powershell
-   Move-Item .\sbagen+-win64.exe "C:\Program Files\sbagen+\sbagen+.exe"  # Replace with your downloaded file
-   ```
+This happens because the executable is **not digitally signed**, and as a command-line program, it may be flagged as suspicious by default.
 
-5. Add the directory to your system PATH:
+`SBaGen+` is an open-source project, and the source code is publicly available in this repository for inspection.
 
-   ```powershell
-   # Add to system PATH (requires administrator privileges)
-   [Environment]::SetEnvironmentVariable("Path", $env:Path + ";C:\Program Files\sbagen+", "Machine")
-
-   # Refresh the current PowerShell session's PATH
-   $env:Path = [Environment]::GetEnvironmentVariable("Path", "Machine")
-   ```
-
-6. Verify the installation:
-
-   ```powershell
-   sbagen+ -h
-   ```
+✅ **Temporary solution:** if you trust the source of the executable, add an exception in your antivirus for the file or the folder where `SBaGen+` is installed.
 
 ## Basic Usage
-
-After installation, you can use SBaGen+ from the command line. If you've installed it to your PATH as suggested, you can simply use the `sbagen+` command. Otherwise, you'll need to specify the path to the executable.
-
-```bash
-# Play a simple sequence with brown noise
-sbagen+ -i brown/80 200@10/08
-
-# Play a simple sequence with white noise
-sbagen+ -i white/20 200@10/08
-
-# Play a simple sequence with pink noise
-sbagen+ -i pink/80 200@10/08
-
-# Play with an MP3 background file
-sbagen+ -m background.mp3 -i mix/80 200@10/08
-
-# Play with an OGG background file
-sbagen+ -m background.ogg -i mix/80 200@10/08
-```
-
-If you're running the executable directly from the `dist` directory without installing it, use the appropriate binary for your system:
-
-```bash
-# For Linux 64-bit
-./dist/sbagen+-linux64 -i brown/80 200@10/08
-
-# For macOS
-./dist/sbagen+-macos-universal -i brown/80 200@10/08
-
-# For Windows 64-bit
-.\dist\sbagen+-win64.exe -i brown/80 200@10/08
-```
 
 See [USAGE.md](USAGE.md) for more information on how to use SBaGen+.
 
