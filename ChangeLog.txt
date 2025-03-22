@@ -1,3 +1,6 @@
+1.5.3 Added an installer to easily install SBaGen+ on Windows.
+   Removed OSS audio support. ALSA is now default on Linux 
+
 1.5.2 Added support for mixpulse and mixspin effects
      Added -B option for macOS to fix audio in Bluetooth devices (see SBAGEN+.TXT for details)
 	 Deprecated AudioHardware.h and Carbon removed, using AudioObject API instead
