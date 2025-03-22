@@ -9,11 +9,7 @@ if [ ! -f dist/sbagen+-win32.exe ]; then
     exit 1
 fi
 
-# Get the version from the VERSION file
-VERSION=$(cat VERSION)
-
-# Setup name
-SETUP_NAME="sbagen-plus-v${VERSION}-setup.exe"
+SETUP_NAME="sbagen+-windows-setup.exe"
 
 # Remove the existing installer if it exists
 rm -f dist/${SETUP_NAME}
@@ -100,6 +96,9 @@ pandoc -f markdown -t plain README.md -o build/README.txt
 
 # Convert USAGE.md to USAGE.txt
 pandoc -f markdown -t plain USAGE.md -o build/USAGE.txt
+
+# Convert RESEARCH.md to RESEARCH.txt
+pandoc -f markdown -t plain RESEARCH.md -o build/RESEARCH.txt
 
 # Run ISCC with increased memory limits and in silent mode
 wine "$ISCC" /O+ /Q setup.iss

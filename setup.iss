@@ -3,7 +3,7 @@
 #define MyAppPublisher "Ruan Klein"
 #define MyAppURL "https://github.com/ruanklein/sbagen-plus"
 #define MyAppExeName "sbagen+.exe"
-#define MyAppIcon "sbagen+.ico"
+#define MyAppIcon "assets\sbagen+.ico"
 #define MyAppAssocName "SBaGen+ Sequence File"
 #define MyAppAssocExt ".sbg"
 #define MyAppAssocKey StringChange(MyAppAssocName, " ", "") + MyAppAssocExt
@@ -22,7 +22,7 @@ AppUpdatesURL={#MyAppURL}
 DefaultDirName={autopf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 OutputDir=dist
-OutputBaseFilename=sbagen-plus-v{#MyAppVersion}-setup
+OutputBaseFilename=sbagen+-windows-setup
 Compression=lzma2/fast
 LZMAUseSeparateProcess=yes
 LZMANumBlockThreads=1
@@ -81,7 +81,7 @@ Source: "windows-build-sbagen+.sh"; DestDir: "{app}\src"; Flags: ignoreversion
 Source: "windows-create-installer.sh"; DestDir: "{app}\src"; Flags: ignoreversion
 Source: "VERSION"; DestDir: "{app}\src"; DestName: "VERSION"; Flags: ignoreversion
 Source: "setup.iss"; DestDir: "{app}\src"; Flags: ignoreversion
-Source: "sbagen+.ico"; DestDir: "{app}\src"; Flags: ignoreversion
+Source: "assets\sbagen+.ico"; DestDir: "{app}\src"; Flags: ignoreversion
 Source: "Dockerfile"; DestDir: "{app}\src"; Flags: ignoreversion
 Source: "compose.yml"; DestDir: "{app}\src"; Flags: ignoreversion
 ; Library header files
@@ -100,6 +100,8 @@ Source: "ChangeLog.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "build\README.txt"; DestDir: "{app}\src"; Flags: ignoreversion
 ; USAGE.txt
 Source: "build\USAGE.txt"; DestDir: "{app}"; Flags: ignoreversion
+; RESEARCH.txt
+Source: "build\RESEARCH.txt"; DestDir: "{app}"; Flags: ignoreversion
 
 [Dirs]
 Name: "{#MyAppUserDocsDir}"; Flags: uninsalwaysuninstall
@@ -113,6 +115,7 @@ Name: "{#MyAppUserDocsDir}\Documentation"; Filename: "{app}\docs"
 Name: "{#MyAppUserDocsDir}\Examples"; Filename: "{app}\examples"
 Name: "{#MyAppUserDocsDir}\License"; Filename: "{app}\COPYING.txt"
 Name: "{#MyAppUserDocsDir}\USAGE"; Filename: "{app}\USAGE.txt"
+Name: "{#MyAppUserDocsDir}\RESEARCH"; Filename: "{app}\RESEARCH.txt"
 
 ; Desktop shortcut to Documents folder
 Name: "{autodesktop}\SBaGen+ Files"; Filename: "{#MyAppUserDocsDir}"

@@ -1,8 +1,8 @@
-# SBaGen+ Usage Guide
+# <img src="assets/sbagen+.png" alt="SBaGen+ Logo" width="32" height="32"> SBaGen+ Usage Guide
 
 This guide will help you get started with SBaGen+, a powerful tool for generating binaural beats and isochronic tones to assist with meditation, relaxation, and altering states of consciousness.
 
-## Table of Contents
+## 📑 Table of Contents
 
 1. [Introduction to Brainwave Entrainment](#introduction-to-brainwave-entrainment)
 2. [Basic Concepts](#basic-concepts)
@@ -12,7 +12,7 @@ This guide will help you get started with SBaGen+, a powerful tool for generatin
 6. [Using Background Sounds](#using-background-sounds)
 7. [Advanced Tips](#advanced-tips)
 
-## Introduction to Brainwave Entrainment
+## 🧠 Introduction to Brainwave Entrainment
 
 Brainwave entrainment is a method to stimulate the brain into entering a specific state by using a pulsing sound, light, or electromagnetic field. The pulses elicit the brain's 'frequency following' response, encouraging the brainwaves to align to the frequency of the given beat.
 
@@ -22,7 +22,7 @@ SBaGen+ supports two main types of brainwave entrainment:
 
 2. **Isochronic Tones**: These are single tones that are turned on and off at regular intervals. The brain responds to this rhythmic stimulation and begins to resonate with the frequency. Isochronic tones can be effective **with or without headphones**.
 
-### Brainwave Frequency Bands
+### 📊 Brainwave Frequency Bands
 
 Different frequency ranges correspond to different mental states:
 
@@ -32,9 +32,9 @@ Different frequency ranges correspond to different mental states:
 - **Beta (13-30 Hz)**: Active thinking, focus, alertness
 - **Gamma (30+ Hz)**: Higher mental activity, peak concentration
 
-## Basic Concepts
+## 💡 Basic Concepts
 
-### Understanding the Syntax
+### 📝 Understanding the Syntax
 
 SBaGen+ uses a specific syntax to define tones:
 
@@ -89,7 +89,7 @@ mix/80 mixpulse:10/50
 
 This creates a pulse effect on the audio input (mix) at 80% amplitude, with the pulse rate of 10Hz and an intensity of 50%.
 
-## Command Line Basics
+## ⌨️ Command Line Basics
 
 Here are some basic commands to get started:
 
@@ -110,14 +110,14 @@ sbagen+ -m ambient-music.mp3 -i mix/80 mixspin:500+8.0/50
 sbagen+ my-sequence.sbg
 ```
 
-### Common Options
+### 🔧 Common Options
 
 - `-i [tones]`: Play the specified tones immediately
 - `-m [file]`: Mix with a background sound file (MP3, OGG, WAV)
 - `-o [file]`: Output to a file instead of playing
 - `-L [time]`: Limit playback to the specified time (e.g., 0:30 for 30 minutes)
 
-## Creating Simple Sequences
+## 📝 Creating Simple Sequences
 
 Sequences allow you to program changes in tones over time. Here's how to create a simple sequence file:
 
@@ -164,7 +164,7 @@ This sequence will:
 3. Return to alpha waves (10Hz) for 5 minutes
 4. Turn off after 30 minutes
 
-## Example Sequences for Different Purposes
+## 📚 Example Sequences for Different Purposes
 
 Here are some example sequences for various purposes in the `examples/plus` directory. You can save these as `.sbg` files and run them with SBaGen+.
 
@@ -174,7 +174,7 @@ Here are some example sequences for various purposes in the `examples/plus` dire
 - [Stress Relief with White Noise](examples/plus/stress-relief.sbg) - Helps you relax and reduce stress
 - [Morning Energizer with Isochronic Tones](examples/plus/morning-energizer.sbg) - Helps you wake up and get energized
 
-## Using Background Sounds
+## 🎵 Using Background Sounds
 
 You can enhance your experience by adding background sounds like nature recordings or ambient music. SBaGen+ supports MP3, OGG, and WAV files.
 
@@ -211,9 +211,9 @@ off: -
 
 Note the use of `mix/80` instead of `pink/40`. This tells SBaGen+ to mix the background sound at 80% amplitude.
 
-## Advanced Tips
+## 🔍 Advanced Tips
 
-### Finding Your Optimal Frequencies
+### 🎯 Finding Your Ideal Frequencies
 
 Everyone responds differently to brainwave entrainment. Experiment with different frequencies to find what works best for you:
 
@@ -221,19 +221,19 @@ Everyone responds differently to brainwave entrainment. Experiment with differen
 - If you're not falling asleep with delta frequencies, try adjusting between 1-4Hz
 - Experiment with different carrier frequencies (100-400Hz range)
 
-### Amplitude Considerations
+### 📊 Considerations about Amplitude
 
 - Keep binaural beats subtle (10-25% amplitude)
 - Isochronic tones can be slightly louder (15-30% amplitude)
 - Background noise should usually be louder than the tones
 
-### Session Duration
+### ⏱️ Session Duration
 
 - For beginners, start with 15-20 minute sessions
 - Gradually increase to 30-60 minutes as you become more comfortable
 - For sleep aid sequences, 45-90 minutes can help you through the initial sleep cycles
 
-### Creating a Practice
+### 🔄 Creating a Practice
 
 For best results, use brainwave entrainment regularly:
 
@@ -243,10 +243,12 @@ For best results, use brainwave entrainment regularly:
 
 Remember that brainwave entrainment is a tool to help you achieve certain mental states, but the experience is ultimately personal. Experiment, adjust, and find what works best for you.
 
-## Conclusion
+## 🎉 Conclusion
 
 SBaGen+ is a powerful tool for exploring altered states of consciousness, enhancing meditation, improving focus, and aiding relaxation. This guide covers the basics to get you started, but there's much more to explore. As you become more familiar with the program, you can create increasingly sophisticated sequences tailored to your specific needs.
 
 For more technical details, see the [SBaGen+ Manual](docs/SBAGEN+.txt).
+
+And for the scientific background behind SBaGen+, check out [RESEARCH.md](RESEARCH.md).
 
 Happy exploring!
