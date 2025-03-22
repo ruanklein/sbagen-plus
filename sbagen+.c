@@ -1593,8 +1593,8 @@ outChunk() {
 	  {
 	    // Calculate intensity factor based on amplitude
 	    // Amplitude varies from 0 to 4096 (0-100%)
-	    // Normalize to a factor between 0.5 and 4.0
-	    double intensity_factor = 0.5 + (ch->amp / 4096.0) * 3.5;
+	    // Normalize to a factor between 1.0 and 10.0
+	    double intensity_factor = 1.0 + (ch->amp / 4096.0) * 9.0;
 
 	    // Apply intensity factor to rotation value
 	    int amplified_val = (int)(val * intensity_factor);
