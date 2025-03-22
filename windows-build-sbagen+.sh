@@ -32,7 +32,7 @@ cat > /tmp/sbagen.rc << EOF
 #include <windows.h>
 
 // Include icon
-1 ICON "sbagen+.ico"
+1 ICON "assets/sbagen+.ico"
 
 VS_VERSION_INFO VERSIONINFO
 FILEVERSION     $VERSION_RC
