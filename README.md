@@ -1,14 +1,10 @@
-# SBaGen+ - Sequenced Brainwave Generator
+# <img src="assets/sbagen+.png" alt="SBaGen+ Logo" width="32" height="32"> SBaGen+ - Sequenced Brainwave Generator
 
 SBaGen+ is a command-line tool for generating binaural beats and isochronic tones, designed to assist with meditation, relaxation, and altering states of consciousness.
 
-## Table of Contents
+## 📑 Table of Contents
 
 - [About This Project](#about-this-project)
-- [Compilation](#compilation)
-  - [Build Scripts Structure](#build-scripts-structure)
-  - [Building with Docker](#option-1-using-docker-compose-simplest-method)
-  - [Building Natively](#option-2-building-natively)
 - [Installation](#installation)
   - [Download Pre-built Binaries](#download-pre-built-binaries)
   - [Installing on Linux](#installing-on-linux)
@@ -16,92 +12,25 @@ SBaGen+ is a command-line tool for generating binaural beats and isochronic tone
   - [Installing on Windows](#installing-on-windows)
 - [Basic Usage](#basic-usage)
 - [Documentation](#documentation)
+- [Research](#research)
+- [Compilation](#compilation)
+  - [Build Scripts Structure](#build-scripts-structure)
+  - [Building with Docker](#option-1-using-docker-compose-simplest-method)
+  - [Building Natively](#option-2-building-natively)
 - [License](#license)
 - [Credits](#credits)
 
-## About This Project
+## 💡 About This Project
 
 SBaGen+ is a fork of the original SBaGen (Sequenced Binaural Beat Generator) created by Jim Peters. The original project has not been maintained for many years, and this fork aims to keep it functional on modern systems while preserving its original structure. Updates focus on compatibility fixes and minor feature additions requested by longtime users, without major refactoring of the original code.
 
-The name has been changed from **“Sequenced Binaural Beat Generator”** to **“Sequenced Brainwave Generator”** to better reflect its expanded functionality. Since SBaGen+ now supports isochronic tones in addition to binaural beats, the original name no longer fully represented its capabilities.
+The name has been changed from **"Sequenced Binaural Beat Generator"** to **"Sequenced Brainwave Generator"** to better reflect its expanded functionality. Since SBaGen+ now supports isochronic tones in addition to binaural beats, the original name no longer fully represented its capabilities.
 
-## Compilation
-
-SBaGen+ can be compiled for macOS, Linux and Windows. The build process is divided into two steps:
-
-1. **Building the libraries**: This step is only necessary if you want MP3 and OGG support
-2. **Building the main program**: This step compiles SBaGen+ using the libraries built in the previous step
-
-### Build Scripts Structure
-
-- **Library build scripts**:
-
-  - `macos-build-libs.sh`: Builds libraries for macOS (universal binary - ARM64 + x86_64)
-  - `linux-build-libs.sh`: Builds libraries for Linux (32-bit, 64-bit, ARM64 [if native])
-  - `windows-build-libs.sh`: Builds libraries for Windows using MinGW (cross-compilation)
-
-- **Main program build scripts**:
-  - `macos-build-sbagen+.sh`: Builds SBaGen+ for macOS (universal binary - ARM64 + x86_64)
-  - `linux-build-sbagen+.sh`: Builds SBaGen+ for Linux (32-bit, 64-bit, ARM64 [if native])
-  - `windows-build-sbagen+.sh`: Builds SBaGen+ for Windows using MinGW (cross-compilation)
-
-#### Option 1: Using Docker Compose (Simplest Method)
-
-The easiest way to build SBaGen+ for Linux and Windows is using Docker Compose:
-
-```bash
-# Build all Linux and Windows binaries with a single command
-docker compose up build
-
-# Build for Linux ARM64
-docker compose up build-arm64
-```
-
-This will automatically build the Docker image and run all necessary build scripts to generate the binaries for Linux and Windows. All compiled binaries will be placed in the `dist` directory.
-
-#### Option 2: Building Natively
-
-If you prefer to build without Docker, you can use the build scripts directly on your system, provided you have all the necessary dependencies installed.
-
-##### Building for macOS
-
-```bash
-# Build the libraries (only needed for MP3 and OGG support)
-./macos-build-libs.sh
-
-# Build SBaGen+
-./macos-build-sbagen+.sh
-```
-
-After compilation, you'll find the universal binary (works on both Intel and Apple Silicon) in the `dist` directory:
-
-- `sbagen+-macos-universal`
-
-##### Building for Linux
-
-```bash
-# Build the libraries (only needed for MP3 and OGG support)
-./linux-build-libs.sh
-
-# Build SBaGen+
-./linux-build-sbagen+.sh
-```
-
-##### Building for Windows (cross-compilation on Linux/macOS)
-
-```bash
-# Build the libraries (only needed for MP3 and OGG support)
-./windows-build-libs.sh
-
-# Build SBaGen+
-./windows-build-sbagen+.sh
-```
-
-## Installation
+## 📥 Installation
 
 You can either compile SBaGen+ from source as described above or download pre-built binaries from the [releases page](https://github.com/ruanklein/sbagen-plus/releases).
 
-### Download Pre-built Binaries
+### ⬇️ Download Pre-built Binaries
 
 The latest release (v1.5.3) can be downloaded directly from the following links:
 
@@ -113,7 +42,7 @@ The latest release (v1.5.3) can be downloaded directly from the following links:
 
   **Important**: Always verify the SHA256 checksum of downloaded binaries against those listed on the [releases page](https://github.com/ruanklein/sbagen-plus/releases) to ensure file integrity and security.
 
-### Installing on Linux
+### 🐧 Installing on Linux
 
 1. Download the appropriate binary for your system:
 
@@ -153,7 +82,7 @@ The latest release (v1.5.3) can be downloaded directly from the following links:
    sbagen+ -h
    ```
 
-### Installing on macOS
+### 🍎 Installing on macOS
 
 1. Download the macOS universal binary:
 
@@ -186,7 +115,7 @@ The latest release (v1.5.3) can be downloaded directly from the following links:
    sbagen+ -h
    ```
 
-### Installing on Windows
+### 🪟 Installing on Windows
 
 1. Download the installer:
 
@@ -211,19 +140,103 @@ This happens because the executable is **not digitally signed**, and as a comman
 
 ✅ **Temporary solution:** if you trust the source of the executable, add an exception in your antivirus for the file or the folder where `SBaGen+` is installed.
 
-## Basic Usage
+## 🚀 Basic Usage
 
 See [USAGE.md](USAGE.md) for more information on how to use SBaGen+.
 
-## Documentation
+## 📚 Documentation
 
 For detailed information on all features, see the [SBAGEN+.txt](docs/SBAGEN+.txt) file.
 
-## License
+## 🔍 Research
+
+For the scientific background behind SBaGen+, check out [RESEARCH.md](RESEARCH.md).
+
+## 🛠️ Compilation
+
+SBaGen+ can be compiled for macOS, Linux and Windows. The build process is divided into two steps:
+
+1. **Building the libraries**: This step is only necessary if you want MP3 and OGG support
+2. **Building the main program**: This step compiles SBaGen+ using the libraries built in the previous step
+
+### 📁 Build Scripts Structure
+
+- **Library build scripts**:
+
+  - `macos-build-libs.sh`: Builds libraries for macOS (universal binary - ARM64 + x86_64)
+  - `linux-build-libs.sh`: Builds libraries for Linux (32-bit, 64-bit, ARM64 [if native])
+  - `windows-build-libs.sh`: Builds libraries for Windows using MinGW (cross-compilation)
+
+- **Main program build scripts**:
+  - `macos-build-sbagen+.sh`: Builds SBaGen+ for macOS (universal binary - ARM64 + x86_64)
+  - `linux-build-sbagen+.sh`: Builds SBaGen+ for Linux (32-bit, 64-bit, ARM64 [if native])
+  - `windows-build-sbagen+.sh`: Builds SBaGen+ for Windows using MinGW (cross-compilation)
+
+#### 🐳 Option 1: Using Docker Compose (Simplest Method)
+
+The easiest way to build SBaGen+ for Linux and Windows is using Docker Compose:
+
+```bash
+# Build all Linux and Windows binaries with a single command
+docker compose up build
+
+# Build for Linux ARM64
+docker compose up build-arm64
+```
+
+This will automatically build the Docker image and run all necessary build scripts to generate the binaries for Linux and Windows. All compiled binaries will be placed in the `dist` directory.
+
+#### 💻 Option 2: Building Natively
+
+If you prefer to build without Docker, you can use the build scripts directly on your system, provided you have all the necessary dependencies installed.
+
+##### 🍎 Building for macOS
+
+```bash
+# Build the libraries (only needed for MP3 and OGG support)
+./macos-build-libs.sh
+
+# Build SBaGen+
+./macos-build-sbagen+.sh
+```
+
+After compilation, you'll find the universal binary (works on both Intel and Apple Silicon) in the `dist` directory:
+
+- `sbagen+-macos-universal`
+
+##### 🐧 Building for Linux
+
+```bash
+# Build the libraries (only needed for MP3 and OGG support)
+./linux-build-libs.sh
+
+# Build SBaGen+
+./linux-build-sbagen+.sh
+```
+
+##### 🪟 Building for Windows (cross-compilation on Linux/macOS)
+
+```bash
+# Build the libraries (only needed for MP3 and OGG support)
+./windows-build-libs.sh
+
+# Build SBaGen+
+./windows-build-sbagen+.sh
+```
+
+If you want create a installer for Windows, you can use the `windows-build-installer.sh` script.
+
+```bash
+./windows-build-installer.sh
+```
+
+This will create a installer for Windows in the `dist` directory.
+
+## ⚖️ License
 
 SBaGen+ is distributed under the GPL license. See the [COPYING.txt](COPYING.txt) file for details.
 
-## Credits
+## 👏 Credits
 
 Original SBaGen was developed by Jim Peters. See [SBaGen project](https://uazu.net/sbagen/).
 
