@@ -7,7 +7,7 @@ APP_NAME="SBaGen+"
 SBAGEN_BINARY="dist/sbagen+-macos-universal"
 PNG_SOURCE="assets/sbagen+.png"
 ICON_NAME="app_icon"
-DMG_NAME="SBaGen+.dmg"
+DMG_NAME="SBaGen+-Installer.dmg"
 
 section_header "Creating macOS Application Bundle..."
 
@@ -106,6 +106,27 @@ if [ $? -ne 0 ]; then
     error "Failed to compile AppleScript into application bundle!"
     exit 1
 fi
+
+# Copy source code
+info "Copying source code to application bundle..."
+create_dir_if_not_exists "build/$APP_NAME.app/Contents/Resources/src"
+create_dir_if_not_exists "build/$APP_NAME.app/Contents/Resources/src/libs"
+cp -R sbagen+.c \
+    mp3dec.c \
+    oggdec.c \
+    linux-build-* \
+    macos-build-* \
+    windows-build-* \
+    macos-create-installer.sh \
+    windows-create-installer.sh \
+    setup.iss \
+    Dockerfile \
+    compose.yml \
+    "build/$APP_NAME.app/Contents/Resources/src"
+
+cp -R libs/*.h \
+    libs/config.* \
+    "build/$APP_NAME.app/Contents/Resources/src/libs"
 
 # Copy the binary
 info "Copying binary to application bundle..."
