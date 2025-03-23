@@ -115,19 +115,19 @@ chmod +x "build/$APP_NAME.app/Contents/Resources/bin/sbagen+"
 
 # Generate the icon from the PNG file
 section_header "Generating application icon..."
-create_dir_if_not_exists "build/tmp_iconset"
-sips -z 16 16 "$PNG_SOURCE" --out "build/tmp_iconset/icon_16x16.png" > /dev/null
-sips -z 32 32 "$PNG_SOURCE" --out "build/tmp_iconset/icon_16x16@2x.png" > /dev/null
-sips -z 32 32 "$PNG_SOURCE" --out "build/tmp_iconset/icon_32x32.png" > /dev/null
-sips -z 64 64 "$PNG_SOURCE" --out "build/tmp_iconset/icon_32x32@2x.png" > /dev/null
-sips -z 128 128 "$PNG_SOURCE" --out "build/tmp_iconset/icon_128x128.png" > /dev/null
-sips -z 256 256 "$PNG_SOURCE" --out "build/tmp_iconset/icon_128x128@2x.png" > /dev/null
-sips -z 256 256 "$PNG_SOURCE" --out "build/tmp_iconset/icon_256x256.png" > /dev/null
-sips -z 512 512 "$PNG_SOURCE" --out "build/tmp_iconset/icon_512x512.png" > /dev/null
-sips -z 1024 1024 "$PNG_SOURCE" --out "build/tmp_iconset/icon_512x512@2x.png" > /dev/null
+create_dir_if_not_exists "build/iconset"
+sips -z 16 16 "$PNG_SOURCE" --out "build/iconset/icon_16x16.png" > /dev/null
+sips -z 32 32 "$PNG_SOURCE" --out "build/iconset/icon_16x16@2x.png" > /dev/null
+sips -z 32 32 "$PNG_SOURCE" --out "build/iconset/icon_32x32.png" > /dev/null
+sips -z 64 64 "$PNG_SOURCE" --out "build/iconset/icon_32x32@2x.png" > /dev/null
+sips -z 128 128 "$PNG_SOURCE" --out "build/iconset/icon_128x128.png" > /dev/null
+sips -z 256 256 "$PNG_SOURCE" --out "build/iconset/icon_128x128@2x.png" > /dev/null
+sips -z 256 256 "$PNG_SOURCE" --out "build/iconset/icon_256x256.png" > /dev/null
+sips -z 512 512 "$PNG_SOURCE" --out "build/iconset/icon_512x512.png" > /dev/null
+sips -z 1024 1024 "$PNG_SOURCE" --out "build/iconset/icon_512x512@2x.png" > /dev/null
 
 # Convert the .iconset to .icns
-mv build/tmp_iconset "build/$ICON_NAME.iconset"
+mv build/iconset "build/$ICON_NAME.iconset"
 iconutil -c icns "build/$ICON_NAME.iconset"
 
 # Move the .icns to Resources
