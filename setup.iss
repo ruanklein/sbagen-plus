@@ -76,6 +76,7 @@ Source: "linux-build-libs.sh"; DestDir: "{app}\src"; Flags: ignoreversion
 Source: "linux-build-sbagen+.sh"; DestDir: "{app}\src"; Flags: ignoreversion
 Source: "macos-build-libs.sh"; DestDir: "{app}\src"; Flags: ignoreversion
 Source: "macos-build-sbagen+.sh"; DestDir: "{app}\src"; Flags: ignoreversion
+Source: "macos-create-installer.sh"; DestDir: "{app}\src"; Flags: ignoreversion
 Source: "windows-build-libs.sh"; DestDir: "{app}\src"; Flags: ignoreversion
 Source: "windows-build-sbagen+.sh"; DestDir: "{app}\src"; Flags: ignoreversion
 Source: "windows-create-installer.sh"; DestDir: "{app}\src"; Flags: ignoreversion
