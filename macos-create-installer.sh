@@ -11,6 +11,9 @@ DMG_NAME="SBaGen+-Installer.dmg"
 
 section_header "Creating macOS Application Bundle..."
 
+# Clean build directory
+rm -rf build
+
 # Check if the binary exists
 if [ ! -f "$SBAGEN_BINARY" ]; then
     error "$SBAGEN_BINARY not found. Execute ./macos-build-sbagen+.sh first."
@@ -29,11 +32,57 @@ create_dir_if_not_exists "build"
 # Create temporary AppleScript with the dialog
 info "Creating AppleScript handler..."
 cat > build/sbagen.applescript <<EOF
+on showAppNotInstalledAlert()
+    set appPath to POSIX path of (path to me)
+
+    if appPath starts with "/Volumes/" then
+        display dialog "Please move the app to the Applications folder before using it." buttons {"OK"} default button 1
+        error number -128
+    end if
+end showAppNotInstalledAlert
+
+on setupDocsFolder()
+	set documentsFolder to POSIX path of (path to documents folder)
+	set targetFolder to documentsFolder & "SBaGen+"
+	set appBase to "/Applications/SBaGen+.app/Contents/Resources"
+
+    set folderExists to (do shell script "test -d " & quoted form of targetFolder & " && echo yes || echo no")
+	if folderExists is "yes" then return
+
+	do shell script "mkdir -p " & quoted form of targetFolder
+
+	set fileMap to {¬
+	    {"Documentation", appBase & "/docs"}, ¬
+	    {"Examples", appBase & "/examples"}, ¬
+	    {"Scripts", appBase & "/scripts"}, ¬
+	    {"License.txt", appBase & "/COPYING.txt"}, ¬
+	    {"Research.txt", appBase & "/RESEARCH.txt"}, ¬
+	    {"Usage.txt", appBase & "/USAGE.txt"}}
+
+	repeat with pair in fileMap
+		set fileName to item 1 of pair
+		set targetPath to item 2 of pair
+		set filePath to targetFolder & "/" & fileName
+
+		set fileExists to (do shell script "test -e " & quoted form of filePath & " && echo yes || echo no")
+
+		if fileExists is "no" then
+			do shell script "cp -R " & quoted form of targetPath & " " & quoted form of filePath
+		end if
+	end repeat
+end setupDocsFolder
+
 on run
+    showAppNotInstalledAlert()
+    setupDocsFolder()
+
     display dialog "Please open a .sbg file using this application." buttons {"OK"} default button "OK" with title "$APP_NAME" with icon POSIX file ((POSIX path of (path to me)) & "Contents/Resources/app_icon.icns")
 end run
 
 on open theFiles
+    showAppNotInstalledAlert()
+    setupDocsFolder()
+
     set filePath to POSIX path of (item 1 of theFiles)
     set appPath to POSIX path of (path to me)
     set sbagenPath to quoted form of (appPath & "Contents/Resources/bin/sbagen+")
@@ -107,26 +156,28 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# Copy source code
-info "Copying source code to application bundle..."
-create_dir_if_not_exists "build/$APP_NAME.app/Contents/Resources/src"
-create_dir_if_not_exists "build/$APP_NAME.app/Contents/Resources/src/libs"
-cp -R sbagen+.c \
-    mp3dec.c \
-    oggdec.c \
-    linux-build-* \
-    macos-build-* \
-    windows-build-* \
-    macos-create-installer.sh \
-    windows-create-installer.sh \
-    setup.iss \
-    Dockerfile \
-    compose.yml \
-    "build/$APP_NAME.app/Contents/Resources/src"
+# Copy documentation
+info "Copying documentation to application bundle..."
+create_dir_if_not_exists "build/$APP_NAME.app/Contents/Resources/docs"
+cp -R docs/* "build/$APP_NAME.app/Contents/Resources/docs"
 
-cp -R libs/*.h \
-    libs/config.* \
-    "build/$APP_NAME.app/Contents/Resources/src/libs"
+# Copy COPYING.txt
+info "Copying COPYING.txt to application bundle..."
+cp COPYING.txt "build/$APP_NAME.app/Contents/Resources/COPYING.txt"
+
+# Convert *.md to *.txt
+pandoc -f markdown -t plain USAGE.md -o build/$APP_NAME.app/Contents/Resources/USAGE.txt
+pandoc -f markdown -t plain RESEARCH.md -o build/$APP_NAME.app/Contents/Resources/RESEARCH.txt
+
+# Copy examples
+info "Copying examples to application bundle..."
+create_dir_if_not_exists "build/$APP_NAME.app/Contents/Resources/examples"
+cp -R examples/* "build/$APP_NAME.app/Contents/Resources/examples"
+
+# Copy scripts
+info "Copying scripts to application bundle..."
+create_dir_if_not_exists "build/$APP_NAME.app/Contents/Resources/scripts"
+cp -R scripts/* "build/$APP_NAME.app/Contents/Resources/scripts"
 
 # Copy the binary
 info "Copying binary to application bundle..."
@@ -276,10 +327,28 @@ codesign --force --deep --sign - "build/$APP_NAME.app" --entitlements build/enti
 # Create a temporary folder for the DMG content
 section_header "Creating DMG installer..."
 create_dir_if_not_exists "build/dmg"
-mv "build/$APP_NAME.app" build/dmg/
+mv "build/$APP_NAME.app" "build/dmg/"
 
-# Create the DMG
-hdiutil create -volname "$APP_NAME" -srcfolder build/dmg -ov -format UDZO "dist/$DMG_NAME" > /dev/null 2>&1
+# Clean all dmg files in dist
+rm -f dist/*.dmg
+
+# Create the DMG with background using create-dmg
+create-dmg \
+  --volname "$APP_NAME" \
+  --window-pos 200 120 \
+  --window-size 800 400 \
+  --icon-size 100 \
+  --icon "$APP_NAME.app" 200 190 \
+  --hide-extension "$APP_NAME.app" \
+  --app-drop-link 600 185 \
+  --background "assets/dmg-background.png" \
+  "dist/$DMG_NAME" \
+  "build/dmg" > /dev/null
+
+if [ $? -ne 0 ]; then
+    error "Failed to create DMG!"
+    exit 1
+fi
 
 # Remove temporary files
 info "Cleaning up temporary files..."
