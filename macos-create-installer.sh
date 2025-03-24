@@ -138,7 +138,7 @@ on open theFiles
     if mainChoice is "Play" then
         tell application "Terminal"
             activate
-            set terminalWindow to do script (sbagenPath & " " & quoted form of filePath & "; exit")
+            set terminalWindow to do script ("cd " & quoted form of dirPath & "; " & sbagenPath & " " & quoted form of filePath & "; exit")
         end tell
     else if mainChoice is "Edit" then
         tell application "TextEdit"
@@ -150,7 +150,7 @@ on open theFiles
         if convertChoice is "Convert to WAV" then
             tell application "Terminal"
                 activate
-                set terminalWindow to do script (sbagenPath & " -Wo " & outputFilePath & " " & quoted form of filePath & "; exit")
+                set terminalWindow to do script ("cd " & quoted form of dirPath & "; " & sbagenPath & " -Wo " & outputFilePath & " " & quoted form of filePath & "; exit")
                 repeat while busy of terminalWindow is true
                     delay 0.5
                 end repeat
@@ -159,7 +159,7 @@ on open theFiles
         else if convertChoice is "Convert to WAV (30 min)" then
             tell application "Terminal"
                 activate
-                set terminalWindow to do script (sbagenPath & " -L 00:30:00 -Wo " & outputFilePath & " " & quoted form of filePath & "; exit")
+                set terminalWindow to do script ("cd " & quoted form of dirPath & "; " & sbagenPath & " -L 00:30:00 -Wo " & outputFilePath & " " & quoted form of filePath & "; exit")
                 repeat while busy of terminalWindow is true
                     delay 0.5
                 end repeat
