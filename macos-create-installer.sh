@@ -41,13 +41,25 @@ on showAppNotInstalledAlert()
     end if
 end showAppNotInstalledAlert
 
-on setupDocsFolder()
+on initialize()
 	set documentsFolder to POSIX path of (path to documents folder)
 	set targetFolder to documentsFolder & "SBaGen+"
 	set appBase to "/Applications/SBaGen+.app/Contents/Resources"
 
     set folderExists to (do shell script "test -d " & quoted form of targetFolder & " && echo yes || echo no")
 	if folderExists is "yes" then return
+
+    set userChoice to button returned of (display dialog "This software is distributed under the GPL v2 license.\n\nYou can view the full license terms now, if you wish." buttons {"OK", "View License"} default button "OK" with title "GPL License")
+
+
+	if userChoice is "View License" then
+		set noticePath to ((POSIX path of (path to me)) & "Contents/Resources/NOTICE.txt")
+		tell application "TextEdit"
+			activate
+			open POSIX file noticePath
+		end tell
+        error number -128
+	end if
 
 	do shell script "mkdir -p " & quoted form of targetFolder
 
@@ -56,6 +68,7 @@ on setupDocsFolder()
 	    {"Examples", appBase & "/examples"}, ¬
 	    {"Scripts", appBase & "/scripts"}, ¬
 	    {"License.txt", appBase & "/COPYING.txt"}, ¬
+        {"Notice.txt", appBase & "/NOTICE.txt"}, ¬
 	    {"Research.txt", appBase & "/RESEARCH.txt"}, ¬
 	    {"Usage.txt", appBase & "/USAGE.txt"}}
 
@@ -70,18 +83,18 @@ on setupDocsFolder()
 			do shell script "cp -R " & quoted form of targetPath & " " & quoted form of filePath
 		end if
 	end repeat
-end setupDocsFolder
+end initialize
 
 on run
     showAppNotInstalledAlert()
-    setupDocsFolder()
+    initialize()
 
     display dialog "Please open a .sbg file using this application." buttons {"OK"} default button "OK" with title "$APP_NAME" with icon POSIX file ((POSIX path of (path to me)) & "Contents/Resources/app_icon.icns")
 end run
 
 on open theFiles
     showAppNotInstalledAlert()
-    setupDocsFolder()
+    initialize()
 
     set filePath to POSIX path of (item 1 of theFiles)
     set appPath to POSIX path of (path to me)
@@ -164,6 +177,10 @@ cp -R docs/* "build/$APP_NAME.app/Contents/Resources/docs"
 # Copy COPYING.txt
 info "Copying COPYING.txt to application bundle..."
 cp COPYING.txt "build/$APP_NAME.app/Contents/Resources/COPYING.txt"
+
+# Copy NOTICE.txt
+info "Copying NOTICE.txt to application bundle..."
+cp NOTICE.txt "build/$APP_NAME.app/Contents/Resources/NOTICE.txt"
 
 # Convert *.md to *.txt
 pandoc -f markdown -t plain USAGE.md -o build/$APP_NAME.app/Contents/Resources/USAGE.txt
