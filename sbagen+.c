@@ -2288,7 +2288,7 @@ setup_device(void) {
     UInt32 propertySize, bufferByteCount;
     struct AudioStreamBasicDescription streamDesc;
     
-    int old_out_rate= out_rate;
+    int device_out_rate;
     int buffer_size= opt_B > 0 ? opt_B : 4096; // Default is 2048 samples (L+R)
 
     out_bsiz= buffer_size;
@@ -2341,7 +2341,7 @@ setup_device(void) {
         error("Get audio device properties failed, status = %d", (int)err);
     }
 
-    out_rate= (int)streamDesc.mSampleRate;
+    device_out_rate = (int)streamDesc.mSampleRate;
 
     if (streamDesc.mChannelsPerFrame != 2) 
       error("SBaGen+ requires a stereo output device -- \n"
@@ -2370,8 +2370,8 @@ setup_device(void) {
 
     // Report settings      
     if (!opt_Q) {
-       if (old_out_rate != out_rate && !out_rate_def) 
-	  warn("*** WARNING: Non-default sampling rates not yet supported on OS X ***");
+       if (device_out_rate != out_rate && out_rate_def) 
+	      warn("*** WARNING: Device output rate is %d Hz, but SBaGen+ is configured for %d Hz ***", device_out_rate, out_rate);
        warn("Outputting %d-bit audio at %d Hz to \"%s\",\n"
 	    "  using %d %d-sample fragments, %d ms per fragment",
 	    (int)streamDesc.mBitsPerChannel, out_rate, deviceName,
