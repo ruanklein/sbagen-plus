@@ -35,6 +35,7 @@ SetupIconFile={#MyAppIcon}
 UninstallDisplayIcon={app}\{#MyAppExeName}
 WizardStyle=modern
 LicenseFile=COPYING.txt
+DisableWelcomePage=no
 ChangesAssociations=yes
 
 [Languages]
@@ -54,6 +55,10 @@ LicenseLabel={#MyAppName} license agreement.
 LicenseAccepted=I &accept the agreement
 LicenseNotAccepted=I &do not accept the agreement
 
+[CustomMessages]
+NoticeCaption=Important Notice
+NoticeDescription=Please read this important notice before continuing:
+
 [Tasks]
 Name: "associatewithfiles"; Description: "Associate .sbg files with {#MyAppName}"; GroupDescription: "File associations:";
 
@@ -62,47 +67,25 @@ Name: "associatewithfiles"; Description: "Associate .sbg files with {#MyAppName}
 Source: "dist\sbagen+-win32.exe"; DestDir: "{app}"; DestName: "sbagen+.exe"; Flags: ignoreversion
 ; Documentation
 Source: "COPYING.txt"; DestDir: "{app}"; Flags: ignoreversion
+Source: "NOTICE.txt"; DestDir: "{app}"; Flags: ignoreversion dontcopy
 Source: "docs\*"; DestDir: "{app}\docs"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; Example files
 Source: "examples\*"; DestDir: "{app}\examples"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; Scripts directory
 Source: "scripts\*"; DestDir: "{app}\scripts"; Flags: ignoreversion recursesubdirs createallsubdirs
-; Source files
-Source: "sbagen+.c"; DestDir: "{app}\src"; Flags: ignoreversion
-Source: "mp3dec.c"; DestDir: "{app}\src"; Flags: ignoreversion
-Source: "oggdec.c"; DestDir: "{app}\src"; Flags: ignoreversion
-Source: "lib.sh"; DestDir: "{app}\src"; Flags: ignoreversion
-Source: "linux-build-libs.sh"; DestDir: "{app}\src"; Flags: ignoreversion
-Source: "linux-build-sbagen+.sh"; DestDir: "{app}\src"; Flags: ignoreversion
-Source: "macos-build-libs.sh"; DestDir: "{app}\src"; Flags: ignoreversion
-Source: "macos-build-sbagen+.sh"; DestDir: "{app}\src"; Flags: ignoreversion
-Source: "macos-create-installer.sh"; DestDir: "{app}\src"; Flags: ignoreversion
-Source: "windows-build-libs.sh"; DestDir: "{app}\src"; Flags: ignoreversion
-Source: "windows-build-sbagen+.sh"; DestDir: "{app}\src"; Flags: ignoreversion
-Source: "windows-create-installer.sh"; DestDir: "{app}\src"; Flags: ignoreversion
-Source: "VERSION"; DestDir: "{app}\src"; DestName: "VERSION"; Flags: ignoreversion
-Source: "setup.iss"; DestDir: "{app}\src"; Flags: ignoreversion
-Source: "assets\sbagen+.ico"; DestDir: "{app}\src"; Flags: ignoreversion
-Source: "Dockerfile"; DestDir: "{app}\src"; Flags: ignoreversion
-Source: "compose.yml"; DestDir: "{app}\src"; Flags: ignoreversion
-; Library header files
-Source: "libs\_G_config.h"; DestDir: "{app}\src\libs"; Flags: ignoreversion
-Source: "libs\config_types.h"; DestDir: "{app}\src\libs"; Flags: ignoreversion
-Source: "libs\config.guess"; DestDir: "{app}\src\libs"; Flags: ignoreversion
-Source: "libs\config.sub"; DestDir: "{app}\src\libs"; Flags: ignoreversion
-Source: "libs\ivorbiscodec.h"; DestDir: "{app}\src\libs"; Flags: ignoreversion
-Source: "libs\ivorbisfile.h"; DestDir: "{app}\src\libs"; Flags: ignoreversion
-Source: "libs\mad.h"; DestDir: "{app}\src\libs"; Flags: ignoreversion
-Source: "libs\ogg.h"; DestDir: "{app}\src\libs"; Flags: ignoreversion
-Source: "libs\os_types.h"; DestDir: "{app}\src\libs"; Flags: ignoreversion
 ; Changelog
 Source: "ChangeLog.txt"; DestDir: "{app}"; Flags: ignoreversion
-; README.txt
-Source: "build\README.txt"; DestDir: "{app}\src"; Flags: ignoreversion
 ; USAGE.txt
 Source: "build\USAGE.txt"; DestDir: "{app}"; Flags: ignoreversion
 ; RESEARCH.txt
 Source: "build\RESEARCH.txt"; DestDir: "{app}"; Flags: ignoreversion
+; Documentation files in user's Documents folder
+Source: "docs\*"; DestDir: "{#MyAppUserDocsDir}\Documentation"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "examples\*"; DestDir: "{#MyAppUserDocsDir}\Examples"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "COPYING.txt"; DestDir: "{#MyAppUserDocsDir}"; DestName: "License.txt"; Flags: ignoreversion
+Source: "NOTICE.txt"; DestDir: "{#MyAppUserDocsDir}"; DestName: "Notice.txt"; Flags: ignoreversion
+Source: "build\USAGE.txt"; DestDir: "{#MyAppUserDocsDir}"; DestName: "Usage.txt"; Flags: ignoreversion
+Source: "build\RESEARCH.txt"; DestDir: "{#MyAppUserDocsDir}"; DestName: "Research.txt"; Flags: ignoreversion
 
 [Dirs]
 Name: "{#MyAppUserDocsDir}"; Flags: uninsalwaysuninstall
@@ -110,13 +93,6 @@ Name: "{#MyAppUserDocsDir}"; Flags: uninsalwaysuninstall
 [Icons]
 ; Program shortcuts
 Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"
-
-; Documentation shortcuts in user's Documents folder
-Name: "{#MyAppUserDocsDir}\Documentation"; Filename: "{app}\docs"
-Name: "{#MyAppUserDocsDir}\Examples"; Filename: "{app}\examples"
-Name: "{#MyAppUserDocsDir}\License"; Filename: "{app}\COPYING.txt"
-Name: "{#MyAppUserDocsDir}\USAGE"; Filename: "{app}\USAGE.txt"
-Name: "{#MyAppUserDocsDir}\RESEARCH"; Filename: "{app}\RESEARCH.txt"
 
 ; Desktop shortcut to Documents folder
 Name: "{autodesktop}\SBaGen+ Files"; Filename: "{#MyAppUserDocsDir}"
@@ -150,6 +126,32 @@ Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts
 Filename: "{win}\explorer.exe"; Parameters: """{#MyAppUserDocsDir}"""; Description: "Open SBaGen+ folder"; Flags: postinstall nowait skipifsilent shellexec
 
 [Code]
+var
+  NoticePage: TOutputMsgMemoWizardPage;
+
+procedure InitializeWizard;
+var
+  NoticeLines: TStringList;
+  NoticeText: AnsiString;
+begin
+  { Create the notice page }
+  NoticePage := CreateOutputMsgMemoPage(wpWelcome,
+    ExpandConstant('{cm:NoticeCaption}'),
+    ExpandConstant('{cm:NoticeDescription}'),
+    '', '');
+
+  { Load and display NOTICE.txt content }
+  NoticeLines := TStringList.Create;
+  try
+    ExtractTemporaryFile('NOTICE.txt');
+    NoticeLines.LoadFromFile(ExpandConstant('{tmp}\NOTICE.txt'));
+    NoticeText := NoticeLines.Text;
+    NoticePage.RichEditViewer.Lines.Text := NoticeText;
+  finally
+    NoticeLines.Free;
+  end;
+end;
+
 function GetUninstallString(): String;
 var
   sUnInstPath: String;
