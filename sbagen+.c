@@ -2289,7 +2289,7 @@ setup_device(void) {
     struct AudioStreamBasicDescription streamDesc;
     
     int old_out_rate= out_rate;
-    int buffer_size= opt_B > 0 ? opt_B : BUFFER_SIZE;
+    int buffer_size= opt_B > 0 ? opt_B : 4096; // Default is 2048 samples (L+R)
 
     out_bsiz= buffer_size;
     out_blen= out_mode ? out_bsiz/2 : out_bsiz;
