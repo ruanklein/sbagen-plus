@@ -1577,8 +1577,42 @@ outChunk() {
 	  ch->off1 += ch->inc1;
 	  ch->off1 &= (ST_SIZ << 16) - 1;
 	  val= (ch->inc2 * sin_table[ch->off1 >> 16]) >> 24;
-	  tot1 += ch->amp * noise_buf[(uchar)(noise_off+128+val)];
-	  tot2 += ch->amp * noise_buf[(uchar)(noise_off+128-val)];
+	  
+	  // Spin intensity control similar to mixspin
+	  {
+	    // Calculate intensity factor based on amplitude
+	    // Fixed intensity factor for spinning pink noise
+	    double intensity_factor = 3.5;
+
+	    // Apply intensity factor to rotation value
+	    int amplified_val = (int)(val * intensity_factor);
+	    
+	    // Limit value between -128 and 127
+	    if (amplified_val > 127) amplified_val = 127;
+	    if (amplified_val < -128) amplified_val = -128;
+	    
+	    // Use absolute value for calculations
+	    int pos_val = amplified_val < 0 ? -amplified_val : amplified_val;
+	    int noise_l, noise_r;
+
+	    // Get base noise value
+	    int base_noise = noise_buf[(uchar)(noise_off+128)];
+	    
+	    // When val is close to 0, channels are played normally
+	    // When val approaches +/-128, channels are swapped or muted
+	    if (amplified_val >= 0) {
+	      // Rotation to the right: left channel decreases, right channel receives part of the left channel
+	      noise_l = (base_noise * (128 - pos_val)) >> 7;
+	      noise_r = base_noise + ((base_noise * pos_val) >> 7);
+	    } else {
+	      // Rotation to the left: right channel decreases, left channel receives part of the right channel
+	      noise_l = base_noise + ((base_noise * pos_val) >> 7);
+	      noise_r = (base_noise * (128 - pos_val)) >> 7;
+	    }
+
+	    tot1 += ch->amp * noise_l;
+	    tot2 += ch->amp * noise_r;
+	  }
 	  break;
        case 5:	// Mix level
 	  tot1 += mix1 * ch->amp;
