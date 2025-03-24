@@ -45,18 +45,22 @@ on initialize()
 	set documentsFolder to POSIX path of (path to documents folder)
 	set targetFolder to documentsFolder & "SBaGen+"
 	set appBase to "/Applications/SBaGen+.app/Contents/Resources"
+    set desktopFolder to POSIX path of (path to desktop folder)
+    set linkPath to desktopFolder & "SBaGen+ Files"
+
+    set noticePath to ((POSIX path of (path to me)) & "Contents/Resources/NOTICE.txt")
+    set noticeText to do shell script "cat " & quoted form of noticePath
 
     set folderExists to (do shell script "test -d " & quoted form of targetFolder & " && echo yes || echo no")
 	if folderExists is "yes" then return
 
-    set userChoice to button returned of (display dialog "This software is distributed under the GPL v2 license.\n\nYou can view the full license terms now, if you wish." buttons {"OK", "View License"} default button "OK" with title "GPL License")
-
+    set userChoice to button returned of (display dialog noticeText buttons {"OK, I Agree", "View License"} default button "View License" with title "GPL License")
 
 	if userChoice is "View License" then
-		set noticePath to ((POSIX path of (path to me)) & "Contents/Resources/NOTICE.txt")
+		set licensePath to ((POSIX path of (path to me)) & "Contents/Resources/COPYING.txt")
 		tell application "TextEdit"
 			activate
-			open POSIX file noticePath
+			open POSIX file licensePath
 		end tell
         error number -128
 	end if
@@ -70,7 +74,8 @@ on initialize()
 	    {"License.txt", appBase & "/COPYING.txt"}, ¬
         {"Notice.txt", appBase & "/NOTICE.txt"}, ¬
 	    {"Research.txt", appBase & "/RESEARCH.txt"}, ¬
-	    {"Usage.txt", appBase & "/USAGE.txt"}}
+	    {"Usage.txt", appBase & "/USAGE.txt"}, ¬
+	    {"ChangeLog.txt", appBase & "/ChangeLog.txt"}}
 
 	repeat with pair in fileMap
 		set fileName to item 1 of pair
@@ -83,6 +88,11 @@ on initialize()
 			do shell script "cp -R " & quoted form of targetPath & " " & quoted form of filePath
 		end if
 	end repeat
+
+    set linkExists to (do shell script "test -e " & quoted form of linkPath & " && echo yes || echo no")
+    if linkExists is "no" then
+	    do shell script "ln -s " & quoted form of targetFolder & " " & quoted form of linkPath
+    end if
 end initialize
 
 on run
@@ -181,6 +191,10 @@ cp COPYING.txt "build/$APP_NAME.app/Contents/Resources/COPYING.txt"
 # Copy NOTICE.txt
 info "Copying NOTICE.txt to application bundle..."
 cp NOTICE.txt "build/$APP_NAME.app/Contents/Resources/NOTICE.txt"
+
+# Copy ChangeLog.txt
+info "Copying ChangeLog.txt to application bundle..."
+cp ChangeLog.txt "build/$APP_NAME.app/Contents/Resources/ChangeLog.txt"
 
 # Convert *.md to *.txt
 pandoc -f markdown -t plain USAGE.md -o build/$APP_NAME.app/Contents/Resources/USAGE.txt
