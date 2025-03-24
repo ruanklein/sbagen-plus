@@ -48,13 +48,14 @@ on initialize()
     set desktopFolder to POSIX path of (path to desktop folder)
     set linkPath to desktopFolder & "SBaGen+ Files"
 
-    set noticePath to ((POSIX path of (path to me)) & "Contents/Resources/NOTICE.txt")
-    set noticeText to do shell script "cat " & quoted form of noticePath
-
     set folderExists to (do shell script "test -d " & quoted form of targetFolder & " && echo yes || echo no")
 	if folderExists is "yes" then return
 
-    set userChoice to button returned of (display dialog noticeText buttons {"OK, I Agree", "View License"} default button "View License" with title "GPL License")
+    set noticePath to ((POSIX path of (path to me)) & "Contents/Resources/NOTICE.txt")
+    set noticeText to do shell script "cat " & quoted form of noticePath
+    set noticeText to noticeText & return & "––" & return & return & "IMPORTANT: By clicking 'OK, I AGREE', you confirm that you have read and accepted the license terms."
+
+    set userChoice to button returned of (display dialog noticeText buttons {"View License", "OK, I Agree", "Cancel"} default button "View License" with title "GPL License")
 
 	if userChoice is "View License" then
 		set licensePath to ((POSIX path of (path to me)) & "Contents/Resources/COPYING.txt")
@@ -64,6 +65,10 @@ on initialize()
 		end tell
         error number -128
 	end if
+
+    if userChoice is "Cancel" then
+        error number -128
+    end if
 
 	do shell script "mkdir -p " & quoted form of targetFolder
 
