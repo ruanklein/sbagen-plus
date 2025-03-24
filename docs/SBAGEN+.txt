@@ -55,6 +55,7 @@ Contents of this document:
 2.6.2: Adjusting the length of a -p drop session
 2.7: The 'slide' sequences
 2.8: Buffer Size Configuration for Bluetooth Devices on macOS
+2.9: Sample Rate Considerations
 
 3: Writing sequence files
 3.1: The sequence-file format
@@ -964,6 +965,35 @@ If you're using Bluetooth headphones or wireless speakers and notice distortions
   sbagen+ -m river1.ogg -B 2048 -p drop 00ds+ mix/99
 
 This option can also be included directly in sequence files, as shown in the example above. This is useful for creating sequences optimized for Bluetooth devices without having to specify the option on the command line.
+
+
+2.9: Sample Rate Considerations
+------------------------------
+
+Usage:
+
+  -r rate
+
+Example:
+
+  sbagen+ -r 44100 -i 200+10/1
+
+SBaGen+ was designed and optimized for a sample rate of 44.1kHz. While the program supports different sample rates through the -r option, using 44.1kHz is recommended for the following reasons:
+
+1. Timing Accuracy: The internal calculations and timing of sequences are based on 44.1kHz. Using a different sample rate may result in timing discrepancies, where sequences may play faster or slower than intended.
+
+2. Audio Quality: The binaural beat frequencies (typically 0.5-30Hz) and carrier frequencies (50-1500Hz) are well within the Nyquist frequency limit of 44.1kHz (22.05kHz), ensuring accurate reproduction.
+
+3. Performance: Higher sample rates (48kHz, 96kHz, etc.) will increase CPU usage and memory consumption without providing any benefit for binaural beats or isochronic tones.
+
+4. Compatibility: 44.1kHz is the standard sample rate for most audio devices and ensures the best compatibility across different systems.
+
+If you need to use a different sample rate (e.g., for compatibility with specific hardware), be aware that:
+- Sequence timing may be affected
+- CPU usage may increase with higher rates
+- The -r option is primarily useful for audio file export or when specific hardware requires a different rate
+
+For best results and accurate timing, it is recommended to use the default 44.1kHz sample rate.
 
 
 3: Writing sequence files
