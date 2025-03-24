@@ -101,13 +101,20 @@ on run
 
     set documentsFolder to POSIX path of (path to documents folder)
     set examplesPath to documentsFolder & "SBaGen+/Examples"
-    
-    set userChoice to button returned of (display dialog "Please open a .sbg file using this application." buttons {"OK", "View Examples"} default button "OK" with title "$APP_NAME" with icon POSIX file ((POSIX path of (path to me)) & "Contents/Resources/app_icon.icns"))
+    set iconPath to ((POSIX path of (path to me)) & "Contents/Resources/app_icon.icns")
+    set dialogText to "Please open a .sbg file using this application."
 
-    if userChoice is "View Examples" then
-        tell application "Finder"
-            open (POSIX file examplesPath as alias)
-        end tell
+    set examplesExists to (do shell script "test -d " & quoted form of examplesPath & " && echo yes || echo no")
+    
+    if examplesExists is "yes" then
+        set userChoice to button returned of (display dialog dialogText buttons {"OK", "View Examples"} default button "OK" with title "$APP_NAME" with icon POSIX file iconPath)
+        if userChoice is "View Examples" then
+            tell application "Finder"
+                open (POSIX file examplesPath as alias)
+            end tell
+        end if
+    else
+        display dialog dialogText buttons {"OK"} default button "OK" with title "$APP_NAME" with icon POSIX file iconPath
     end if
 
 end run
