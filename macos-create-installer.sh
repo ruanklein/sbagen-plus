@@ -99,7 +99,17 @@ on run
     showAppNotInstalledAlert()
     initialize()
 
-    display dialog "Please open a .sbg file using this application." buttons {"OK"} default button "OK" with title "$APP_NAME" with icon POSIX file ((POSIX path of (path to me)) & "Contents/Resources/app_icon.icns")
+    set documentsFolder to POSIX path of (path to documents folder)
+    set examplesPath to documentsFolder & "SBaGen+/Examples"
+    
+    set userChoice to button returned of (display dialog "Please open a .sbg file using this application." buttons {"OK", "View Examples"} default button "OK" with title "$APP_NAME" with icon POSIX file ((POSIX path of (path to me)) & "Contents/Resources/app_icon.icns"))
+
+    if userChoice is "View Examples" then
+        tell application "Finder"
+            open (POSIX file examplesPath as alias)
+        end tell
+    end if
+
 end run
 
 on open theFiles
