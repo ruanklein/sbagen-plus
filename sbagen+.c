@@ -2159,9 +2159,6 @@ setup_device(void) {
             out_rate, snd_strerror(err));
     }
     
-    // Update sampling rate if it was changed
-    out_rate = rate;
-    
     // Configure buffer and period size
     period_size = 1024; // Initial value
     if ((err = snd_pcm_hw_params_set_period_size_near(alsa_handle, alsa_params, &period_size, 0)) < 0) {
@@ -2195,6 +2192,8 @@ setup_device(void) {
     out_fd = -9998; // Special value for ALSA
     
     if (!opt_Q)
+      if(rate != out_rate && out_rate_def)
+        warn("*** WARNING: Device output rate is %d Hz, but SBaGen+ is configured for %d Hz ***", rate, out_rate);
       warn("ALSA audio output %d-bit at %d Hz with period of %lu samples, %d ms per period",
            out_mode ? 16 : 8, out_rate, period_size, out_buf_ms);
     return;
