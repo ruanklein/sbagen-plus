@@ -14,6 +14,7 @@ services:
         ./linux-build-sbagen+.sh
         ./windows-build-libs.sh
         ./windows-build-sbagen+.sh
+        ./windows-create-installer.sh
 
   build-arm64:
     build: .
