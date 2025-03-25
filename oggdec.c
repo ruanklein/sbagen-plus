@@ -599,7 +599,7 @@ looper_read(int *dst, int dlen) {
 
 static void 
 looper_sched() {
-   int update= 0;
+   // int update= 0;
 
    // Handle 2-channel separately
    if (ch2) {
@@ -614,7 +614,7 @@ looper_sched() {
 
       // Complete when both are set up ready
       if (aa->mode && bb->mode) break;
-      update= 1;
+      // update= 1;
 
       // Make 'bb' the one we are filling in
       if (bb->mode && !aa->mode) {
