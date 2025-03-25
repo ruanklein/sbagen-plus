@@ -63,8 +63,9 @@ NoticeDescription=Please read this important notice before continuing:
 Name: "associatewithfiles"; Description: "Associate .sbg files with {#MyAppName}"; GroupDescription: "File associations:";
 
 [Files]
-; Using 32-bit version that works on all architectures
-Source: "dist\sbagen+-win32.exe"; DestDir: "{app}"; DestName: "sbagen+.exe"; Flags: ignoreversion
+; Include both 32-bit and 64-bit versions
+Source: "dist\sbagen+-win32.exe"; DestDir: "{app}"; DestName: "sbagen+-win32.exe"; Flags: ignoreversion
+Source: "dist\sbagen+-win64.exe"; DestDir: "{app}"; DestName: "sbagen+-win64.exe"; Flags: ignoreversion
 ; Documentation
 Source: "COPYING.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "NOTICE.txt"; DestDir: "{app}"; Flags: ignoreversion dontcopy
@@ -176,6 +177,7 @@ var
   sUnInstallString: String;
 begin
   Result := True;
+  
   if IsUpgrade() then
   begin
     V := MsgBox('A previous version of ' + '{#MyAppName}' + ' was detected. Would you like to uninstall it before continuing?', mbInformation, MB_YESNO);
@@ -188,5 +190,34 @@ begin
     end
     else
       Result := False;
+  end;
+end;
+
+procedure CurStepChanged(CurStep: TSetupStep);
+var
+  SourceFile: String;
+  DestFile: String;
+begin
+  if CurStep = ssPostInstall then
+  begin
+    { Check system architecture and copy appropriate executable }
+    if IsWin64 then
+    begin
+      SourceFile := ExpandConstant('{app}\sbagen+-win64.exe');
+      DestFile := ExpandConstant('{app}\sbagen+.exe');
+    end
+    else
+    begin
+      SourceFile := ExpandConstant('{app}\sbagen+-win32.exe');
+      DestFile := ExpandConstant('{app}\sbagen+.exe');
+    end;
+    
+    { Copy the appropriate executable }
+    if FileCopy(SourceFile, DestFile, False) then
+    begin
+      { Delete the original files }
+      DeleteFile(ExpandConstant('{app}\sbagen+-win32.exe'));
+      DeleteFile(ExpandConstant('{app}\sbagen+-win64.exe'));
+    end;
   end;
 end; 
