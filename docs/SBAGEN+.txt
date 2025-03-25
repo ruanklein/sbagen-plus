@@ -1117,6 +1117,8 @@ Here are the different types:
   <carrier>/<amp>		                  # Sine-wave (a binaural tone with 0Hz beat)
   bell+<freq>/<amp>                   # Bell sound
   spin:<width>+<freq>/<amp>           # Spinning variable-delay pink noise
+  bspin:<width>+<freq>/<amp>          # Spinning variable-delay brown noise
+  wspin:<width>+<freq>/<amp>          # Spinning variable-delay white noise
   mixspin:<width>+<freq>/<intensity>  # Spinning effect on mix input
   mixpulse:<pulse>/<intensity>        # Pulse effect on mix input
   <carrier>@<pulse>/<amp>             # Isochronic tones
@@ -1171,6 +1173,22 @@ the start of the period in which the tone-set is used.
 
 The spinning pink noise generates a binaural effect in a completely
 different way to binaural tones, by shifting the delay of pink noise
+in opposite directions for each ear, at a given beat frequency.  In
+this case, the first number is the width of the maximum delay from
+centre in microseconds.  Values from 100 to 500 seem good to me,
+although you might want to experiment with this.  The second number is
+the beat frequency and the third is the amplitude, as above.
+
+The spinning brown noise generates a binaural effect in a completely
+different way to binaural tones, by shifting the delay of brown noise
+in opposite directions for each ear, at a given beat frequency.  In
+this case, the first number is the width of the maximum delay from
+centre in microseconds.  Values from 100 to 500 seem good to me,
+although you might want to experiment with this.  The second number is
+the beat frequency and the third is the amplitude, as above.
+
+The spinning white noise generates a binaural effect in a completely
+different way to binaural tones, by shifting the delay of white noise
 in opposite directions for each ear, at a given beat frequency.  In
 this case, the first number is the width of the maximum delay from
 centre in microseconds.  Values from 100 to 500 seem good to me,
