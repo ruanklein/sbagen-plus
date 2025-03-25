@@ -2316,11 +2316,12 @@ setup_device(void) {
     // Mark that we are using ALSA
     out_fd = -9998; // Special value for ALSA
     
-    if (!opt_Q)
+    if (!opt_Q) {
       if(rate != out_rate && out_rate_def)
         warn("*** WARNING: Device output rate is %d Hz, but SBaGen+ is configured for %d Hz ***", rate, out_rate);
       warn("ALSA audio output %d-bit at %d Hz with period of %lu samples, %d ms per period",
            out_mode ? 16 : 8, out_rate, period_size, out_buf_ms);
+    }
     return;
   }
 #endif
@@ -2349,7 +2350,7 @@ setup_device(void) {
 
      if (MMSYSERR_NOERROR != 
 	 (rv= waveOutOpen(&aud_handle, WAVE_MAPPER, 
-			  (WAVEFORMATEX*)&fmt, (DWORD)win32_audio_callback, 
+			  (WAVEFORMATEX*)&fmt, (DWORD_PTR)win32_audio_callback, 
 			  (DWORD)0, CALLBACK_FUNCTION))) {
 	char buf[255];
 	waveOutGetErrorText(rv, buf, sizeof(buf)-1);
