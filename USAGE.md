@@ -75,6 +75,13 @@ SBaGen+ uses a specific syntax to define tones:
   - Example: `mixpulse:10/50` - A pulse effect with a rate of 10Hz and 50% intensity
   - Note: Requires `mix/<amplitude>` to be specified in the same tone set
 
+- **Binaural AM**: `[carrier frequency]~[modulation frequency]/[amplitude]`
+
+  - Example: `440+0.5/50` - A 440Hz carrier with 0.5Hz amplitude modulation at 50% amplitude
+  - Note: Creates a binaural amplitude modulation effect where the modulation is applied in opposite phases to each channel
+  - The modulation frequency should be in the brainwave range (0.5-30Hz)
+  - Requires headphones for the binaural effect
+
 - **Noise**: `[type]/[amplitude]`
   - Examples: `pink/40`, `white/30`, `brown/50`
 
@@ -99,6 +106,12 @@ mix/80 mixpulse:10/50
 ```
 
 This creates a pulse effect on the audio input (mix) at 80% amplitude, with the pulse rate of 10Hz and an intensity of 50%.
+
+```
+pink/40 440~0.5/30
+```
+
+This creates a binaural AM effect with a 440Hz carrier frequency modulated at 0.5Hz (delta range) at 30% amplitude. The modulation is applied in opposite phases to each channel, creating a unique binaural effect.
 
 ## ⌨️ Command Line Basics
 
@@ -187,6 +200,7 @@ Here are some example sequences for various purposes in the `examples/plus` dire
 - [Creativity Boost (Mixed Approach)](examples/plus/creativity-boost.sbg) - Helps you get creative
 - [Stress Relief with White Noise](examples/plus/stress-relief.sbg) - Helps you relax and reduce stress
 - [Morning Energizer with Isochronic Tones](examples/plus/morning-energizer.sbg) - Helps you wake up and get energized
+- [Deep Meditation with Binaural AM](examples/plus/deep-meditation-am.sbg) - Uses binaural AM for deep meditation and relaxation
 
 ## 🎵 Using Background Sounds
 
@@ -234,12 +248,15 @@ Everyone responds differently to brainwave entrainment. Experiment with differen
 - If 10Hz alpha doesn't feel relaxing, try 9Hz or 11Hz
 - If you're not falling asleep with delta frequencies, try adjusting between 1-4Hz
 - Experiment with different carrier frequencies (100-400Hz range)
+- For binaural AM, try different carrier frequencies (300-600Hz) to find the most comfortable base tone
+- The modulation frequency in binaural AM can be more subtle than traditional binaural beats, so experiment with lower values (0.5-4Hz) for deep meditation
 
 ### 📊 Considerations about Amplitude
 
 - Keep binaural beats subtle (10-25% amplitude)
 - Isochronic tones can be slightly louder (15-30% amplitude)
 - Background noise should usually be louder than the tones
+- Binaural AM can be used at slightly higher amplitudes (20-35%) due to its smoother modulation
 
 ### ⏱️ Session Duration
 
