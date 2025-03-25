@@ -464,6 +464,7 @@ char *pdir;			// Program directory (used as second place to look for -m files)
  int aud_rd;	// Next buffer to read out of list (to send to device)
  int aud_wr;	// Next buffer to write.  aud_rd==aud_wr means empty buffer list
  static AudioDeviceID aud_dev;
+ static AudioDeviceIOProcID proc_id; // New: store the procedure ID
 #endif
 
 //
@@ -644,6 +645,16 @@ void cleanup_alsa() {
 }
 #endif
 
+#ifdef MAC_AUDIO
+void cleanup_mac_audio() {
+    if (proc_id) {
+        AudioDeviceStop(aud_dev, proc_id);
+        AudioDeviceDestroyIOProcID(aud_dev, proc_id);
+        proc_id = 0;
+    }
+}
+#endif
+
 //
 //	Time-keeping functions
 //
@@ -781,6 +792,9 @@ main(int argc, char **argv) {
    
 #ifdef ALSA_AUDIO
    cleanup_alsa();
+#endif
+#ifdef MAC_AUDIO
+   cleanup_mac_audio();
 #endif
 
    return 0;
@@ -1226,6 +1240,9 @@ error(char *fmt, ...) {
 #endif
 #ifdef ALSA_AUDIO
   cleanup_alsa();
+#endif
+#ifdef MAC_AUDIO
+  cleanup_mac_audio();
 #endif
   exit(1);
 }
@@ -2472,8 +2489,16 @@ setup_device(void) {
     }
 
     // Setup callback and start it
-    err= AudioDeviceAddIOProc(aud_dev, mac_callback, (void *)1);
-    err= AudioDeviceStart(aud_dev, mac_callback);
+    err = AudioDeviceCreateIOProcID(aud_dev, mac_callback, (void *)1, &proc_id);
+    if (err != noErr) {
+        error("Failed to create audio callback, status = %d", (int)err);
+    }
+    
+    err = AudioDeviceStart(aud_dev, proc_id);
+    if (err != noErr) {
+        AudioDeviceDestroyIOProcID(aud_dev, proc_id);
+        error("Failed to start audio device, status = %d", (int)err);
+    }
 
     // Report settings      
     if (!opt_Q) {
