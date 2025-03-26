@@ -1,39 +1,13 @@
 SBaGen+ -- Sequenced Brainwave Generator
 ------------------------------------------
 
-SBaGen+ is a fork of the original SBaGen (Sequenced Binaural Beat Generator).
-This fork adds new features while maintaining compatibility with the original.
+SBaGen+ is a fork of the original SBaGen software (https://uazu.net/sbagen/),
+distributed under the terms of the GNU General Public License v2.
 
-From the original Author:
-This utility, released under the GNU GPL v2 (see the file
-COPYING), generates white/pink/brown noise, binaural beats, and isochronic tones through your
-soundcard in real-time according to a 24-hour programmed sequence read
-from a file. It can also be used to play a sequence on demand, rather
-than according to the clock. MP3 or OGG soundtracks may also be mixed
-in instead of pink noise.
+The full source code is available at:
+https://github.com/ruanklein/sbagen-plus
 
-The original idea was to program a set of tones to play overnight as I
-slept, hoping to improve dreaming and dream-recall. That way, I could
-also program the sequence to bring me up into alpha rhythms to
-hopefully have a good start to the day. More recently I have been
-working with shorter, more focussed sessions of about an hour, which I
-listen to either during the day or at night.
-
-Some of the more interesting uses (for me) of binaural tones I've read
-about include: improving dream-recall, entering lucid dreaming,
-facilitating meditation, accessing intuition, exploring consciousness,
-emotional clearing, and training in altered states. Isochronic tones can
-be used for similar purposes and may be more effective for some people.
-
-USE AND EXPERIMENT AT YOUR OWN RISK!
-
-If you make any changes or improvements to the code, let me know so
-that I can keep the master copy up to date. Also, if you come up with
-any interesting tone-sets or sequences that you would like to share,
-along with their story, please post them on the mailing list (see
-http://sbagen.sf.net/). Thanks to the SBaGen community we now also
-have a Wiki where you can post stuff.
-
+For licensing information, see License.txt.
 
 Contents of this document:
 -------------------------
@@ -75,31 +49,22 @@ A: User-defined waveforms
 0: Legal notice
 ---------------
 
-SBaGen -- Sequenced Binaural Beat Generator
-Copyright (c) 1999-2005 Jim Peters, http://uazu.net/
-  
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation, version 2.
-  
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-  
-  You should have received a copy of the GNU General Public License
-  along with this program; if not, write to the Free Software
-  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+	SBaGen+ - Sequenced Brainwave Generator
 
-"River sounds" loopable OGG files (river1.ogg, river2.ogg)
-Copyright (c) 2003-2004 Jim Peters, http://uazu.net/
+	Original version (c) 1999-2011 Jim Peters <jim@uazu.net>
+	This fork maintained by Ruan <https://ruan.sh/>
 
-  These audio files are released under the Creative Commons
-  Attribution-ShareAlike license, either version 1.0 or 2.0.  See here
-  for details:
+	For latest version see https://github.com/ruanklein/sbagen-plus.
+  Released under the GNU GPL version 2. Use at your own risk.
 
-  http://creativecommons.org/licenses/by-sa/1.0/
-
+	"This program is free software; you can redistribute it and/or modify
+	  it under the terms of the GNU General Public License as published by
+	  the Free Software Foundation, version 2.
+	  
+	  This program is distributed in the hope that it will be useful,
+	  but WITHOUT ANY WARRANTY; without even the implied warranty of
+	  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	  GNU General Public License for more details."
 
 1: Theory
 ---------
@@ -116,9 +81,8 @@ It is also possible to play several different tones together, giving
 several different beat frequencies, and programming quite a complex
 brain-state based on several frequencies (in several different bands).
 These complex mixtures of frequencies are the basis of the Hemi-Sync
-(TM) process from the Monroe Institute <www.monroeinstitute.org>,
-based on Robert Monroe's experiments with out-of-body experiences and
-so on.
+(TM) process from the Monroe Institute, based on Robert Monroe's
+experiments with out-of-body experiences and so on.
 
 Taking an alternative approach, CenterPointe <www.centerpointe.com>
 use single tones, but vary the carrier frequencies to achieve a kind
@@ -127,15 +91,8 @@ interesting technique.  There may well be other useful binaural beat
 based techniques yet to be discovered.
 
 For an overview of the theory of binaural beats and how they affect
-the mind, take a look at the Monroe Institute site, particularly the
-pages at <http://www.monroeinstitute.org/programs/hemi-sync.html>.
-
-I have been experimenting with this stuff on and off now for several
-years, and I know binaural beats can have powerful effects.  Rather
-than going for the most powerful effect, though, it seems to me better
-to take a more gentle approach but to keep on doing sessions daily.
-Using a series like the "-p drop" series allows you to move forwards
-at your own pace.
+the mind, take a look at the Monroe Institute site:
+https://www.monroeinstitute.org
 
 Note that the recommended way to listen to binaural beats is with
 headphones.  Any other way causes some of the signal intended for the
@@ -144,17 +101,12 @@ effect is less strong.  Also, in both the Monroe Institute and
 CenterPointe programmes, the binaural tones are only just audible
 above the pink noise or soundtrack, i.e. they are not played too loud.
 
-I originally wrote this utility to help me set up sequences to
-experiment on myself.  If you are happy experimenting on yourself,
-feel free to use my utility -- but don't blame me if you mis-program
-sbagen with an overnight sequence that leaves you relaxing comfortably
-in Theta when you should have gone to work!
+If a little bit of experimentation puts you off, The Monroe Institute
+and CenterPointe both sell pre-packaged tapes and CDs with helpline
+support and that kind of thing.
 
-You know what I'm saying -- USE AT YOUR OWN RISK.  If a little bit of
-experimentation puts you off, The Monroe Institute and CenterPointe
-both sell pre-packaged tapes and CDs with helpline support and that
-kind of thing.
-
+Therefore, use binaural and isochronic sounds consciously and
+AT YOUR OWN RISK.
 
 1.1: Isochronic Tones
 --------------------
@@ -183,8 +135,6 @@ The primary advantages of isochronic tones include:
 In SBaGen+, isochronic tones are implemented by modulating a carrier frequency
 with a pulse frequency. For example, a 300Hz carrier tone pulsed at 10Hz
 creates an isochronic tone that may help induce an alpha brainwave state.
-This is represented in the format 300@10/20, where 300 is the carrier
-frequency, 10 is the pulse rate, and 20 is the amplitude percentage.
 
 Both binaural beats and isochronic tones can be effective for different
 purposes and individuals. Some people respond better to one method than
@@ -194,12 +144,6 @@ brainwave entrainment experiences.
 While headphones are essential for binaural beats, isochronic tones can be 
 effective with or without headphones, though headphones may still provide 
 a more immersive experience.
-
-The white noise generates a random signal with equal energy at all frequencies.
-It can be used for masking background sounds or as a meditation aid. The
-amplitude <amp> controls the volume level. For example, white/10 generates
-white noise at 10% amplitude.
-
 
 Some more theory -- the oscillations in the brain are split into four
 'bands' according to frequency:
@@ -224,48 +168,10 @@ with the attention focussed outside, dealing with the outside world.
 It is also generated when you are solving logical problems, such as
 mental arithmetic.
 
-It is interesting to note that in normal dreams, a combination of
-Theta, Alpha and Beta waves are produced, just as if the person was
-awake.  Also, Theta (a sleep frequency) may be generated by skilled
-individuals, whilst fully conscious and with their eyes open.  Stuart
-Wilde, for instance, talks about training for years with a metronome
-to achieve eyes-open Theta (around 4-5Hz).
-
-Anyway, it looks to me like Theta is the place to be, connected with
-all kinds of ESP functioning, such as direct 'knowing', and other such
-stuff.  I'm sure I've been there many times one way or another, but
-I'm looking to explore this area much further now using this utility.
-
-References:
-
-My source for a lot of the information on brain waves above is the
-book: "How to build a lie detector, brain wave monitor and other
-secret parapsychological electronics projects" by Mike and Ruth
-Wolverton, TAB books, 1981.
-
-I became interested in The Monroe Institute and their activities
-through the writings of Ken Eagle Feather, and from attending several
-courses of his.  He talks briefly about Hemi-Sync (TM) in "Tracking
-Freedom", mentioning some of the 'Focus Levels' (tone-sets) discovered
-by the Monroe Institute, which include ones related to out-of-body
-experiences and even 'other worlds'.  I believe he also talks about
-some of his experiences on Monroe Institute workshops in his first
-book "Travelling with Power", although I've not read it (yet).
-
-
 2: Invocation
 -----------------------------
 
-One quick thing to note before we start -- remember to play these
-binaural beats at low levels, especially when using headphones as
-recommended.  You can mix them with a louder soundtrack or pink noise
-so that the brain has something louder to keep its attention on.  The
-binaural beats can be just-audible in the mix -- that is enough.  With
-speakers, the effect is not so strong, so the binaural beats can be
-louder, but don't overdo it -- my experience was that playing them
-loud didn't improve the effect at all, it just gave me a headache.
-
-So, here we go.  The following example commands should be typed at the
+The following example commands should be typed at the
 shell prompt provided by your operating system, prepared as explained
 above.
 
@@ -318,7 +224,7 @@ This example runs the sequence at 120 times the normal speed.  This is
 quite useful to check that a new sequence is going to do what you
 expect it to do.
 
-To check that SBaGen has interpreted your sequence-file correctly, use
+To check that SBaGen+ has interpreted your sequence-file correctly, use
 the -D option, which dumps a listing of the interpreted sequence
 instead of playing it:
 
@@ -501,11 +407,12 @@ according to your needs.
 --------------------------------
 
 There are two options to allow you to mix in a background soundtrack
-with the binaurals as they are generated.  This is generally regarded
-as a good idea, and this technique is used by both CenterPointe and
-the Monroe Institute.  The binaural beats are generated at a low level
-(e.g. 200+4/1.0), so that they are only just audible when mixed with
-the louder soundtrack (of water sounds or whatever).
+with the binaurals or isochronic as they are generated.  This is
+generally regarded as a good idea, and this technique is used by both
+CenterPointe and the Monroe Institute. The binaural beats/isochronic
+tones are generated at a low level (e.g. 200+4/1.0), so that they are
+only just audible when mixed with the louder soundtrack (of water sounds
+or whatever).
 
 The soundtrack should be either in the form of an MP3 file, an OGG
 file, a 16-bit stereo WAV file, or raw 16-bit little-endian stereo
@@ -550,7 +457,7 @@ file to be stored on your disk.
 2.3: Standard background sounds
 -------------------------------
 
-SBaGen comes with two standard OGG files that loop themselves
+Original SBaGen comes with two standard OGG files that loop themselves
 endlessly in a random way that provides an endless stream of river
 sounds with no discernable pattern.  These are used with the -m
 option.  For example:
@@ -642,7 +549,7 @@ used to select different cross-fade times.
 2.4.1: Using ReplayGain with OGG files
 --------------------------------------
 
-SBaGen supports ReplayGain tags in the OGG header.  What this means is
+SBaGen+ supports ReplayGain tags in the OGG header.  What this means is
 that if you run 'vorbisgain' on your OGG file to add this tag, your
 OGG file should come out sounding around about the same loudness level
 as everyone else's OGG files (including river1.ogg and river2.ogg).
@@ -949,9 +856,13 @@ Example:
   
   -B 2048 # optional comment
 
-On macOS, some users may experience audio distortion when using Bluetooth devices. This occurs because the default audio buffer size may not be suitable for the higher latency of these wireless devices.
+On macOS, some users may experience audio distortion when using Bluetooth devices.
+This occurs because the default audio buffer size may not be suitable for the higher
+latency of these wireless devices.
 
-The -B option allows you to set a custom buffer size (in samples) for audio output on macOS. Larger values generally result in fewer distortions on Bluetooth devices, but may slightly increase latency.
+The -B option allows you to set a custom buffer size (in samples) for audio output on macOS.
+Larger values generally result in fewer distortions on Bluetooth devices,
+but may slightly increase latency.
 
 Important points about this option:
 
@@ -960,11 +871,15 @@ Important points about this option:
 3. This option is only available for macOS users
 4. Recommended values for Bluetooth devices: 2048 or 4096
 
-If you're using Bluetooth headphones or wireless speakers and notice distortions, crackling, or interruptions in the audio, try adding the -B option with a larger value. For example:
+If you're using Bluetooth headphones or wireless speakers and notice distortions,
+crackling, or interruptions in the audio, try adding the -B option with a larger value.
+For example:
 
   sbagen+ -m river1.ogg -B 2048 -p drop 00ds+ mix/99
 
-This option can also be included directly in sequence files, as shown in the example above. This is useful for creating sequences optimized for Bluetooth devices without having to specify the option on the command line.
+This option can also be included directly in sequence files, as shown in the example above.
+This is useful for creating sequences optimized for Bluetooth devices without having to specify
+the option on the command line.
 
 
 2.9: Sample Rate Considerations
@@ -978,15 +893,22 @@ Example:
 
   sbagen+ -r 44100 -i 200+10/1
 
-SBaGen+ was designed and optimized for a sample rate of 44.1kHz. While the program supports different sample rates through the -r option, using 44.1kHz is recommended for the following reasons:
+SBaGen+ was designed and optimized for a sample rate of 44.1kHz. While the program supports different
+sample rates through the -r option, using 44.1kHz is recommended for the following reasons:
 
-1. Timing Accuracy: The internal calculations and timing of sequences are based on 44.1kHz. Using a different sample rate may result in timing discrepancies, where sequences may play faster or slower than intended.
+1. Timing Accuracy: The internal calculations and timing of sequences are based on 44.1kHz.
+Using a different sample rate may result in timing discrepancies, where sequences may play faster
+or slower than intended.
 
-2. Audio Quality: The binaural beat frequencies (typically 0.5-30Hz) and carrier frequencies (50-1500Hz) are well within the Nyquist frequency limit of 44.1kHz (22.05kHz), ensuring accurate reproduction.
+2. Audio Quality: The binaural beat frequencies (typically 0.5-30Hz) and carrier frequencies
+(50-1500Hz) are well within the Nyquist frequency limit of 44.1kHz (22.05kHz), ensuring accurate
+reproduction.
 
-3. Performance: Higher sample rates (48kHz, 96kHz, etc.) will increase CPU usage and memory consumption without providing any benefit for binaural beats or isochronic tones.
+3. Performance: Higher sample rates (48kHz, 96kHz, etc.) will increase CPU usage and memory consumption
+without providing any benefit for binaural beats or isochronic tones.
 
-4. Compatibility: 44.1kHz is the standard sample rate for most audio devices and ensures the best compatibility across different systems.
+4. Compatibility: 44.1kHz is the standard sample rate for most audio devices and ensures the best
+compatibility across different systems.
 
 If you need to use a different sample rate (e.g., for compatibility with specific hardware), be aware that:
 - Sequence timing may be affected
@@ -1007,9 +929,10 @@ it until it does what you want.  For example, 'prog-tape-3.sbg' is a
 good example of a sequence that gently slides between several
 brainwave frequencies using a single binaural tone.
 
-For Windows users, you can edit these files using EDIT or NotePad (or
-any simple text editor).  Mac users will have to use an editor that
-respects UNIX line-endings (e.g. 'emacs', BBEdit, or whatever).
+For Windows and macOS users, you can edit these files using EDIT or
+NotePad/TextEdit (or any simple text editor).  Mac users will have to
+use an editor that respects UNIX line-endings (e.g. 'emacs', BBEdit, or
+whatever).
 
 
 3.1: The sequence-file format
@@ -1039,7 +962,7 @@ These are described below.  Take a look at the example sequence-files
 3.1.1: Command-line options within the sequence file
 ----------------------------------------------------
 
-All of the command-line options reported by 'sbagen -h' can also be
+All of the command-line options reported by 'sbagen+ -h' can also be
 included in sequence files.  They should appear at the top, before any
 tone-sets or whatever.  The purpose of these options are to permit
 soundtracks to be specified, and to indicate whether the sequence is a
@@ -1431,22 +1354,28 @@ won't work unless they were designed to work together.
 4: Predefined sequences
 ----------------------
 
-SBaGen+ comes with several predefined sequences that you can use without having to create your own sequence files. These are accessed using the -p option followed by the sequence name and any required parameters.
+SBaGen+ comes with several predefined sequences that you can use without
+having to create your own sequence files. These are accessed using
+the -p option followed by the sequence name and any required parameters.
 
 The most commonly used predefined sequences are:
 
-1. **drop** - A sequence that gradually drops from a higher frequency to a lower one, useful for meditation and relaxation.
-   Example: `sbagen -p drop 00ds+`
+1. **drop** - A sequence that gradually drops from a higher frequency to
+   a lower one, useful for meditation and relaxation. Example:
+   `sbagen+ -p drop 00ds+`
 
 2. **slide** - Similar to drop but with a smoother transition between frequencies.
-   Example: `sbagen -p slide 00ds+`
+   Example: `sbagen+ -p slide 00ds+`
 
-These predefined sequences accept various parameters to customize their behavior. See sections 2.6 and 2.7 for detailed information on the parameters and options available for these sequences.
+These predefined sequences accept various parameters to customize their behavior.
+See sections 2.6 and 2.7 for detailed information on the parameters and options
+available for these sequences.
 
 You can also mix these predefined sequences with background sounds:
-   Example: `sbagen -m river1.ogg -p drop 00ds+ mix/99`
+   Example: `sbagen+ -m river1.ogg -p drop 00ds+ mix/99`
 
-The program also includes several example sequence files (prog-*.sbg) and tone-set files (ts-*.sbg) that you can use as templates for creating your own sequences.
+The program also includes several example sequence files (prog-*.sbg) and tone-set
+files (ts-*.sbg) that you can use as templates for creating your own sequences.
 
 
 5: Conclusion
