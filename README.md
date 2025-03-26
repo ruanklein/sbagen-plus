@@ -28,17 +28,17 @@ The name has been changed from **"Sequenced Binaural Beat Generator"** to **"Seq
 
 ## 📥 Installation
 
-You can either compile SBaGen+ from source as described above or download pre-built binaries from the [releases page](https://github.com/ruanklein/sbagen-plus/releases).
+You can download pre-built binaries on Linux and installers for Windows and macOS from the [releases page](https://github.com/ruanklein/sbagen-plus/releases).
 
 ### ⬇️ Download Pre-built Binaries
 
-The latest release (v1.5.3) can be downloaded directly from the following links:
+The latest release (v1.5.4) can be downloaded directly from the following links:
 
-- Linux ARM64: [sbagen+-linux-arm64](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.3/sbagen+-linux-arm64)
-- Linux 32-bit: [sbagen+-linux32](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.3/sbagen+-linux32)
-- Linux 64-bit: [sbagen+-linux64](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.3/sbagen+-linux64)
-- macOS (Universal): [sbagen+-macos-universal](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.3/sbagen+-macos-universal)
-- Windows x86/x86_64 and ARM64: [sbagen+-windows-setup.exe](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.3/sbagen+-windows-setup.exe)
+- Linux ARM64: [sbagen+-linux-arm64](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.4/sbagen+-linux-arm64)
+- Linux 32-bit: [sbagen+-linux32](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.4/sbagen+-linux32)
+- Linux 64-bit: [sbagen+-linux64](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.4/sbagen+-linux64)
+- macOS Installer: [SBaGen+ Installer.dmg](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.4/SBaGen+-Installer.dmg)
+- Windows x86/x86_64 and ARM64: [sbagen+-windows-setup.exe](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.4/sbagen+-windows-setup.exe)
 
   **Important**: Always verify the SHA256 checksum of downloaded binaries against those listed on the [releases page](https://github.com/ruanklein/sbagen-plus/releases) to ensure file integrity and security.
 
@@ -84,42 +84,41 @@ The latest release (v1.5.3) can be downloaded directly from the following links:
 
 ### 🍎 Installing on macOS
 
-1. Download the macOS universal binary:
+1. Download the macOS Installer: [SBaGen+ Installer.dmg](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.4/SBaGen+-Installer.dmg)
+
+2. Verify the SHA256 checksum. You can use the `shasum` command on the terminal to verify the checksum:
 
    ```bash
-   curl -L -o sbagen+-macos-universal https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.2/sbagen+-macos-universal
-   ```
-
-2. Verify the SHA256 checksum:
-
-   ```bash
-   shasum -a 256 sbagen+-macos-universal
+   cd ~/Downloads
+   shasum -a 256 SBaGen+-Installer.dmg
    # Compare the output with the checksum on the releases page
    ```
 
-3. Make the binary executable:
+3. Open the DMG file and drag the `SBaGen+` application to the Applications folder.
 
-   ```bash
-   chmod +x sbagen+-macos-universal
-   ```
+4. Run the `SBaGen+` application from the Applications folder, accept the license agreement and click the `View Examples` button to view examples of sbg files.
 
-4. Move the binary to a directory in your PATH:
+5. Click in the .sbg file to play, edit or convert it. Also, you can drop sbg files on the `SBaGen+` application icon to open them.
 
-   ```bash
-   sudo mv sbagen+-macos-universal /usr/local/bin/sbagen+
-   ```
+**Important:** The `SBaGen+` application is not digitally signed, so you may need to add an exception on the `System Settings -> Security & Privacy -> General tab`.
 
-5. Verify the installation:
+If you want to use SBaGen+ as a command-line tool, you can create a symlink to the `sbagen+` binary in your PATH.
 
-   ```bash
-   sbagen+ -h
-   ```
+```bash
+sudo ln -s /Applications/SBaGen+.app/Contents/Resources/bin/sbagen+ /usr/local/bin/sbagen+
+```
+
+And you can see the usage with:
+
+```bash
+sbagen+ -h
+```
 
 ### 🪟 Installing on Windows
 
 1. Download the installer:
 
-   - [sbagen+-windows-setup.exe](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.3/sbagen+-windows-setup.exe)
+   - [sbagen+-windows-setup.exe](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.4/sbagen+-windows-setup.exe)
 
 2. Verify the SHA256 checksum of the installer. You can use PowerShell or Command Prompt to do this:
 
@@ -186,51 +185,23 @@ docker compose up build-arm64
 
 This will automatically build the Docker image and run all necessary build scripts to generate the binaries for Linux and Windows. All compiled binaries will be placed in the `dist` directory.
 
+**For macOS**, you need compile natively. See next section for more details.
+
 #### 💻 Option 2: Building Natively
 
 If you prefer to build without Docker, you can use the build scripts directly on your system, provided you have all the necessary dependencies installed.
 
-##### 🍎 Building for macOS
+You can see the dependencies in the [Dockerfile](Dockerfile). For macOS, you need the Xcode command line tools installed and home brew installed..
 
-```bash
-# Build the libraries (only needed for MP3 and OGG support)
-./macos-build-libs.sh
+The build scripts are:
 
-# Build SBaGen+
-./macos-build-sbagen+.sh
+```
+<platform>-build-libs.sh # macOS, Linux, Windows
+<platform>-build-sbagen+.sh # macOS, Linux, Windows
+<platform>-create-installer.sh # macOS, Windows
 ```
 
-After compilation, you'll find the universal binary (works on both Intel and Apple Silicon) in the `dist` directory:
-
-- `sbagen+-macos-universal`
-
-##### 🐧 Building for Linux
-
-```bash
-# Build the libraries (only needed for MP3 and OGG support)
-./linux-build-libs.sh
-
-# Build SBaGen+
-./linux-build-sbagen+.sh
-```
-
-##### 🪟 Building for Windows (cross-compilation on Linux/macOS)
-
-```bash
-# Build the libraries (only needed for MP3 and OGG support)
-./windows-build-libs.sh
-
-# Build SBaGen+
-./windows-build-sbagen+.sh
-```
-
-If you want create a installer for Windows, you can use the `windows-build-installer.sh` script.
-
-```bash
-./windows-build-installer.sh
-```
-
-This will create a installer for Windows in the `dist` directory.
+Run the script with the `platform` you use. This will create a installers and binaries in the `dist` directory.
 
 ## ⚖️ License
 
