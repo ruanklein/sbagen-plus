@@ -241,13 +241,3 @@ SBaGen+ is distributed under the GPL license. See the [COPYING.txt](COPYING.txt)
 Original SBaGen was developed by Jim Peters. See [SBaGen project](https://uazu.net/sbagen/).
 
 ALSA support is based from this [patch](https://github.com/jave/sbagen-alsa/blob/master/sbagen.c).
-
-## Features
-
-- Binaural beats with customizable carrier and beat frequencies
-- Isochronic tones with adjustable pulse rates
-- Spinning effects (pink, brown, and white noise)
-- Mix effects for background sounds
-- Pulse effects for background sounds
-- Binaural AM (Amplitude Modulation) with opposite phase modulation
-- Support for MP3, OGG, and WAV background sounds

@@ -195,16 +195,6 @@ While headphones are essential for binaural beats, isochronic tones can be
 effective with or without headphones, though headphones may still provide 
 a more immersive experience.
 
-The binaural AM effect requires headphones to be effective, as it relies on
-the opposite phase modulation between channels to create its unique effect.
-The carrier frequency should be chosen carefully - frequencies between 300-600 Hz
-tend to work best, as they provide a comfortable base tone while still allowing
-the modulation to be clearly perceived. The modulation frequency can be more
-subtle than traditional binaural beats, with values in the 0.5-4 Hz range
-particularly effective for deep meditation. Due to its smoother modulation
-characteristics, the binaural AM effect can be used at slightly higher amplitudes
-(20-35%) compared to traditional binaural beats without causing discomfort.
-
 The white noise generates a random signal with equal energy at all frequencies.
 It can be used for masking background sounds or as a meditation aid. The
 amplitude <amp> controls the volume level. For example, white/10 generates
@@ -348,18 +338,6 @@ each on an independant carrier (100, 200 and 400 Hz), at different
 amplitudes (20, 36 and 2).  This combination is supposedly something
 like "body-asleep, brain-awake", assuming I've reproduced it
 correctly.
-
-To test binaural AM, you can use the ~ notation. For example:
-
->> sbagen -i 440~0.5/30
-
-This creates a binaural AM effect with a 440Hz carrier frequency modulated at 0.5Hz (delta range) at 30% amplitude. The modulation is applied in opposite phases to each channel, creating a unique binaural effect.
-
-You can also combine binaural AM with other sounds:
-
->> sbagen -i pink/40 440~0.5/30
-
-This combines pink noise with a binaural AM effect in the delta range.
 
 To test isochronic tones, you can use the @ notation. For example:
 
@@ -1144,7 +1122,6 @@ Here are the different types:
   mixspin:<width>+<freq>/<intensity>  # Spinning effect on mix input
   mixpulse:<pulse>/<intensity>        # Pulse effect on mix input
   <carrier>@<pulse>/<amp>             # Isochronic tones
-  <carrier>~<modulation>/<amp>        # Binaural AM (Amplitude Modulation)
   wave<num>:<carrier><sign><freq>/<amp>
                                       # Binaural tones using a user-defined 
                                       # waveform (*EXPERIMENTAL*, see later)
@@ -1162,14 +1139,6 @@ that your headphones actually go that low first.  The actual beat
 frequency <freq> (which the brain responds to) should typically be in
 the range 0.5 to 30 Hz.  This corresponds to the ranges for Delta up
 to Beta as described above.
-
-The binaural AM effect uses amplitude modulation to create a unique
-binaural experience. The carrier frequency should be in the range
-300-600 Hz for best results. The modulation frequency should be in
-the brainwave range (0.5-30 Hz). The modulation is applied in opposite
-phases to each channel, creating a distinct binaural effect. This
-effect can be used at slightly higher amplitudes (20-35%) compared to
-traditional binaural beats due to its smoother modulation.
 
 The two tones generated are different by <freq>Hz, equally spaced
 either side of <carrier>.  The <sign> should be + or -, and this
