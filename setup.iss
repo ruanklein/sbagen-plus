@@ -1,5 +1,5 @@
 #define MyAppName "SBaGen+"
-#define MyAppVersion "1.5.3"
+#define MyAppVersion "1.5.4"
 #define MyAppPublisher "Ruan Klein"
 #define MyAppURL "https://github.com/ruanklein/sbagen-plus"
 #define MyAppExeName "sbagen+.exe"
