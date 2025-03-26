@@ -48,13 +48,13 @@ The latest release (v1.5.4) can be downloaded directly from the following links:
 
    ```bash
    # For 64-bit systems
-   wget https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.2/sbagen+-linux64
+   wget https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.4/sbagen+-linux64
 
    # For 32-bit systems
-   wget https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.2/sbagen+-linux32
+   wget https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.4/sbagen+-linux32
 
    # For ARM64 systems
-   wget https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.2/sbagen+-linux-arm64
+   wget https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.4/sbagen+-linux-arm64
    ```
 
 2. Verify the SHA256 checksum:
