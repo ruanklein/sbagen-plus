@@ -51,7 +51,7 @@ section_header "Starting sbagen+ compilation..."
 info "Compilation flags: $CFLAGS"
 info "Libraries: $LIBS"
 
-gcc -w $CFLAGS sbagen+.c -o dist/sbagen+-macos-universal $LIBS
+gcc $CFLAGS sbagen+.c -o dist/sbagen+-macos-universal $LIBS
 
 if [ $? -eq 0 ]; then
     success "Compilation successful! Universal binary created: dist/sbagen+-macos-universal"

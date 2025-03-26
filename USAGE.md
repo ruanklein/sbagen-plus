@@ -52,7 +52,18 @@ SBaGen+ uses a specific syntax to define tones:
 
 - **Spin**: `spin:[width]+[frequency]/[amplitude]`
 
-  - Example: `spin:500+8.0/50` - A spinning pink noise effect with 500μs width, rotating at 8Hz with 50% amplitude
+  - Example: `spin:500+8.0/50` - A spinning effect with 500μs width, rotating at 8Hz with 50% amplitude
+  - Note: Uses pink noise as the base sound for a natural, balanced spatial effect
+
+- **Bspin**: `bspin:[width]+[frequency]/[amplitude]`
+
+  - Example: `bspin:500+8.0/50` - A spinning effect with 500μs width, rotating at 8Hz with 50% amplitude
+  - Note: Uses brown noise as the base sound for a deeper, more bass-heavy spatial effect
+
+- **Wspin**: `wspin:[width]+[frequency]/[amplitude]`
+
+  - Example: `wspin:500+8.0/50` - A spinning effect with 500μs width, rotating at 8Hz with 50% amplitude
+  - Note: Uses white noise as the base sound for a brighter, more present spatial effect
 
 - **Mixspin**: `mixspin:[width]+[frequency]/[intensity]`
 
@@ -97,11 +108,14 @@ Here are some basic commands to get started:
 # Play a simple binaural beat in the alpha range (10Hz)
 sbagen+ -i pink/40 200+10/20
 
-# Play an isochronic tone in the theta range (6Hz)
-sbagen+ -i pink/40 300@6/20
+# Play a simple isochronic tone in the theta range (6Hz)
+sbagen+ -i 300@6/20
 
-# Play a combination of brown noise and delta binaural beat for deep relaxation
-sbagen+ -i brown/50 100+3/25
+# Create a spinning effect with brown noise for deep relaxation
+sbagen+ -i bspin:300+4/50
+
+# Combine different spin effects for complex spatial experience
+sbagen+ -i wspin:300+8/40 bspin:300+4/40
 
 # Create a spinning effect on background music
 sbagen+ -m ambient-music.mp3 -i mix/80 mixspin:500+8.0/50

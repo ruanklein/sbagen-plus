@@ -30,7 +30,7 @@
 //	FINK project's patches to ESounD, by Shawn Hsiao and Masanori
 //	Sekino.  See: http://fink.sf.net
 
-#define VERSION "1.5.3"
+#define VERSION "1.5.4"
 
 // This should be built with one of the following target macros
 // defined, which selects options for that platform, or else with some
@@ -215,6 +215,13 @@ void create_slide(int ac, char **av);
 void validateTotalAmplitude(Voice *voices, int numChannels, const char *line, int lineNum);
 void printSequenceDuration();
 void checkMixInSequence(); // Check if mix/<amp> is specified
+void create_noise_spin_effect(
+  int typ,
+  int amp,
+  int spin_position,
+  int *left,
+  int *right
+); // Create a spin effect
 
 #define ALLOC_ARR(cnt, type) ((type*)Alloc((cnt) * sizeof(type)))
 #define uint unsigned int
@@ -333,7 +340,7 @@ usage() {
 #define N_CH 16			// Number of channels
 
 struct Voice {
-  int typ;			// Voice type: 0 off, 1 binaural, 2 pink noise, 3 bell, 4 spin, 5 mix, 6 mixspin, 7 mixpulse, 8 isochronic, 9 white noise, 10 brown noise, -1 to -100 wave00 to wave99
+  int typ;			// Voice type: 0 off, 1 binaural, 2 pink noise, 3 bell, 4 spin, 5 mix, 6 mixspin, 7 mixpulse, 8 isochronic, 9 white noise, 10 brown noise, 11 bspin, 12 wspin, 13 mixbeat, -1 to -100 wave00 to wave99
   double amp;			// Amplitude level (0-4096 for 0-100%)
   double carr;			// Carrier freq (for binaural/bell/isochronic), width (for spin)
   double res;			// Resonance freq (-ve or +ve) (for binaural/spin/isochronic)
@@ -341,7 +348,7 @@ struct Voice {
 
 struct Channel {
   Voice v;			// Current voice setting (updated from current period)
-  int typ;			// Current type: 0 off, 1 binaural, 2 pink noise, 3 bell, 4 spin, 5 mix, 6 mixspin, 7 mixpulse, 8 isochronic, 9 white noise, 10 brown noise, -1 to -100 wave00 to wave99
+  int typ;			// Current type: 0 off, 1 binaural, 2 pink noise, 3 bell, 4 spin, 5 mix, 6 mixspin, 7 mixpulse, 8 isochronic, 9 white noise, 10 brown noise, 11 bspin, 12 wspin, 13 mixbeat, -1 to -100 wave00 to wave99
   int amp, amp2;		// Current state, according to current type
   int inc1, off1;		//  ::  (for binaural tones, offset + increment into sine 
   int inc2, off2;		//  ::   table * 65536)
@@ -457,6 +464,7 @@ char *pdir;			// Program directory (used as second place to look for -m files)
  int aud_rd;	// Next buffer to read out of list (to send to device)
  int aud_wr;	// Next buffer to write.  aud_rd==aud_wr means empty buffer list
  static AudioDeviceID aud_dev;
+ static AudioDeviceIOProcID proc_id; // New: store the procedure ID
 #endif
 
 //
@@ -637,6 +645,16 @@ void cleanup_alsa() {
 }
 #endif
 
+#ifdef MAC_AUDIO
+void cleanup_mac_audio() {
+    if (proc_id) {
+        AudioDeviceStop(aud_dev, proc_id);
+        AudioDeviceDestroyIOProcID(aud_dev, proc_id);
+        proc_id = 0;
+    }
+}
+#endif
+
 //
 //	Time-keeping functions
 //
@@ -774,6 +792,9 @@ main(int argc, char **argv) {
    
 #ifdef ALSA_AUDIO
    cleanup_alsa();
+#endif
+#ifdef MAC_AUDIO
+   cleanup_mac_audio();
 #endif
 
    return 0;
@@ -1179,6 +1200,14 @@ sprintVoice(char *p, Voice *vp, Voice *dup) {
       if (dup && vp->res == dup->res && vp->amp == dup->amp)
 	return sprintf(p, "  ::");
       return sprintf(p, " mixpulse:%.2f/%.2f", vp->res, AMP_AD(vp->amp));
+    case 11:  // Bspin - spinning brown noise
+      if (dup && vp->carr == dup->carr && vp->res == dup->res && vp->amp == dup->amp)
+	return sprintf(p, "  ::");
+      return sprintf(p, " bspin:%.2f%+.2f/%.2f", vp->carr, vp->res, AMP_AD(vp->amp));
+    case 12:  // Wspin - spinning white noise
+      if (dup && vp->amp == dup->amp)
+	return sprintf(p, "  ::");
+      return sprintf(p, " wspin:%.2f%+.2f/%.2f", vp->carr, vp->res, AMP_AD(vp->amp));
     default:
       if (vp->typ < -100 || vp->typ > -1)
 	return sprintf(p, " ???");
@@ -1211,6 +1240,9 @@ error(char *fmt, ...) {
 #endif
 #ifdef ALSA_AUDIO
   cleanup_alsa();
+#endif
+#ifdef MAC_AUDIO
+  cleanup_mac_audio();
 #endif
   exit(1);
 }
@@ -1383,6 +1415,57 @@ brown_noise() {
   
   // Scale to the same level as the sin_table
   return brown_last * (ST_AMP / 65535);
+}
+
+// Create a spin effect for noise based on the spin_position
+
+void create_noise_spin_effect(
+  int typ,
+  int amp,
+  int spin_position,
+  int *left,
+  int *right
+) {
+  // Apply intensity factor to rotation value
+	int amplified_val = (int)(spin_position * 1.5);
+
+	// Limit value between -128 and 127
+	if (amplified_val > 127) amplified_val = 127;
+	if (amplified_val < -128) amplified_val = -128;
+	    
+  // Use absolute value for calculations
+  int pos_val = amplified_val < 0 ? -amplified_val : amplified_val;
+  int noise_l, noise_r;
+
+  int base_noise;
+  switch (typ) {
+    case 11:
+      base_noise = brown_noise();
+      break;
+    case 12:
+      base_noise = white_noise();
+      break;
+    default:
+      // Default is pink noise
+      base_noise = noise_buf[(uchar)(noise_off+128)];
+      break;
+  }
+
+  // When val is close to 0, channels are played normally
+  // When val approaches +/-128, channels are swapped or muted
+  if (amplified_val >= 0) {
+    // Rotation to the right: left channel decreases, right channel receives part of the left channel
+    noise_l = (base_noise * (128 - pos_val)) >> 7;
+    noise_r = base_noise + ((base_noise * pos_val) >> 7);
+  } else {
+    // Rotation to the left: right channel decreases, left channel receives part of the right channel
+    noise_l = base_noise + ((base_noise * pos_val) >> 7);
+    noise_r = (base_noise * (128 - pos_val)) >> 7;
+  }
+
+  // Apply noise to the left and right channels
+  *left = amp * noise_l;
+  *right = amp * noise_r;
 }
 
 //	//
@@ -1577,8 +1660,8 @@ outChunk() {
 	  ch->off1 += ch->inc1;
 	  ch->off1 &= (ST_SIZ << 16) - 1;
 	  val= (ch->inc2 * sin_table[ch->off1 >> 16]) >> 24;
-	  tot1 += ch->amp * noise_buf[(uchar)(noise_off+128+val)];
-	  tot2 += ch->amp * noise_buf[(uchar)(noise_off+128-val)];
+	  
+	  create_noise_spin_effect(4, ch->amp, val, &tot1, &tot2);
 	  break;
        case 5:	// Mix level
 	  tot1 += mix1 * ch->amp;
@@ -1592,9 +1675,9 @@ outChunk() {
 	  // Mixspin intensity control
 	  {
 	    // Calculate intensity factor based on amplitude
-	    // Amplitude varies from 0 to 4096 (0-100%)
-	    // Normalize to a factor between 0.5 and 4.0
-	    double intensity_factor = 0.5 + (ch->amp / 4096.0) * 3.5;
+ 	    // Amplitude varies from 0 to 4096 (0-100%)
+ 	    // Normalize to a factor between 0.5 and 4.0
+ 	    double intensity_factor = 0.5 + (ch->amp / 4096.0) * 3.5;
 
 	    // Apply intensity factor to rotation value
 	    int amplified_val = (int)(val * intensity_factor);
@@ -1688,6 +1771,20 @@ outChunk() {
             tot1 += val;
             tot2 += val;
           }
+          break;
+       case 11:  // Bspin - spinning brown noise
+          ch->off1 += ch->inc1;
+          ch->off1 &= (ST_SIZ << 16) - 1;
+          val= (ch->inc2 * sin_table[ch->off1 >> 16]) >> 24;
+          
+          create_noise_spin_effect(11, ch->amp, val, &tot1, &tot2);
+          break;
+       case 12:  // Wspin - spinning white noise
+          ch->off1 += ch->inc1;
+          ch->off1 &= (ST_SIZ << 16) - 1;
+          val= (ch->inc2 * sin_table[ch->off1 >> 16]) >> 24;
+          
+          create_noise_spin_effect(12, ch->amp, val, &tot1, &tot2);
           break;
        default:	// Waveform-based binaural tones
 	  tab= waves[-1 - ch->typ];
@@ -1933,6 +2030,10 @@ corrVal(int running) {
 	     ch->off1= ch->off2= 0; break;
 	  case 7:  // Mixpulse
 	     ch->off1= ch->off2= 0; break;
+	  case 11:  // Bspin - spinning brown noise
+	     ch->off1= ch->off2= 0; break;
+	  case 12:  // Wspin - spinning white noise
+	     ch->off1= ch->off2= 0; break;
 	  default:
 	     ch->off1= ch->off2= 0; break;
 	 }
@@ -1978,6 +2079,20 @@ corrVal(int running) {
           vv->amp= rat0 * v0->amp + rat1 * v1->amp;
           vv->res= rat0 * v0->res + rat1 * v1->res;
           break;
+       case 11:  // Bspin - spinning brown noise
+          vv->amp= rat0 * v0->amp + rat1 * v1->amp;
+	        vv->carr= rat0 * v0->carr + rat1 * v1->carr;
+	        vv->res= rat0 * v0->res + rat1 * v1->res;
+	        if (vv->carr > spin_carr_max) vv->carr= spin_carr_max; // Clipping sweep width
+	        if (vv->carr < -spin_carr_max) vv->carr= -spin_carr_max;
+          break;
+       case 12:  // Wspin - spinning white noise
+         vv->amp= rat0 * v0->amp + rat1 * v1->amp;
+	       vv->carr= rat0 * v0->carr + rat1 * v1->carr;
+	       vv->res= rat0 * v0->res + rat1 * v1->res;
+	       if (vv->carr > spin_carr_max) vv->carr= spin_carr_max; // Clipping sweep width
+	       if (vv->carr < -spin_carr_max) vv->carr= -spin_carr_max;
+         break;
        default:		// Waveform based binaural
 	  vv->amp= rat0 * v0->amp + rat1 * v1->amp;
 	  vv->carr= rat0 * v0->carr + rat1 * v1->carr;
@@ -2067,6 +2182,16 @@ corrVal(int running) {
           ch->amp= (int)vv->amp;
           // Modulator (pulse frequency)
           ch->inc2= (int)(vv->res / out_rate * ST_SIZ * 65536);
+          break;
+       case 11:  // Bspin - spinning brown noise
+          ch->amp= (int)vv->amp;
+          ch->inc1= (int)(vv->res / out_rate * ST_SIZ * 65536);
+          ch->inc2= (int)(vv->carr * 1E-6 * out_rate * (1<<24) / ST_AMP);
+          break;
+       case 12:  // Wspin - spinning white noise
+          ch->amp= (int)vv->amp;
+          ch->inc1= (int)(vv->res / out_rate * ST_SIZ * 65536);
+          ch->inc2= (int)(vv->carr * 1E-6 * out_rate * (1<<24) / ST_AMP);
           break;
        default:		// Waveform based binaural
 	  ch->amp= (int)vv->amp;
@@ -2159,9 +2284,6 @@ setup_device(void) {
             out_rate, snd_strerror(err));
     }
     
-    // Update sampling rate if it was changed
-    out_rate = rate;
-    
     // Configure buffer and period size
     period_size = 1024; // Initial value
     if ((err = snd_pcm_hw_params_set_period_size_near(alsa_handle, alsa_params, &period_size, 0)) < 0) {
@@ -2194,9 +2316,12 @@ setup_device(void) {
     // Mark that we are using ALSA
     out_fd = -9998; // Special value for ALSA
     
-    if (!opt_Q)
+    if (!opt_Q) {
+      if(rate != out_rate && out_rate_def)
+        warn("*** WARNING: Device output rate is %d Hz, but SBaGen+ is configured for %d Hz ***", rate, out_rate);
       warn("ALSA audio output %d-bit at %d Hz with period of %lu samples, %d ms per period",
            out_mode ? 16 : 8, out_rate, period_size, out_buf_ms);
+    }
     return;
   }
 #endif
@@ -2225,7 +2350,7 @@ setup_device(void) {
 
      if (MMSYSERR_NOERROR != 
 	 (rv= waveOutOpen(&aud_handle, WAVE_MAPPER, 
-			  (WAVEFORMATEX*)&fmt, (DWORD)win32_audio_callback, 
+			  (WAVEFORMATEX*)&fmt, (DWORD_PTR)win32_audio_callback, 
 			  (DWORD)0, CALLBACK_FUNCTION))) {
 	char buf[255];
 	waveOutGetErrorText(rv, buf, sizeof(buf)-1);
@@ -2288,8 +2413,8 @@ setup_device(void) {
     UInt32 propertySize, bufferByteCount;
     struct AudioStreamBasicDescription streamDesc;
     
-    int old_out_rate= out_rate;
-    int buffer_size= opt_B > 0 ? opt_B : BUFFER_SIZE;
+    int device_out_rate;
+    int buffer_size= opt_B > 0 ? opt_B : 4096; // Default is 2048 samples (L+R)
 
     out_bsiz= buffer_size;
     out_blen= out_mode ? out_bsiz/2 : out_bsiz;
@@ -2341,7 +2466,7 @@ setup_device(void) {
         error("Get audio device properties failed, status = %d", (int)err);
     }
 
-    out_rate= (int)streamDesc.mSampleRate;
+    device_out_rate = (int)streamDesc.mSampleRate;
 
     if (streamDesc.mChannelsPerFrame != 2) 
       error("SBaGen+ requires a stereo output device -- \n"
@@ -2365,13 +2490,21 @@ setup_device(void) {
     }
 
     // Setup callback and start it
-    err= AudioDeviceAddIOProc(aud_dev, mac_callback, (void *)1);
-    err= AudioDeviceStart(aud_dev, mac_callback);
+    err = AudioDeviceCreateIOProcID(aud_dev, mac_callback, (void *)1, &proc_id);
+    if (err != noErr) {
+        error("Failed to create audio callback, status = %d", (int)err);
+    }
+    
+    err = AudioDeviceStart(aud_dev, proc_id);
+    if (err != noErr) {
+        AudioDeviceDestroyIOProcID(aud_dev, proc_id);
+        error("Failed to start audio device, status = %d", (int)err);
+    }
 
     // Report settings      
     if (!opt_Q) {
-       if (old_out_rate != out_rate && !out_rate_def) 
-	  warn("*** WARNING: Non-default sampling rates not yet supported on OS X ***");
+       if (device_out_rate != out_rate && out_rate_def) 
+	      warn("*** WARNING: Device output rate is %d Hz, but SBaGen+ is configured for %d Hz ***", device_out_rate, out_rate);
        warn("Outputting %d-bit audio at %d Hz to \"%s\",\n"
 	    "  using %d %d-sample fragments, %d ms per fragment",
 	    (int)streamDesc.mBitsPerChannel, out_rate, deviceName,
@@ -3097,6 +3230,20 @@ readNameDef() {
     if (2 == sscanf(p, "mixpulse:%lf/%lf %c", &res, &amp, &dmy)) {
       checkMixInSequence();
       nd->vv[ch].typ= 7;
+      nd->vv[ch].res= res;
+      nd->vv[ch].amp= AMP_DA(amp);	
+      continue;
+    }
+    if (3 == sscanf(p, "bspin:%lf%lf/%lf %c", &carr, &res, &amp, &dmy)) {
+      nd->vv[ch].typ= 11;
+      nd->vv[ch].carr= carr;
+      nd->vv[ch].res= res;
+      nd->vv[ch].amp= AMP_DA(amp);	
+      continue;
+    }
+    if (3 == sscanf(p, "wspin:%lf%lf/%lf %c", &carr, &res, &amp, &dmy)) {
+      nd->vv[ch].typ= 12;
+      nd->vv[ch].carr= carr;
       nd->vv[ch].res= res;
       nd->vv[ch].amp= AMP_DA(amp);	
       continue;
