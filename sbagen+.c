@@ -340,7 +340,7 @@ usage() {
 #define N_CH 16			// Number of channels
 
 struct Voice {
-  int typ;			// Voice type: 0 off, 1 binaural, 2 pink noise, 3 bell, 4 spin, 5 mix, 6 mixspin, 7 mixpulse, 8 isochronic, 9 white noise, 10 brown noise, 11 bspin, 12 wspin, 13 binaural AM, 14 binaural FM, 15 Isochronic PAN, -1 to -100 wave00 to wave99
+  int typ;			// Voice type: 0 off, 1 binaural, 2 pink noise, 3 bell, 4 spin, 5 mix, 6 mixspin, 7 mixpulse, 8 isochronic, 9 white noise, 10 brown noise, 11 bspin, 12 wspin, 13 mixbeat, -1 to -100 wave00 to wave99
   double amp;			// Amplitude level (0-4096 for 0-100%)
   double carr;			// Carrier freq (for binaural/bell/isochronic), width (for spin)
   double res;			// Resonance freq (-ve or +ve) (for binaural/spin/isochronic)
@@ -348,7 +348,7 @@ struct Voice {
 
 struct Channel {
   Voice v;			// Current voice setting (updated from current period)
-  int typ;			// Current type: 0 off, 1 binaural, 2 pink noise, 3 bell, 4 spin, 5 mix, 6 mixspin, 7 mixpulse, 8 isochronic, 9 white noise, 10 brown noise, 11 bspin, 12 wspin, 13 binaural AM, 14 binaural FM, 15 Isochronic PAN, -1 to -100 wave00 to wave99
+  int typ;			// Current type: 0 off, 1 binaural, 2 pink noise, 3 bell, 4 spin, 5 mix, 6 mixspin, 7 mixpulse, 8 isochronic, 9 white noise, 10 brown noise, 11 bspin, 12 wspin, 13 mixbeat, -1 to -100 wave00 to wave99
   int amp, amp2;		// Current state, according to current type
   int inc1, off1;		//  ::  (for binaural tones, offset + increment into sine 
   int inc2, off2;		//  ::   table * 65536)
@@ -1208,10 +1208,6 @@ sprintVoice(char *p, Voice *vp, Voice *dup) {
       if (dup && vp->amp == dup->amp)
 	return sprintf(p, "  ::");
       return sprintf(p, " wspin:%.2f%+.2f/%.2f", vp->carr, vp->res, AMP_AD(vp->amp));
-    case 13:  // Binaural AM
-      if (dup && vp->carr == dup->carr && vp->res == dup->res && vp->amp == dup->amp)
-	return sprintf(p, "  ::");
-      return sprintf(p, " %.2f~%.2f/%.2f", vp->carr, vp->res, AMP_AD(vp->amp));
     default:
       if (vp->typ < -100 || vp->typ > -1)
 	return sprintf(p, " ???");
@@ -1790,47 +1786,6 @@ outChunk() {
           
           create_noise_spin_effect(12, ch->amp, val, &tot1, &tot2);
           break;
-       case 13:  // Binaural AM
-          ch->off1 += ch->inc1;  // Carrier (tone frequency) for left channel
-          ch->off1 &= (ST_SIZ << 16) - 1;
-          ch->off2 += ch->inc2;  // Carrier (tone frequency) for right channel
-          ch->off2 &= (ST_SIZ << 16) - 1;
-          
-          // Create the AM effect
-          {
-            // Use a separate modulator frequency (resonance) for AM
-            static int mod_offset = 0;
-            static int mod_increment = 0;
-            
-            // Initialize modulator increment if not set
-            if (mod_increment == 0) {
-              // Use the resonance frequency as modulator
-              mod_increment = (int)(ch->v.res / out_rate * ST_SIZ * 65536);
-            }
-            
-            // Update modulator offset
-            mod_offset += mod_increment;
-            mod_offset &= (ST_SIZ << 16) - 1;
-            
-            // Calculate modulation factor using the modulator frequency
-            int mod_val = sin_table[mod_offset >> 16];
-            
-            // Normalize modulation value to range 0.3 to 1.0
-            double mod_factor = 0.3 + (0.7 * (mod_val + ST_AMP) / (2 * ST_AMP));
-            
-            // Apply the modulation to both channels with different phases
-            // Left channel: normal modulation
-            int left_val = (int)(ch->amp * sin_table[ch->off1 >> 16] * mod_factor);
-            
-            // Right channel: opposite phase modulation (180 degrees)
-            double opp_mod_factor = 0.3 + (0.7 * (-mod_val + ST_AMP) / (2 * ST_AMP));
-            int right_val = (int)(ch->amp2 * sin_table[ch->off2 >> 16] * opp_mod_factor);
-            
-            // Add to totals
-            tot1 += left_val;
-            tot2 += right_val;
-          }
-          break;
        default:	// Waveform-based binaural tones
 	  tab= waves[-1 - ch->typ];
 	  ch->off1 += ch->inc1;
@@ -2079,8 +2034,6 @@ corrVal(int running) {
 	     ch->off1= ch->off2= 0; break;
 	  case 12:  // Wspin - spinning white noise
 	     ch->off1= ch->off2= 0; break;
-	  case 13:  // Binaural AM
-	     ch->off1= ch->off2= 0; break;
 	  default:
 	     ch->off1= ch->off2= 0; break;
 	 }
@@ -2140,11 +2093,6 @@ corrVal(int running) {
 	       if (vv->carr > spin_carr_max) vv->carr= spin_carr_max; // Clipping sweep width
 	       if (vv->carr < -spin_carr_max) vv->carr= -spin_carr_max;
          break;
-       case 13:  // Binaural AM
-         vv->amp= rat0 * v0->amp + rat1 * v1->amp;
-	       vv->carr= rat0 * v0->carr + rat1 * v1->carr;
-	       vv->res= rat0 * v0->res + rat1 * v1->res;
-         break;
        default:		// Waveform based binaural
 	  vv->amp= rat0 * v0->amp + rat1 * v1->amp;
 	  vv->carr= rat0 * v0->carr + rat1 * v1->carr;
@@ -2189,7 +2137,6 @@ corrVal(int running) {
       switch (vv->typ) {
 	 double freq1, freq2;
        case 1:
-       case 13:  // Binaural AM
 	  freq1= vv->carr + vv->res/2;
 	  freq2= vv->carr - vv->res/2;
 	  if (opt_c) {
@@ -3296,13 +3243,6 @@ readNameDef() {
     }
     if (3 == sscanf(p, "wspin:%lf%lf/%lf %c", &carr, &res, &amp, &dmy)) {
       nd->vv[ch].typ= 12;
-      nd->vv[ch].carr= carr;
-      nd->vv[ch].res= res;
-      nd->vv[ch].amp= AMP_DA(amp);	
-      continue;
-    }
-    if (3 == sscanf(p, "%lf~%lf/%lf %c", &carr, &res, &amp, &dmy)) {
-      nd->vv[ch].typ= 13;
       nd->vv[ch].carr= carr;
       nd->vv[ch].res= res;
       nd->vv[ch].amp= AMP_DA(amp);	
