@@ -1,3 +1,13 @@
+1.5.4 Added new spins: bspin and wspin. bspin is a brown noise spin, and wspin is a white noise spin.
+	Added new .sbg files for the new spins.
+	Adjusted pink noise spin to be more similar to the mixspin effect.
+	New macOS installer using a .dmg file.
+	Removed source code from the Windows installer. Added notes about source code availability in the initial setup.
+	Fixed deprecation warnings on all platforms.
+	Fixed bug with the 64-bit executable on Windows, and added it to the installer.
+	Fixed sample rate issue on all platforms. SBaGen+ works only with a 44.1kHz sample rate (see docs/SBAGEN+.TXT for details).
+	Default sample buffer size set to 4096 samples on macOS. This resolves distortion issues on many Bluetooth devices.
+
 1.5.3 Added an installer to easily install SBaGen+ on Windows.
    Removed OSS audio support. ALSA is now default on Linux 
 
