@@ -165,7 +165,7 @@ off: -
 
 Save this as `meditation.sbg`:
 
-For Windows users, you can run the sequence by double-clicking the file. For macOS and Linux users, you can run it from the command line:
+For Windows and macOS users, you can run the sequence by double-clicking the file. For Linux users, you can run it from the command line:
 
 ```bash
 sbagen+ meditation.sbg
