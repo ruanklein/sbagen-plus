@@ -6,8 +6,8 @@ SBaGen+ is a command-line tool for generating binaural beats and isochronic tone
 
 - [💡 About This Project](#-about-this-project)
 - [📥 Installation](#-installation)
-  - [⬇️ Download Pre-built Binaries](#️-download-pre-built-binaries)
   - [🐳 Using SBaGen+ with Docker](#-using-sbagen-with-docker)
+  - [⬇️ Download Pre-built Binaries](#️-download-pre-built-binaries)
   - [🐧 Installing on Linux](#-installing-on-linux)
   - [🍎 Installing on macOS](#-installing-on-macos)
   - [🪟 Installing on Windows](#-installing-on-windows)
@@ -31,18 +31,6 @@ The name has been changed from **"Sequenced Binaural Beat Generator"** to **"Seq
 
 You can download pre-built binaries on Linux and installers for Windows and macOS from the [releases page](https://github.com/ruanklein/sbagen-plus/releases).
 
-### ⬇️ Download Pre-built Binaries
-
-The latest release (v1.5.4) can be downloaded directly from the following links:
-
-- Linux ARM64: [sbagen+-linux-arm64](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.4/sbagen+-linux-arm64)
-- Linux 32-bit: [sbagen+-linux32](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.4/sbagen+-linux32)
-- Linux 64-bit: [sbagen+-linux64](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.4/sbagen+-linux64)
-- macOS Installer: [SBaGen+ Installer.dmg](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.4/SBaGen+-Installer.dmg)
-- Windows x86/x86_64 and ARM64: [sbagen+-windows-setup.exe](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.4/sbagen+-windows-setup.exe)
-
-  **Important**: Always verify the SHA256 checksum of downloaded binaries against those listed on the [releases page](https://github.com/ruanklein/sbagen-plus/releases) to ensure file integrity and security.
-
 ### 🐳 Using SBaGen+ with Docker
 
 If you don’t want to install SBaGen+ on your machine, there’s the option to use it via Docker.
@@ -60,6 +48,18 @@ docker run --rm -v ./sbg:/sbg ruanklein/sbagen-plus -m river1.ogg -Wo out.wav Sl
 This will generate a WAV file in your sbg directory.
 
 If you want to use media files (ogg/mp3/wav) with the -m parameter, make sure they are in the same folder as your .sbg file.
+
+### ⬇️ Download Pre-built Binaries
+
+The latest release (v1.5.4) can be downloaded directly from the following links:
+
+- Linux ARM64: [sbagen+-linux-arm64](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.4/sbagen+-linux-arm64)
+- Linux 32-bit: [sbagen+-linux32](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.4/sbagen+-linux32)
+- Linux 64-bit: [sbagen+-linux64](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.4/sbagen+-linux64)
+- macOS Installer: [SBaGen+ Installer.dmg](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.4/SBaGen+-Installer.dmg)
+- Windows x86/x86_64 and ARM64: [sbagen+-windows-setup.exe](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.4/sbagen+-windows-setup.exe)
+
+  **Important**: Always verify the SHA256 checksum of downloaded binaries against those listed on the [releases page](https://github.com/ruanklein/sbagen-plus/releases) to ensure file integrity and security.
 
 ### 🐧 Installing on Linux
 
