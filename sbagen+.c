@@ -30,7 +30,7 @@
 //	FINK project's patches to ESounD, by Shawn Hsiao and Masanori
 //	Sekino.  See: http://fink.sf.net
 
-#define VERSION "1.5.4"
+#define VERSION "1.5.5"
 
 // This should be built with one of the following target macros
 // defined, which selects options for that platform, or else with some
@@ -212,7 +212,7 @@ void setupOptC(char *spec) ;
 extern int out_rate, out_rate_def;
 void create_drop(int ac, char **av);
 void create_slide(int ac, char **av);
-void validateTotalAmplitude(Voice *voices, int numChannels, const char *line, int lineNum);
+void normalizeAmplitude(Voice *voices, int numChannels, const char *line, int lineNum);
 void printSequenceDuration();
 void checkMixInSequence(); // Check if mix/<amp> is specified
 void create_noise_spin_effect(
@@ -272,6 +272,7 @@ help() {
 	  NL "          -B size   Force buffer size (in samples) for audio output."
     NL "                     (e.g. 1024, 2048, 4096, etc.)"
 #endif
+	  NL "          -N        Disable automatic amplitude normalization (allow clipping)"
 	  NL "          -L time   Select the length of time (hh:mm or hh:mm:ss) to output"
 	  NL "                     for.  Default is to output forever."
 	  NL "          -S        Output from the first tone-set in the sequence (Start),"
@@ -283,8 +284,8 @@ help() {
 	  NL "          -o file   Output raw data to the given file instead of default device"
 	  NL "          -O        Output raw data to the standard output"
 	  NL "          -W        Output a WAV-format file instead of raw data"
-	  NL "          -m file   Read audio data from the given file and mix it with the"
-	  NL "                      generated binaural beats; may be "
+	  NL "          -m file   Read audio data from the given file and mix it with"
+	  NL "                      generated brainwave tones; may be "
 #ifdef OGG_DECODE
 	  "ogg/"
 #endif
@@ -293,7 +294,7 @@ help() {
 #endif
 	  "wav/raw format"
 	  NL "          -M        Read raw audio data from the standard input and mix it"
-	  NL "                      with the generated binaural beats (raw only)"
+	  NL "                      with the generated brainwave tones (raw only)"
 	  NL
 	  NL "          -R rate   Select rate in Hz that frequency changes are recalculated"
 	  NL "                     (for file/pipe output only, default is 10Hz)"
@@ -434,6 +435,7 @@ int opt_T= -1;			// Time to start at (for -S option)
 #ifdef MAC_AUDIO
 int opt_B= -1;		// Buffer size override (-1 = auto)
 #endif
+int opt_N= 1;			// Enable automatic amplitude normalization (default)
 
 FILE *mix_in;			// Input stream for mix sound data, or 0
 int mix_cnt;			// Version number from mix filename (#<digits>), or -1
@@ -856,6 +858,7 @@ scanOptions(int *acp, char ***avp) {
        opt_B *= 2;
 	     break;
 #endif
+	  case 'N': opt_N= 0; break;
 	  case 'c':
 	     if (argc-- < 1) error("-c expects argument");
 	     setupOptC(*argv++);
@@ -3251,8 +3254,8 @@ readNameDef() {
     badSeq();
   }
   
-  // Validate total amplitude before adding to the list
-  validateTotalAmplitude(nd->vv, N_CH, lin_copy, in_lin);
+  // Normalize total amplitude before adding to the list
+  normalizeAmplitude(nd->vv, N_CH, lin_copy, in_lin);
   
   nd->nxt= nlist; nlist= nd;
 }  
@@ -3749,31 +3752,50 @@ create_slide(int ac, char **av) {
    correctPeriods();
 }   
 
-// Function to validate the total amplitude of voices
-void validateTotalAmplitude(Voice *voices, int numChannels, const char *line, int lineNum) {
+// Function to normalize the total amplitude of voices
+void normalizeAmplitude(Voice *voices, int numChannels, const char *line, int lineNum) {
   double totalAmplitude = 0.0;
   
+  // First, check mixspin/mixpulse separately (these have different logic)
   for (int ch = 0; ch < numChannels; ch++) {
-    // Check if voice is mixspin or mixpulse to check if effect intensity is over 100%
     if (voices[ch].typ == 6 || voices[ch].typ == 7) {
       double ampPercentage = voices[ch].amp / 40.96;
-
       if (ampPercentage > 100.0) {
         error("Total intensity of mixspin/mixpulse exceeds 100%% (%.2f%%) at line %d:\n  %s\nPlease reduce intensity to prevent audio distortion.", 
               ampPercentage, lineNum, line);
       }
     }
-
-    if (voices[ch].typ != 0 && voices[ch].typ != 6 && voices[ch].typ != 7) { // If voice is active. Mixspin and Mixpulse are not included
-      // Convert from internal amplitude format back to percentage
+  }
+  
+  // Calculate the total amplitude of all voices (excluding mixspin/mixpulse)
+  for (int ch = 0; ch < numChannels; ch++) {
+    if (voices[ch].typ != 0 && voices[ch].typ != 6 && voices[ch].typ != 7) {
       double ampPercentage = voices[ch].amp / 40.96;
       totalAmplitude += ampPercentage;
     }
   }
   
-  if (totalAmplitude > 100.0) {
-    error("Total amplitude exceeds 100%% (%.2f%%) at line %d:\n  %s\nPlease reduce amplitudes to prevent audio distortion.", 
-          totalAmplitude, lineNum, line);
+  // If total amplitude exceeds 100%, normalize all active voices (except mixspin/mixpulse)
+  if (opt_N && totalAmplitude > 100.0) {
+    double normalizationFactor = 100.0 / totalAmplitude;
+    
+    if (!opt_Q) {
+      warn("Total amplitude %.2f%% exceeds 100%% at line %d, auto-normalizing by factor %.3f", 
+           totalAmplitude, lineNum, normalizationFactor);
+    }
+    
+    // Apply normalization to all active voices (except mixspin/mixpulse)
+    for (int ch = 0; ch < numChannels; ch++) {
+      if (voices[ch].typ != 0 && voices[ch].typ != 6 && voices[ch].typ != 7) {
+        voices[ch].amp *= normalizationFactor;
+      }
+    }
+  }
+
+  // If total amplitude exceeds 100%, warn the user
+  if (!opt_N && !opt_Q && totalAmplitude > 100.0) {
+    warn("*** WARNING: Total amplitude %.2f%% exceeds 100%% at line %d, distortion may occur ***", 
+         totalAmplitude, lineNum);
   }
 }
 
