@@ -1,3 +1,6 @@
+1.5.5 Added auto-normalization of amplitude to prevent distortion.
+	Added -N option to disable automatic amplitude normalization.
+
 1.5.4 Added new spins: bspin and wspin. bspin is a brown noise spin, and wspin is a white noise spin.
 	Added new .sbg files for the new spins.
 	Adjusted pink noise spin to be more similar to the mixspin effect.
