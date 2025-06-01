@@ -273,6 +273,7 @@ help() {
     NL "                     (e.g. 1024, 2048, 4096, etc.)"
 #endif
 	  NL "          -N        Disable automatic amplitude normalization (allow clipping)"
+	  NL "          -V        Set the global volume level (Min 1, Max 100. Default 100)"
 	  NL "          -L time   Select the length of time (hh:mm or hh:mm:ss) to output"
 	  NL "                     for.  Default is to output forever."
 	  NL "          -S        Output from the first tone-set in the sequence (Start),"
@@ -436,6 +437,7 @@ int opt_T= -1;			// Time to start at (for -S option)
 int opt_B= -1;		// Buffer size override (-1 = auto)
 #endif
 int opt_N= 1;			// Enable automatic amplitude normalization (default)
+int opt_V= 100;			// Global volume level (default 100%)
 
 FILE *mix_in;			// Input stream for mix sound data, or 0
 int mix_cnt;			// Version number from mix filename (#<digits>), or -1
@@ -859,6 +861,12 @@ scanOptions(int *acp, char ***avp) {
 	     break;
 #endif
 	  case 'N': opt_N= 0; break;
+	  case 'V':
+	     if (argc-- < 1 || 1 != sscanf(*argv++, "%d %c", &opt_V, &dmy)) 
+		    error("-V expects volume level in percent (0-100)");
+	     if (opt_V < 0 || opt_V > 100)
+		    error("Volume level must be between 0 and 100");
+	     break;
 	  case 'c':
 	     if (argc-- < 1) error("-c expects argument");
 	     setupOptC(*argv++);
@@ -1800,6 +1808,12 @@ outChunk() {
 	  break;
       }
 
+      // Apply volume level
+      if (opt_V != 100) {
+        tot1 = ((long long)tot1 * opt_V + 50) / 100;
+        tot2 = ((long long)tot2 * opt_V + 50) / 100;
+      }
+
       // White noise dither; you could also try (rand0-rand1) for a
       // dither with more high frequencies
       rand0= rand1; 
@@ -2215,6 +2229,9 @@ corrVal(int running) {
 
 void 
 setup_device(void) {
+
+  if (!opt_Q && opt_V != 100)
+       warn("Global volume level set to %d%%", opt_V);
 
   // Handle output to files and pipes
   if (opt_O || opt_o) {
