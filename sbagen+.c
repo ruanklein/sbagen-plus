@@ -274,6 +274,7 @@ help() {
 #endif
 	  NL "          -N        Disable automatic amplitude normalization (allow clipping)"
 	  NL "          -V        Set the global volume level (Min 1, Max 100. Default 100)"
+    NL "          -w type   Set waveform type (sine, square, triangle, sawtooth; default sine)"
 	  NL "          -L time   Select the length of time (hh:mm or hh:mm:ss) to output"
 	  NL "                     for.  Default is to output forever."
 	  NL "          -S        Output from the first tone-set in the sequence (Start),"
@@ -438,6 +439,7 @@ int opt_B= -1;		// Buffer size override (-1 = auto)
 #endif
 int opt_N= 1;			// Enable automatic amplitude normalization (default)
 int opt_V= 100;			// Global volume level (default 100%)
+int opt_w= 0;			// Waveform type (0 = sine, 1 = square, 2 = triangle, 3 = sawtooth)
 
 FILE *mix_in;			// Input stream for mix sound data, or 0
 int mix_cnt;			// Version number from mix filename (#<digits>), or -1
@@ -693,11 +695,12 @@ main(int argc, char **argv) {
    while (p > pdir && p[-1] != '/' && p[-1] != '\\') *--p= 0;
 
    argc--; argv++;
-   init_sin_table();
    bigendian= ((char*)&test)[0] != 0;
    
    // Process all the options
    rv= scanOptions(&argc, &argv);
+
+   init_sin_table();
    
    if (argc < 1) usage();
    
@@ -866,6 +869,15 @@ scanOptions(int *acp, char ***avp) {
 		    error("-V expects volume level in percent (0-100)");
 	     if (opt_V < 0 || opt_V > 100)
 		    error("Volume level must be between 0 and 100");
+	     break;
+	  case 'w':
+	     if (argc-- < 1) error("-w expects waveform type (sine, square, triangle, sawtooth)");
+       if (0 == strcmp(*argv, "sine")) opt_w= 0;
+       else if (0 == strcmp(*argv, "square")) opt_w= 1;
+       else if (0 == strcmp(*argv, "triangle")) opt_w= 2;
+       else if (0 == strcmp(*argv, "sawtooth")) opt_w= 3;
+       else error("Unknown waveform: %s (use sine, square, triangle, sawtooth)", *argv);
+       argv++;
 	     break;
 	  case 'c':
 	     if (argc-- < 1) error("-c expects argument");
@@ -1233,8 +1245,32 @@ init_sin_table() {
   int a;
   int *arr= (int*)Alloc(ST_SIZ * sizeof(int));
 
-  for (a= 0; a<ST_SIZ; a++)
-    arr[a]= (int)(ST_AMP * sin((a * 3.14159265358979323846 * 2) / ST_SIZ));
+  for (a= 0; a<ST_SIZ; a++) {
+    double phase = (a * 2.0 * 3.14159265358979323846) / ST_SIZ;
+    double val;
+    
+    switch(opt_w) {
+      case 0: // Sine (default)
+        val = sin(phase);
+        break;
+      case 1: // Square
+        val = (sin(phase) >= 0) ? 1.0 : -1.0;
+        break;
+      case 2: // Triangle
+        if (phase < 3.14159265358979323846)
+          val = (2.0 * phase / 3.14159265358979323846) - 1.0;
+        else
+          val = 3.0 - (2.0 * phase / 3.14159265358979323846);
+        break;
+      case 3: // Sawtooth
+        val = (2.0 * phase / (2.0 * 3.14159265358979323846)) - 1.0;
+        break;
+      default:
+        val = sin(phase);
+    }
+    
+    arr[a]= (int)(ST_AMP * val);
+  }
 
   sin_table= arr;
 }
@@ -2232,6 +2268,11 @@ setup_device(void) {
 
   if (!opt_Q && opt_V != 100)
        warn("Global volume level set to %d%%", opt_V);
+
+  if (!opt_Q && opt_w != 0) {
+   char *waveforms[] = {"sine", "square", "triangle", "sawtooth"};
+   warn("Using %s waveform for brainwave tones", waveforms[opt_w]);
+  }
 
   // Handle output to files and pipes
   if (opt_O || opt_o) {
