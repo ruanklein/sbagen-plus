@@ -175,16 +175,16 @@ The following example commands should be typed at the
 shell prompt provided by your operating system, prepared as explained
 above.
 
->> sbagen
+>> sbagen+
 
 This gives a brief usage information.
  
->> sbagen -h
+>> sbagen+ -h
 
 This gives the full usage information, showing the version number and
 the full list of options.  Check this for any new features.
  
->> sbagen prog-chakras-1.sbg
+>> sbagen+ prog-chakras-1.sbg
 
 This runs the sequence in file 'prog-chakras-1.sbg', starting playing
 whatever should be playing at the current moment, according to the
@@ -199,17 +199,17 @@ Windows, macOS and UNIX.  (Most UNIX users already know this, but
 it seems that many Windows users don't know about this standard DOS
 key combination).
 
->> sbagen -p drop 00ds+
+>> sbagen+ -p drop 00ds+
 
 This runs one of the built-in pre-defined sequences called "drop" with
 the given parameters (see later for an explanation).
 
->> sbagen -m river1.ogg -p drop 00ds+ mix/99
+>> sbagen+ -m river1.ogg -p drop 00ds+ mix/99
 
 This runs the same sequence, but mixes it with water sounds from the
 loopable OGG file river1.ogg.
 
->> sbagen -m river2.ogg -p slide 200+10/1 mix/99
+>> sbagen+ -m river2.ogg -p slide 200+10/1 mix/99
 
 This runs another built-in pre-defined sequence and mixes it with
 other river sounds.  This particular sequence keeps you in alpha for a
@@ -218,7 +218,7 @@ half-hour session whilst dropping the carrier right down to zero.
 To test a sequence (without waiting the full 24 hours for it to play
 through), run with the -q 'quick' option:
 
->> sbagen -q 120 prog-chakras-1.sbg
+>> sbagen+ -q 120 prog-chakras-1.sbg
 
 This example runs the sequence at 120 times the normal speed.  This is
 quite useful to check that a new sequence is going to do what you
@@ -228,7 +228,7 @@ To check that SBaGen+ has interpreted your sequence-file correctly, use
 the -D option, which dumps a listing of the interpreted sequence
 instead of playing it:
 
->> sbagen -D prog-chakras-1.sbg
+>> sbagen+ -D prog-chakras-1.sbg
 
 To quickly test a particular tone-set continuously, use the -i
 immediate option.  This is good for experimenting with different
@@ -236,7 +236,7 @@ ideas.  If your shell lets you recall the previous command with
 up-arrow, you can quickly test and fine-tune a tone-set in this way
 before putting it into a sequence:
 
->> sbagen -i pink/40 100+1.5/20 200-4/36 400+8/2
+>> sbagen+ -i pink/40 100+1.5/20 200-4/36 400+8/2
 
 This incidentally, is an example of a complex brain-state built from
 pink noise, to which is added three frequencies (1.5Hz, 4Hz and 8Hz)
@@ -247,7 +247,7 @@ correctly.
 
 To test isochronic tones, you can use the @ notation. For example:
 
->> sbagen -i 300@10/20
+>> sbagen+ -i 300@10/20
 
 This creates an isochronic tone with a carrier frequency of 300Hz, pulsing at 
 10Hz (alpha range), with an amplitude of 20%. Unlike binaural beats, isochronic 
@@ -255,19 +255,19 @@ tones can be effective even without headphones.
 
 You can also combine isochronic tones with other sounds:
 
->> sbagen -i pink/40 300@10/20
+>> sbagen+ -i pink/40 300@10/20
 
 This combines pink noise with an isochronic tone in the alpha range.
 
 While you're at it, try the alternate 'spin' effect.  Not everyone
 likes this, but in any case it's there if you want to use it:
 
->> sbagen -i spin:300+4.2/80
+>> sbagen+ -i spin:300+4.2/80
 
 You can also try the 'mixspin' effect, which applies a spatial rotation to
 audio input instead of to pink noise:
 
->> sbagen -m river1.ogg -i mix/80 mixspin:500+8.0/50
+>> sbagen+ -m river1.ogg -i mix/80 mixspin:500+8.0/50
 
 The mixspin effect creates an immersive spatial experience where the sound
 appears to rotate around your head. The width parameter (500μs in this example)
@@ -277,7 +277,7 @@ fast it rotates, and the intensity (50%) controls the strength of the effect.
 You can also try the 'mixpulse' effect, which applies a pulse effect to the
 audio input instead of to pink noise:
 
->> sbagen -m river1.ogg -i mix/80 mixpulse:10/50
+>> sbagen+ -m river1.ogg -i mix/80 mixpulse:10/50
 
 The mixpulse effect creates a rhythmic pulse effect where the sound intensity
 fluctuates at the given rate. The pulse rate is 10Hz and the intensity is 50%.
@@ -286,8 +286,35 @@ If you're having trouble with your soundcard or CPU usage on a very
 old machine, use the -r or -b options to run at a lower output rate or
 bit-width.  For example:
 
->> sbagen -r 8000 -i pink/40 100+1.5/20 200+6/30
->> sbagen -b 8 -i pink/40 100+1.5/20 200+6/30
+>> sbagen+ -r 8000 -i pink/40 100+1.5/20 200+6/30
+>> sbagen+ -b 8 -i pink/40 100+1.5/20 200+6/30
+
+SBaGen+ includes several additional options for enhanced control:
+
+The -V option allows you to set a global volume level from 1 to 100 
+(default is 100). This affects the final output volume without changing 
+the relative amplitudes between different tones in your sequence:
+
+>> sbagen+ -V 50 -i 200+10/20
+>> sbagen+ -V 25 -m river1.ogg -p drop 00ds+ mix/99
+
+The -w option allows you to select the waveform type for binaural beats 
+and isochronic tones. Available options are: sine (default), square, 
+triangle, and sawtooth. Note that sine waves are generally recommended 
+for binaural beats and isochronic tones as they produce the smoothest entrainment effect:
+
+>> sbagen+ -w sine -i 200+10/20      # Default sine wave
+>> sbagen+ -w square -i 200+10/20    # Square wave (more aggressive)
+>> sbagen+ -w triangle -i 200+10/20  # Triangle wave (moderate)
+>> sbagen+ -w sawtooth -i 200+10/20  # Sawtooth wave
+
+The -N option disables automatic amplitude normalization. By default, 
+SBaGen+ automatically normalizes amplitudes when the total exceeds 100% 
+to prevent audio distortion. Using -N allows the original behavior where 
+amplitude totals exceeding 100% may cause clipping and distortion:
+
+>> sbagen+ -N -i pink/60 200+10/50   # May cause distortion if total > 100%
+>> sbagen+ -i pink/60 200+10/50      # Automatically normalized (default)
 
 
 For UNIX and macOS, you'll find that there are a set of short
@@ -308,15 +335,15 @@ the possibilities.
 For all platforms (UNIX, Windows and macOS), the sequence files
 (prog-*) can be used in the same way:
 
->> sbagen prog-NSDWS-example.sbg
+>> sbagen+ prog-NSDWS-example.sbg
 
 Have a play with these sequences.  Some of them are designed to run at
 night, so you will hear nothing if you play them during the day.  You
 get around this by playing them immediately using '-q 1', or '-S' (run
 from start):
 
->> sbagen -q 1 prog-NSDWS-example.sbg
->> sbagen -S prog-NSDWS-example.sbg
+>> sbagen+ -q 1 prog-NSDWS-example.sbg
+>> sbagen+ -S prog-NSDWS-example.sbg
 
 On UNIX and macOS, there are also a few Perl-scripts which you can
 run (p-*).  These generate a sequence on the fly and then run it.  For
@@ -348,17 +375,17 @@ cases headerless raw data is output (to write a WAV file, see the -W
 option below).  For example, to pipe to bplay under UNIX, you could
 use the following:
 
->> sbagen -r 8000 -O -i 100+0.92/30 200+4.2/15 | bplay -S -s 8000 -b 16
+>> sbagen+ -r 8000 -O -i 100+0.92/30 200+4.2/15 | bplay -S -s 8000 -b 16
 
 To output an isochronic tone to a file:
 
->> sbagen -r 44100 -o isochronic-alpha.raw -i 300@10/20
+>> sbagen+ -r 44100 -o isochronic-alpha.raw -i 300@10/20
 
 The -L option allows a time-limit to be set on the output.  So, for
 example, to output 45 minutes of data to a file, and then play it with
 bplay, use:
 
->> sbagen -r 8000 -o out.raw -L 0:45 -i 100+0.92/30 200+4.2/15
+>> sbagen+ -r 8000 -o out.raw -L 0:45 -i 100+0.92/30 200+4.2/15
 >> bplay -S -s 8000 -b 16 out.raw
 
 As an alternative to using -L, it is possible to use -S and -E to
@@ -373,11 +400,11 @@ options (-L or -SE) is also used to fix the length.  The -W option
 should be used in conjunction with -o or -O.  So, repeating the
 examples above using WAV files, we have:
 
->> sbagen -r 8000 -WO -L 1:00 -i 100+0.92/30 200+4.2/15 | bplay
+>> sbagen+ -r 8000 -WO -L 1:00 -i 100+0.92/30 200+4.2/15 | bplay
 
 and:
 
->> sbagen -r 8000 -Wo out.wav -L 0:45 -i 100+0.92/30 200+4.2/15
+>> sbagen+ -r 8000 -Wo out.wav -L 0:45 -i 100+0.92/30 200+4.2/15
 >> bplay out.wav
 
 The -Q option may be useful to turn off the information that the
@@ -387,7 +414,7 @@ If you are using another utility (perl or whatever) to generate the
 sequence-file, you can pipe it directly to the utility, and use '-' as
 the filename.  For example:
 
->> cat prog-chakras-1.sbg | sbagen -
+>> cat prog-chakras-1.sbg | sbagen+ -
 
 For those pushing the utility past its design limits, you may wish to
 use the following options: 
@@ -419,11 +446,11 @@ file, a 16-bit stereo WAV file, or raw 16-bit little-endian stereo
 audio file.  By specifying the -m option, the given file is mixed with
 the generated binaural beats:
 
->> sbagen -m background.wav -i 200+4/1
+>> sbagen+ -m background.wav -i 200+4/1
 
 or
  
->> sbagen -m river1.ogg -i 200+4/1
+>> sbagen+ -m river1.ogg -i 200+4/1
 
 When the soundtrack file ends, sbagen will stop playing.  For loopable
 OGGs, though (see later), the soundtrack goes on forever.  By default
@@ -438,7 +465,7 @@ binaural beats might cause clipping.  However, you can reduce the
 amplitude of the soundtrack using "mix" to fit within the maximum
 total limit of 100.  For example:
 
->> sbagen -m soundtrack.mp3 -i mix/99 200+4/1
+>> sbagen+ -m soundtrack.mp3 -i mix/99 200+4/1
 
 "Mix" entries may also be used in sequence files to fade the
 soundtrack in and out.
@@ -448,7 +475,7 @@ input.  This is useful in combination with other tools that generate
 audio.  For example, you can use 'splay' on UNIX as an external MP3
 player instead of using the built-in one, for example:
 
->> splay -d - background.mp3 | sbagen -M -i mix/99 200+4/1
+>> splay -d - background.mp3 | sbagen+ -M -i mix/99 200+4/1
 
 Piping data in like this has the advantage of not requiring a huge WAV
 file to be stored on your disk.
@@ -462,17 +489,17 @@ endlessly in a random way that provides an endless stream of river
 sounds with no discernable pattern.  These are used with the -m
 option.  For example:
 
-  sbagen -m river1.ogg -i 200+10/1
-  sbagen -m river1.ogg#1 -i 200+10/1
-  sbagen -m river2.ogg -i 200+10/1
-  sbagen -m river2.ogg#1 -i 200+10/1
+  sbagen+ -m river1.ogg -i 200+10/1
+  sbagen+ -m river1.ogg#1 -i 200+10/1
+  sbagen+ -m river2.ogg -i 200+10/1
+  sbagen+ -m river2.ogg#1 -i 200+10/1
 
 The '#1' part allows you to select different looping setups from the
 file.  Each file may have several looping setups, on #0 (the default),
 #1, #2 and so on.  Adding a "mix" spec allows you to control the
 volume level, for example:
 
-  sbagen -m river1.ogg -i 200+10/1 mix/50
+  sbagen+ -m river1.ogg -i 200+10/1 mix/50
 
 Please note that these sound files are released under the Creative
 Commons "Attribution-ShareAlike" licence:
@@ -587,11 +614,11 @@ may be able to measure this, but if not you could try a few
 frequencies and adjust the amplitude by ear until they sound okay.
 For example, you could try the following:
 
-  sbagen -i 160/1
-  sbagen -i 80/1
-  sbagen -i 40/1
-  sbagen -i 30/1
-  sbagen -i 20/1
+  sbagen+ -i 160/1
+  sbagen+ -i 80/1
+  sbagen+ -i 40/1
+  sbagen+ -i 30/1
+  sbagen+ -i 20/1
 
 Now try adjusting the amplitudes of the lower tones to make them
 audible in some way.  Don't overdo it, though -- remember your ears
@@ -983,6 +1010,9 @@ follows:
   -i ...    Generate the whole sequence from an 'immediate' spec
   -p ...    Generate the whole sequence from a prodefined sequence type,
               e.g. -p drop or -p slide
+  -V level  Set global volume level (1-100, default 100)
+  -w type   Set waveform type: sine, square, triangle, sawtooth (default sine)
+  -N        Disable automatic amplitude normalization
 
 The option and its arguments must appear on a line together, and
 several options may be put on one line if you wish, or they may be
@@ -1004,6 +1034,20 @@ To run for 30 minutes from the clock-time of 2pm in the sequence file,
 try this:
 
   -L 0:30 -T 14:00
+
+Additional SBaGen+ options can also be used in sequence files:
+
+To set a custom global volume level (useful for creating quieter sequences):
+
+  -V 50
+
+To use a different waveform type for all binaural beats and isochronic tones:
+
+  -w triangle
+
+To disable automatic amplitude normalization (allows amplitude totals > 100%):
+
+  -N
 
 
 3.1.2: Tone-set definition lines
@@ -1049,9 +1093,12 @@ Here are the different types:
                                       # Binaural tones using a user-defined 
                                       # waveform (*EXPERIMENTAL*, see later)
 
-The amplitudes are expressed on a scale 0-100.  The total of all the
-amplitudes <amp> in a tone-set should not exceed 100, or else there
-will be distortion on output as the waveforms are clipped.
+The amplitudes are expressed on a scale 0-100.  By default, SBaGen+ 
+automatically normalizes amplitudes when the total exceeds 100% to prevent 
+audio distortion. If you want to disable this behavior and allow clipping 
+(which may cause distortion), you can use the -N option. In the original 
+behavior (with -N), if the total of all amplitudes <amp> in a tone-set 
+exceeds 100, there will be distortion on output as the waveforms are clipped.
 
 The binaural tones are based on a carrier frequency (in Hz), which
 should typically be in the range 50 to 1000.  Frequencies above
