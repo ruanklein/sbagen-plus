@@ -699,8 +699,6 @@ main(int argc, char **argv) {
    
    // Process all the options
    rv= scanOptions(&argc, &argv);
-
-   init_sin_table();
    
    if (argc < 1) usage();
    
@@ -716,6 +714,8 @@ main(int argc, char **argv) {
       if (argc < 1) usage();
       readSeq(argc, argv);
    }
+
+   init_sin_table();
    
    if (opt_W && !opt_o && !opt_O)
       error("Use -o or -O with the -W option");
