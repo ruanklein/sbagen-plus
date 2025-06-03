@@ -259,6 +259,28 @@ You can also combine isochronic tones with other sounds:
 
 This combines pink noise with an isochronic tone in the alpha range.
 
+**Testing Individual Waveforms**
+
+You can also test specific waveforms for individual tones using the waveform prefix:
+
+>> sbagen+ -i square:200+10/20
+>> sbagen+ -i triangle:300@8/15
+>> sbagen+ -i sawtooth:150+6/25
+
+Or combine different waveforms in a single test:
+
+>> sbagen+ -i sine:200+10/15 square:300@8/10
+
+This creates a complex soundscape with a sine wave binaural beat, a square wave 
+isochronic tone, and triangle wave modulated pink noise.
+
+To test waveform-modulated spatial effects with background audio:
+
+>> sbagen+ -m river1.ogg -i mix/80 triangle:mixspin:400+6.0/40
+>> sbagen+ -m river1.ogg -i mix/75 square:mixpulse:8/50
+
+These create spatial rotation and pulsing effects with waveform modulation.
+
 While you're at it, try the alternate 'spin' effect.  Not everyone
 likes this, but in any case it's there if you want to use it:
 
@@ -1067,6 +1089,14 @@ Examples:
   theta6: pink/40 150+6/30
   test10: pink/40 100+1.5/30 200-4/27 400+8/1.5
   all-off: -
+  
+  # Examples using individual waveforms:
+  alpha-square: square:200+10/20 pink/30
+  mixed-iso: sine:300@8/15 triangle:150@12/10
+  deep-delta: triangle:80+2/25 sawtooth:brown/20
+  energizing: square:400+15/30 sawtooth:600+20/15 white/10
+  spatial-mix: mix/80 triangle:mixspin:400+6.0/40
+  rhythmic-mix: mix/75 square:mixpulse:8/50
 
 The name starts with a letter, and may continue with letters, numbers,
 '_' or '-'.  Following the colon is a list of one or more tone
@@ -1089,9 +1119,11 @@ Here are the different types:
   mixspin:<width>+<freq>/<intensity>  # Spinning effect on mix input
   mixpulse:<pulse>/<intensity>        # Pulse effect on mix input
   <carrier>@<pulse>/<amp>             # Isochronic tones
-  wave<num>:<carrier><sign><freq>/<amp>
-                                      # Binaural tones using a user-defined 
-                                      # waveform (*EXPERIMENTAL*, see later)
+  <waveform>:<carrier><sign><freq>/<amp> # Binaural tones with specific waveform
+  <waveform>:<carrier>@<pulse>/<amp>  # Isochronic tones with specific waveform
+  <waveform>:<carrier>/<amp>          # Simple tones with specific waveform
+  <waveform>:mixspin:<width>+<freq>/<intensity> # Mixspin with specific waveform modulation
+  <waveform>:mixpulse:<pulse>/<intensity>       # Mixpulse with specific waveform modulation
 
 The amplitudes are expressed on a scale 0-100.  By default, SBaGen+ 
 automatically normalizes amplitudes when the total exceeds 100% to prevent 
@@ -1116,6 +1148,58 @@ decides which channel carries the higher frequency.  I don't think
 this matters, but in case it does, you can change it here.  So, for
 example, 100+4/20 generates tones of 102 and 98 Hz, whereas 100-4/20
 generates tones of 98 and 102 Hz.
+
+**Individual Waveform Specifications**
+
+SBaGen+ supports specifying individual waveforms for each tone in a tone-set 
+definition, allowing you to use different waveform types (sine, square, triangle, 
+sawtooth) for specific tones rather than applying a global waveform with the -w option.
+
+The syntax for individual waveform specifications is:
+
+  <waveform>:<tone-spec>
+
+where <waveform> can be one of: sine, square, triangle, sawtooth
+
+Examples:
+
+  sine:200+10/20          # Binaural beats using sine wave
+  square:300@8/15         # Isochronic tones using square wave  
+  triangle:150-6/25       # Binaural beats using triangle wave
+  sawtooth:400/10         # Simple tone using sawtooth wave
+  triangle:mixspin:400+6.0/40  # Mixspin with triangle wave modulation
+  square:mixpulse:8/60    # Mixpulse with square wave modulation
+
+This feature allows for precise control over the waveform characteristics of 
+individual elements within a tone-set. For example, you might want to use a 
+sine wave for the main binaural beat while using a square wave for an 
+isochronic pulse:
+
+  mixed-waves: sine:200+10/15 square:300@4/10 pink/20
+
+**Waveform Characteristics:**
+
+- **Sine Wave**: Pure fundamental frequency, smooth and gentle, least fatiguing
+- **Square Wave**: Contains odd harmonics (3rd, 5th, 7th, etc.), more penetrating 
+  and aggressive, useful for alertness and concentration
+- **Triangle Wave**: Contains odd harmonics with faster decay than square wave, 
+  providing a middle ground between sine and square
+- **Sawtooth Wave**: Contains both odd and even harmonics, creating a bright, 
+  buzzy sound, useful for energizing effects
+
+When individual waveforms are specified, they override any global waveform 
+setting from the -w command-line option for that specific tone. Tones without 
+explicit waveform specifications will use the global setting (default: sine).
+
+The waveform specification can be applied to:
+- Binaural beats (<carrier><sign><freq>/<amp>)
+- Isochronic tones (<carrier>@<pulse>/<amp>)
+- Simple tones (<carrier>/<amp>)
+- Mixspin effects (triangle:mixspin:<width>+<freq>/<intensity>)
+- Mixpulse effects (square:mixpulse:<pulse>/<intensity>)
+
+Note: For mixspin and mixpulse effects, the waveform modulates the spatial effect 
+intensity, creating pulsing or rhythmic variations in the spatial processing.
 
 The isochronic tones use amplitude modulation of a single carrier frequency
 to create a pulsing effect. The <carrier> is the frequency of the tone in Hz,
@@ -1176,11 +1260,20 @@ The mixspin effect must be used in conjunction with a mix/<amp> specification
 in the same tone set, as it processes the audio input rather than generating
 its own tones. Higher intensity values create more pronounced rotation effects.
 
+Waveforms can also be applied to mixspin effects to modulate the rotation 
+intensity. For example, triangle:mixspin:400+6.0/40 applies a triangle wave 
+modulation to the spinning effect, creating rhythmic variations in the 
+spatial intensity.
+
 The mixpulse effect creates a pulse effect on the audio input stream
 (specified with mix/<amp>). The <pulse> parameter controls the pulse rate in Hz,
 and <intensity> controls the intensity of the effect (0-100%). For example, mixpulse:10/50
 creates a pulse effect with a rate of 10Hz and 50% intensity. This creates a rhythmic
 pulse effect where the sound intensity fluctuates at the given rate.
+
+Waveforms can also be applied to mixpulse effects to shape the pulse envelope.
+For example, square:mixpulse:8/60 uses a square wave to create sharp on/off 
+pulses, while sine:mixpulse:8/60 creates smoother pulsing variations.
 
 Binaural tones generated using wave<num> work just the same way as
 normal binaural tones.  See the section later on for details.
