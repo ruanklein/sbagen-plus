@@ -5,6 +5,11 @@ on:
     branches: [development]
   workflow_dispatch:
 
+permissions:
+  contents: write
+  actions: read
+  packages: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
