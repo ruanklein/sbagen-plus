@@ -1093,7 +1093,6 @@ Examples:
   # Examples using individual waveforms:
   alpha-square: square:200+10/20 pink/30
   mixed-iso: sine:300@8/15 triangle:150@12/10
-  deep-delta: triangle:80+2/25 sawtooth:brown/20
   energizing: square:400+15/30 sawtooth:600+20/15 white/10
   spatial-mix: mix/80 triangle:mixspin:400+6.0/40
   rhythmic-mix: mix/75 square:mixpulse:8/50
