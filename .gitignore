@@ -9,5 +9,6 @@ sbagen+-*
 *.mp3
 *.ogg
 *.log
+*.tmp.c
 
 !/examples/**/*.sbg
