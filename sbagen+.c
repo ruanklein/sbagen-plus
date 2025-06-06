@@ -240,6 +240,8 @@ void CALLBACK win32_audio_callback(HWAVEOUT, UINT, DWORD, DWORD, DWORD);
 OSStatus mac_callback(AudioDeviceID, const AudioTimeStamp *, const AudioBufferList *, 
 		      const AudioTimeStamp *, AudioBufferList *, const AudioTimeStamp *, 
 		      void *inClientData);
+
+void init_mac_audio();
 #endif
 
 #define NL "\n"
@@ -469,7 +471,7 @@ char *pdir;			// Program directory (used as second place to look for -m files)
 #ifdef MAC_AUDIO
  #define BUFFER_COUNT 8
  #define BUFFER_SIZE 4096*4
- char aud_buf[BUFFER_COUNT][BUFFER_SIZE];
+ char *aud_buf[BUFFER_COUNT];
  int aud_rd;	// Next buffer to read out of list (to send to device)
  int aud_wr;	// Next buffer to write.  aud_rd==aud_wr means empty buffer list
  static AudioDeviceID aud_dev;
@@ -660,6 +662,12 @@ void cleanup_mac_audio() {
         AudioDeviceStop(aud_dev, proc_id);
         AudioDeviceDestroyIOProcID(aud_dev, proc_id);
         proc_id = 0;
+    }
+}
+
+void init_mac_audio() {
+    for (int i = 0; i < BUFFER_COUNT; i++) {
+        aud_buf[i] = (char *)Alloc(BUFFER_SIZE);
     }
 }
 #endif
@@ -2517,6 +2525,9 @@ setup_device(void) {
     
     int device_out_rate;
     int buffer_size= opt_B > 0 ? opt_B : 4096; // Default is 2048 samples (L+R)
+
+    // Initialize the audio buffers for Mac here
+    init_mac_audio();
 
     out_bsiz= buffer_size;
     out_blen= out_mode ? out_bsiz/2 : out_bsiz;
