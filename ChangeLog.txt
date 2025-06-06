@@ -4,7 +4,8 @@
 1.5.5: Added global waveform control by -w option.
 1.5.5: Added individual waveform types for binaural, isochronic, bells, spins, mixspin and mixpulse.
 1.5.5: Added an option to add the sbagen+ executable to the PATH environment variable in the Windows installer.
-1.5.5: Fixed a bug with spins. 
+1.5.5: Fixed a bug with spins.
+1.5.5: Fixed a warning about a linker alignment on macOS.
 1.5.5: New icon for Windows and macOS.
 
 1.5.4: Added new spins: bspin and wspin. bspin is a brown noise spin, and wspin is a white noise spin.
