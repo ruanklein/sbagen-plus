@@ -61,7 +61,7 @@ NoticeDescription=Please read this important notice before continuing:
 
 [Tasks]
 Name: "associatewithfiles"; Description: "Associate .sbg files with {#MyAppName}"; GroupDescription: "File associations:";
-Name: "addtopath"; Description: "Add {#MyAppName} to PATH environment variable"; GroupDescription: "System integration:";
+Name: "addtopath"; Description: "Add {#MyAppName} to PATH environment variable"; GroupDescription: "System integration:"; Flags: unchecked
 
 [Files]
 ; Include both 32-bit and 64-bit versions
