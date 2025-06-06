@@ -1532,6 +1532,8 @@ Happy experimenting !!
 Appendix-A: User-defined waveforms
 ----------------------------------
 
+Note: This feature is not related to the functionality of adding waveforms directly to tone sets.
+
 This was a bright idea I had at one point in the distant past, but it
 never worked out.  Some day I think I will cut it out of SBaGen and
 out of these docs, but for now at least it is still here:
