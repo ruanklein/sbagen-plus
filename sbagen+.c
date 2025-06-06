@@ -4172,7 +4172,7 @@ void normalizeAmplitude(Voice *voices, int numChannels, const char *line, int li
     if (voices[ch].typ == 6 || voices[ch].typ == 7) {
       double ampPercentage = voices[ch].amp / 40.96;
       if (ampPercentage > 100.0) {
-        error("Total intensity of mixspin/mixpulse exceeds 100%% (%.2f%%) at line %d:\n  %s\nPlease reduce intensity to prevent audio distortion.", 
+        error("Total intensity of mixspin/mixpulse exceeds 100%% (%.2f%%) at line %d:\n  %s", 
               ampPercentage, lineNum, line);
       }
     }
