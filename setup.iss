@@ -1,5 +1,5 @@
 #define MyAppName "SBaGen+"
-#define MyAppVersion "1.5.4"
+#define MyAppVersion "1.5.5"
 #define MyAppPublisher "Ruan Klein"
 #define MyAppURL "https://github.com/ruanklein/sbagen-plus"
 #define MyAppExeName "sbagen+.exe"
@@ -61,6 +61,7 @@ NoticeDescription=Please read this important notice before continuing:
 
 [Tasks]
 Name: "associatewithfiles"; Description: "Associate .sbg files with {#MyAppName}"; GroupDescription: "File associations:";
+Name: "addtopath"; Description: "Add {#MyAppName} to PATH environment variable"; GroupDescription: "System integration:"; Flags: unchecked
 
 [Files]
 ; Include both 32-bit and 64-bit versions
@@ -123,12 +124,48 @@ Root: HKCU; Subkey: "Software\Classes\{#MyAppAssocKey}\shell\writetoWAV30\comman
 ; Force Windows to refresh shell icons
 Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\{#MyAppAssocExt}"; ValueType: none; ValueName: ""; Flags: deletekey; Tasks: associatewithfiles
 
+; Add installation directory to user PATH
+Root: HKCU; Subkey: "Environment"; ValueType: expandsz; ValueName: "PATH"; ValueData: "{olddata};{app}"; Check: NeedsAddPath('{app}'); Tasks: addtopath
+
 [Run]
 Filename: "{win}\explorer.exe"; Parameters: """{#MyAppUserDocsDir}"""; Description: "Open SBaGen+ folder"; Flags: postinstall nowait skipifsilent shellexec
 
 [Code]
 var
   NoticePage: TOutputMsgMemoWizardPage;
+
+function NeedsAddPath(Param: string): boolean;
+var
+  OrigPath: string;
+begin
+  if RegQueryStringValue(HKEY_CURRENT_USER, 'Environment', 'PATH', OrigPath) then
+  begin
+    { look for the path with leading and trailing semicolon }
+    { Pos() returns 0 if not found }
+    Result := Pos(';' + Param + ';', ';' + OrigPath + ';') = 0;
+  end
+  else
+  begin
+    Result := True;
+  end;
+end;
+
+procedure RemovePath(Path: string);
+var
+  Paths: string;
+  P: Integer;
+begin
+  if RegQueryStringValue(HKEY_CURRENT_USER, 'Environment', 'PATH', Paths) then
+  begin
+    { Remove path from the string }
+    P := Pos(';' + Path + ';', ';' + Paths + ';');
+    if P > 0 then
+    begin
+      Delete(Paths, P - 1, Length(Path) + 1);
+      RegWriteStringValue(HKEY_CURRENT_USER, 'Environment', 'PATH', Paths);
+    end;
+  end;
+end;
 
 procedure InitializeWizard;
 var
@@ -219,5 +256,24 @@ begin
       DeleteFile(ExpandConstant('{app}\sbagen+-win32.exe'));
       DeleteFile(ExpandConstant('{app}\sbagen+-win64.exe'));
     end;
+    
+    { Notify system about PATH changes }
+    if WizardIsTaskSelected('addtopath') then
+    begin
+      { Broadcast WM_SETTINGCHANGE message }
+      MsgBox('SBaGen+ has been added to the PATH environment variable. ' +
+             'You may need to restart running applications for them to ' +
+             'recognize the change.', mbInformation, MB_OK);
+    end;
+  end;
+end;
+
+{ Handle uninstallation - Remove dynamically created files }
+procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
+begin
+  if CurUninstallStep = usPostUninstall then
+  begin
+    { Remove the dynamically created sbagen+.exe file }
+    DeleteFile(ExpandConstant('{app}\sbagen+.exe'));
   end;
 end; 

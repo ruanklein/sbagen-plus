@@ -32,6 +32,7 @@ XVFB_PID=$(pgrep -f "Xvfb $DISPLAY -screen 0 1024x768x16")
 
 # Start Xvfb to provide a virtual display if it's not already running
 if [ -z "$XVFB_PID" ]; then
+    rm -f /tmp/.X${DISPLAY/:/}-lock
     info "Starting Xvfb for headless Wine operation..."
     Xvfb $DISPLAY -screen 0 1024x768x16 & XVFB_PID=$!
     sleep 2  # Wait for Xvfb to start

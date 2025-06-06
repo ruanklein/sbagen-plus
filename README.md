@@ -51,13 +51,13 @@ If you want to use media files (ogg/mp3/wav) with the -m parameter, make sure th
 
 ### ⬇️ Download Pre-built Binaries
 
-The latest release (v1.5.4) can be downloaded directly from the following links:
+The latest release (v1.5.5) can be downloaded directly from the following links:
 
-- Linux ARM64: [sbagen+-linux-arm64](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.4/sbagen+-linux-arm64)
-- Linux 32-bit: [sbagen+-linux32](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.4/sbagen+-linux32)
-- Linux 64-bit: [sbagen+-linux64](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.4/sbagen+-linux64)
-- macOS Installer: [SBaGen+ Installer.dmg](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.4/SBaGen+-Installer.dmg)
-- Windows x86/x86_64 and ARM64: [sbagen+-windows-setup.exe](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.4/sbagen+-windows-setup.exe)
+- Linux ARM64: [sbagen+-linux-arm64](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.5/sbagen+-linux-arm64)
+- Linux 32-bit: [sbagen+-linux32](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.5/sbagen+-linux32)
+- Linux 64-bit: [sbagen+-linux64](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.5/sbagen+-linux64)
+- macOS Installer: [SBaGen+ Installer.dmg](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.5/SBaGen+-Installer.dmg)
+- Windows x86/x86_64 and ARM64: [sbagen+-windows-setup.exe](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.5/sbagen+-windows-setup.exe)
 
   **Important**: Always verify the SHA256 checksum of downloaded binaries against those listed on the [releases page](https://github.com/ruanklein/sbagen-plus/releases) to ensure file integrity and security.
 
@@ -67,13 +67,13 @@ The latest release (v1.5.4) can be downloaded directly from the following links:
 
    ```bash
    # For 64-bit systems
-   wget https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.4/sbagen+-linux64
+   wget https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.5/sbagen+-linux64
 
    # For 32-bit systems
-   wget https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.4/sbagen+-linux32
+   wget https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.5/sbagen+-linux32
 
    # For ARM64 systems
-   wget https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.4/sbagen+-linux-arm64
+   wget https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.5/sbagen+-linux-arm64
    ```
 
 2. Verify the SHA256 checksum:
@@ -103,7 +103,7 @@ The latest release (v1.5.4) can be downloaded directly from the following links:
 
 ### 🍎 Installing on macOS
 
-1. Download the macOS Installer: [SBaGen+ Installer.dmg](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.4/SBaGen+-Installer.dmg)
+1. Download the macOS Installer: [SBaGen+ Installer.dmg](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.5/SBaGen+-Installer.dmg)
 
 2. Verify the SHA256 checksum. You can use the `shasum` command on the terminal to verify the checksum:
 
@@ -137,7 +137,7 @@ sbagen+ -h
 
 1. Download the installer:
 
-   - [sbagen+-windows-setup.exe](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.4/sbagen+-windows-setup.exe)
+   - [sbagen+-windows-setup.exe](https://github.com/ruanklein/sbagen-plus/releases/download/v1.5.5/sbagen+-windows-setup.exe)
 
 2. Verify the SHA256 checksum of the installer. You can use PowerShell or Command Prompt to do this:
 

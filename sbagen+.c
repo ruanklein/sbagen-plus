@@ -30,7 +30,7 @@
 //	FINK project's patches to ESounD, by Shawn Hsiao and Masanori
 //	Sekino.  See: http://fink.sf.net
 
-#define VERSION "1.5.4"
+#define VERSION __VERSION__
 
 // This should be built with one of the following target macros
 // defined, which selects options for that platform, or else with some
@@ -212,7 +212,7 @@ void setupOptC(char *spec) ;
 extern int out_rate, out_rate_def;
 void create_drop(int ac, char **av);
 void create_slide(int ac, char **av);
-void validateTotalAmplitude(Voice *voices, int numChannels, const char *line, int lineNum);
+void normalizeAmplitude(Voice *voices, int numChannels, const char *line, int lineNum);
 void printSequenceDuration();
 void checkMixInSequence(); // Check if mix/<amp> is specified
 void create_noise_spin_effect(
@@ -240,6 +240,8 @@ void CALLBACK win32_audio_callback(HWAVEOUT, UINT, DWORD, DWORD, DWORD);
 OSStatus mac_callback(AudioDeviceID, const AudioTimeStamp *, const AudioBufferList *, 
 		      const AudioTimeStamp *, AudioBufferList *, const AudioTimeStamp *, 
 		      void *inClientData);
+
+void init_mac_audio();
 #endif
 
 #define NL "\n"
@@ -272,6 +274,9 @@ help() {
 	  NL "          -B size   Force buffer size (in samples) for audio output."
     NL "                     (e.g. 1024, 2048, 4096, etc.)"
 #endif
+	  NL "          -N        Disable automatic amplitude normalization (allow clipping)"
+	  NL "          -V        Set the global volume level (Min 1, Max 100. Default 100)"
+    NL "          -w type   Set the global waveform type (sine, square, triangle, sawtooth; default sine)"
 	  NL "          -L time   Select the length of time (hh:mm or hh:mm:ss) to output"
 	  NL "                     for.  Default is to output forever."
 	  NL "          -S        Output from the first tone-set in the sequence (Start),"
@@ -283,8 +288,8 @@ help() {
 	  NL "          -o file   Output raw data to the given file instead of default device"
 	  NL "          -O        Output raw data to the standard output"
 	  NL "          -W        Output a WAV-format file instead of raw data"
-	  NL "          -m file   Read audio data from the given file and mix it with the"
-	  NL "                      generated binaural beats; may be "
+	  NL "          -m file   Read audio data from the given file and mix it with"
+	  NL "                      generated brainwave tones; may be "
 #ifdef OGG_DECODE
 	  "ogg/"
 #endif
@@ -293,7 +298,7 @@ help() {
 #endif
 	  "wav/raw format"
 	  NL "          -M        Read raw audio data from the standard input and mix it"
-	  NL "                      with the generated binaural beats (raw only)"
+	  NL "                      with the generated brainwave tones (raw only)"
 	  NL
 	  NL "          -R rate   Select rate in Hz that frequency changes are recalculated"
 	  NL "                     (for file/pipe output only, default is 10Hz)"
@@ -344,6 +349,7 @@ struct Voice {
   double amp;			// Amplitude level (0-4096 for 0-100%)
   double carr;			// Carrier freq (for binaural/bell/isochronic), width (for spin)
   double res;			// Resonance freq (-ve or +ve) (for binaural/spin/isochronic)
+  int waveform; // 0=sine, 1=square, 2=triangle, 3=sawtooth
 };
 
 struct Channel {
@@ -378,7 +384,8 @@ struct BlockDef {
 #define NS_DITHER 16		// How many bits right to shift the noise for dithering
 #define NS_AMP (ST_AMP<<NS_ADJ)
 #define ST_SIZ 16384		// Number of elements in sine-table (power of 2)
-int *sin_table;
+// int *sin_table;
+int *sin_tables[4]; // 0=sine, 1=square, 2=triangle, 3=sawtooth
 #define AMP_DA(pc) (40.96 * (pc))	// Display value (%age) to ->amp value
 #define AMP_AD(amp) ((amp) / 40.96)	// Amplitude value to display %age
 int *waves[100];		// Pointers are either 0 or point to a sin_table[]-style array of int
@@ -434,6 +441,10 @@ int opt_T= -1;			// Time to start at (for -S option)
 #ifdef MAC_AUDIO
 int opt_B= -1;		// Buffer size override (-1 = auto)
 #endif
+int opt_N= 1;			// Enable automatic amplitude normalization (default)
+int opt_V= 100;			// Global volume level (default 100%)
+int opt_w= 0;			// Waveform type (0 = sine, 1 = square, 2 = triangle, 3 = sawtooth)
+char *waveform_name[] = {"sine", "square", "triangle", "sawtooth"}; // To be used for messages
 
 FILE *mix_in;			// Input stream for mix sound data, or 0
 int mix_cnt;			// Version number from mix filename (#<digits>), or -1
@@ -460,7 +471,7 @@ char *pdir;			// Program directory (used as second place to look for -m files)
 #ifdef MAC_AUDIO
  #define BUFFER_COUNT 8
  #define BUFFER_SIZE 4096*4
- char aud_buf[BUFFER_COUNT][BUFFER_SIZE];
+ char *aud_buf[BUFFER_COUNT];
  int aud_rd;	// Next buffer to read out of list (to send to device)
  int aud_wr;	// Next buffer to write.  aud_rd==aud_wr means empty buffer list
  static AudioDeviceID aud_dev;
@@ -653,6 +664,12 @@ void cleanup_mac_audio() {
         proc_id = 0;
     }
 }
+
+void init_mac_audio() {
+    for (int i = 0; i < BUFFER_COUNT; i++) {
+        aud_buf[i] = (char *)Alloc(BUFFER_SIZE);
+    }
+}
 #endif
 
 //
@@ -689,7 +706,6 @@ main(int argc, char **argv) {
    while (p > pdir && p[-1] != '/' && p[-1] != '\\') *--p= 0;
 
    argc--; argv++;
-   init_sin_table();
    bigendian= ((char*)&test)[0] != 0;
    
    // Process all the options
@@ -709,6 +725,8 @@ main(int argc, char **argv) {
       if (argc < 1) usage();
       readSeq(argc, argv);
    }
+
+   init_sin_table();
    
    if (opt_W && !opt_o && !opt_O)
       error("Use -o or -O with the -W option");
@@ -856,6 +874,22 @@ scanOptions(int *acp, char ***avp) {
        opt_B *= 2;
 	     break;
 #endif
+	  case 'N': opt_N= 0; break;
+	  case 'V':
+	     if (argc-- < 1 || 1 != sscanf(*argv++, "%d %c", &opt_V, &dmy)) 
+		    error("-V expects volume level in percent (0-100)");
+	     if (opt_V < 0 || opt_V > 100)
+		    error("Volume level must be between 0 and 100");
+	     break;
+	  case 'w':
+	     if (argc-- < 1) error("-w expects waveform type (sine, square, triangle, sawtooth)");
+       if (0 == strcmp(*argv, "sine")) opt_w= 0;
+       else if (0 == strcmp(*argv, "square")) opt_w= 1;
+       else if (0 == strcmp(*argv, "triangle")) opt_w= 2;
+       else if (0 == strcmp(*argv, "sawtooth")) opt_w= 3;
+       else error("Unknown waveform: %s (use sine, square, triangle, sawtooth)", *argv);
+       argv++;
+	     break;
 	  case 'c':
 	     if (argc-- < 1) error("-c expects argument");
 	     setupOptC(*argv++);
@@ -1162,8 +1196,8 @@ sprintVoice(char *p, Voice *vp, Voice *dup) {
       if (dup && vp->carr == dup->carr && vp->res == dup->res && vp->amp == dup->amp)
 	return sprintf(p, "  ::");
       if (vp->res == 0)
-	return sprintf(p, " %.2f/%.2f", vp->carr, AMP_AD(vp->amp));
-      return sprintf(p, " %.2f%+.2f/%.2f", vp->carr, vp->res, AMP_AD(vp->amp));
+	return sprintf(p, " %s:%.2f/%.2f", waveform_name[vp->waveform], vp->carr, AMP_AD(vp->amp));
+      return sprintf(p, " %s:%.2f%+.2f/%.2f", waveform_name[vp->waveform], vp->carr, vp->res, AMP_AD(vp->amp));
     case 2:
       if (dup && vp->amp == dup->amp)
 	return sprintf(p, "  ::");
@@ -1179,11 +1213,11 @@ sprintVoice(char *p, Voice *vp, Voice *dup) {
     case 3:
       if (dup && vp->carr == dup->carr && vp->amp == dup->amp)
 	return sprintf(p, "  ::");
-      return sprintf(p, " bell%.2f/%.2f", vp->carr, AMP_AD(vp->amp));
+      return sprintf(p, " %s:bell%.2f/%.2f", waveform_name[vp->waveform], vp->carr, AMP_AD(vp->amp));
     case 4:
       if (dup && vp->carr == dup->carr && vp->res == dup->res && vp->amp == dup->amp)
 	return sprintf(p, "  ::");
-      return sprintf(p, " spin:%.2f%+.2f/%.2f", vp->carr, vp->res, AMP_AD(vp->amp));
+      return sprintf(p, " %s:spin:%.2f%+.2f/%.2f", waveform_name[vp->waveform], vp->carr, vp->res, AMP_AD(vp->amp));
     case 5:
       if (dup && vp->amp == dup->amp)
 	return sprintf(p, "  ::");
@@ -1191,23 +1225,23 @@ sprintVoice(char *p, Voice *vp, Voice *dup) {
     case 8:  // Isochronic tones
       if (dup && vp->carr == dup->carr && vp->res == dup->res && vp->amp == dup->amp)
 	return sprintf(p, "  ::");
-      return sprintf(p, " %.2f@%.2f/%.2f", vp->carr, vp->res, AMP_AD(vp->amp));
+      return sprintf(p, " %s:%.2f@%.2f/%.2f", waveform_name[vp->waveform], vp->carr, vp->res, AMP_AD(vp->amp));
     case 6:  // Mixspin - spinning mix stream
       if (dup && vp->carr == dup->carr && vp->res == dup->res && vp->amp == dup->amp)
 	return sprintf(p, "  ::");
-      return sprintf(p, " mixspin:%.2f%+.2f/%.2f", vp->carr, vp->res, AMP_AD(vp->amp));
+      return sprintf(p, " %s:mixspin:%.2f%+.2f/%.2f", waveform_name[vp->waveform], vp->carr, vp->res, AMP_AD(vp->amp));
     case 7:  // Mixpulse - mix stream with pulse effect
       if (dup && vp->res == dup->res && vp->amp == dup->amp)
 	return sprintf(p, "  ::");
-      return sprintf(p, " mixpulse:%.2f/%.2f", vp->res, AMP_AD(vp->amp));
+      return sprintf(p, " %s:mixpulse:%.2f/%.2f", waveform_name[vp->waveform], vp->res, AMP_AD(vp->amp));
     case 11:  // Bspin - spinning brown noise
       if (dup && vp->carr == dup->carr && vp->res == dup->res && vp->amp == dup->amp)
 	return sprintf(p, "  ::");
-      return sprintf(p, " bspin:%.2f%+.2f/%.2f", vp->carr, vp->res, AMP_AD(vp->amp));
+      return sprintf(p, " %s:bspin:%.2f%+.2f/%.2f", waveform_name[vp->waveform], vp->carr, vp->res, AMP_AD(vp->amp));
     case 12:  // Wspin - spinning white noise
       if (dup && vp->amp == dup->amp)
 	return sprintf(p, "  ::");
-      return sprintf(p, " wspin:%.2f%+.2f/%.2f", vp->carr, vp->res, AMP_AD(vp->amp));
+      return sprintf(p, " %s:wspin:%.2f%+.2f/%.2f", waveform_name[vp->waveform], vp->carr, vp->res, AMP_AD(vp->amp));
     default:
       if (vp->typ < -100 || vp->typ > -1)
 	return sprintf(p, " ???");
@@ -1219,13 +1253,43 @@ sprintVoice(char *p, Voice *vp, Voice *dup) {
 
 void 
 init_sin_table() {
-  int a;
-  int *arr= (int*)Alloc(ST_SIZ * sizeof(int));
+  int a, waveform;
+  
+  // Initialize all 4 waveform tables
+  for (waveform = 0; waveform < 4; waveform++) {
+    int *arr = (int*)Alloc(ST_SIZ * sizeof(int));
+    
+    for (a = 0; a < ST_SIZ; a++) {
+      double phase = (a * 2.0 * 3.14159265358979323846) / ST_SIZ;
+      double val;
+      
+      switch(waveform) {
+        case 0: // Sine
+          val = sin(phase);
+          break;
+        case 1: // Square
+          val = (sin(phase) >= 0) ? 1.0 : -1.0;
+          break;
+        case 2: // Triangle
+          if (phase < 3.14159265358979323846)
+            val = (2.0 * phase / 3.14159265358979323846) - 1.0;
+          else
+            val = 3.0 - (2.0 * phase / 3.14159265358979323846);
+          break;
+        case 3: // Sawtooth
+          val = (2.0 * phase / (2.0 * 3.14159265358979323846)) - 1.0;
+          break;
+        default:
+          val = sin(phase);
+      }
+      
+      arr[a] = (int)(ST_AMP * val);
+    }
+    
+    sin_tables[waveform] = arr;
+  }
 
-  for (a= 0; a<ST_SIZ; a++)
-    arr[a]= (int)(ST_AMP * sin((a * 3.14159265358979323846 * 2) / ST_SIZ));
-
-  sin_table= arr;
+  // sin_table = sin_tables[opt_w];
 }
 
 void 
@@ -1624,10 +1688,12 @@ outChunk() {
        case 1:	// Binaural tones
 	  ch->off1 += ch->inc1;
 	  ch->off1 &= (ST_SIZ << 16) - 1;
-	  tot1 += ch->amp * sin_table[ch->off1 >> 16];
+	  // tot1 += ch->amp * sin_table[ch->off1 >> 16];
+	  tot1 += ch->amp * sin_tables[ch->v.waveform][ch->off1 >> 16];
 	  ch->off2 += ch->inc2;
 	  ch->off2 &= (ST_SIZ << 16) - 1;
-	  tot2 += ch->amp2 * sin_table[ch->off2 >> 16];
+	  // tot2 += ch->amp2 * sin_table[ch->off2 >> 16];
+	  tot2 += ch->amp2 * sin_tables[ch->v.waveform][ch->off2 >> 16];
 	  break;
        case 2:	// Pink noise
 	  val= ns * ch->amp;
@@ -1648,7 +1714,8 @@ outChunk() {
 	  if (ch->off2) {
 	     ch->off1 += ch->inc1;
 	     ch->off1 &= (ST_SIZ << 16) - 1;
-	     val= ch->off2 * sin_table[ch->off1 >> 16];
+	     // val= ch->off2 * sin_table[ch->off1 >> 16];
+	     val= ch->off2 * sin_tables[ch->v.waveform][ch->off1 >> 16];
 	     tot1 += val; tot2 += val;
 	     if (--ch->inc2 < 0) {
 		ch->inc2= out_rate/20;
@@ -1659,9 +1726,14 @@ outChunk() {
        case 4:	// Spinning pink noise
 	  ch->off1 += ch->inc1;
 	  ch->off1 &= (ST_SIZ << 16) - 1;
-	  val= (ch->inc2 * sin_table[ch->off1 >> 16]) >> 24;
-	  
-	  create_noise_spin_effect(4, ch->amp, val, &tot1, &tot2);
+	  // val= (ch->inc2 * sin_table[ch->off1 >> 16]) >> 24;
+	  val= (ch->inc2 * sin_tables[ch->v.waveform][ch->off1 >> 16]) >> 24;
+	  {
+      int spin_left, spin_right;
+      create_noise_spin_effect(4, ch->amp, val, &spin_left, &spin_right);
+      tot1 += spin_left;
+      tot2 += spin_right;
+    }
 	  break;
        case 5:	// Mix level
 	  tot1 += mix1 * ch->amp;
@@ -1670,7 +1742,8 @@ outChunk() {
        case 6:	// Mixspin - spinning mix stream
 	  ch->off1 += ch->inc1;
 	  ch->off1 &= (ST_SIZ << 16) - 1;
-	  val= (ch->inc2 * sin_table[ch->off1 >> 16]) >> 24;
+	  // val= (ch->inc2 * sin_table[ch->off1 >> 16]) >> 24;
+	  val= (ch->inc2 * sin_tables[ch->v.waveform][ch->off1 >> 16]) >> 24;
 	  
 	  // Mixspin intensity control
 	  {
@@ -1714,7 +1787,7 @@ outChunk() {
           
           // Create the isochronic pulse effect in the audio stream
           {
-            int mod_val = sin_table[ch->off2 >> 16];
+            int mod_val = sin_tables[ch->v.waveform][ch->off2 >> 16];
             // Apply a threshold to create distinct pulses with space between them
             double mod_factor = 0.0;
             
@@ -1752,7 +1825,7 @@ outChunk() {
           
           // Change the modulator to create a true isochronic tone with space between pulses
           {
-            int mod_val = sin_table[ch->off2 >> 16];
+            int mod_val = sin_tables[ch->v.waveform][ch->off2 >> 16];
             // Apply a threshold to create distinct pulses with space between them
             // Only produce sound when the modulation value is above a certain threshold
             double mod_factor = 0.0;
@@ -1767,7 +1840,8 @@ outChunk() {
             }
             
             // Apply the modulation to the carrier
-            val = ch->amp * sin_table[ch->off1 >> 16] * mod_factor;
+            // val = ch->amp * sin_table[ch->off1 >> 16] * mod_factor;
+            val = ch->amp * sin_tables[ch->v.waveform][ch->off1 >> 16] * mod_factor;
             tot1 += val;
             tot2 += val;
           }
@@ -1775,16 +1849,28 @@ outChunk() {
        case 11:  // Bspin - spinning brown noise
           ch->off1 += ch->inc1;
           ch->off1 &= (ST_SIZ << 16) - 1;
-          val= (ch->inc2 * sin_table[ch->off1 >> 16]) >> 24;
+          // val= (ch->inc2 * sin_table[ch->off1 >> 16]) >> 24;
+          val= (ch->inc2 * sin_tables[ch->v.waveform][ch->off1 >> 16]) >> 24;
           
-          create_noise_spin_effect(11, ch->amp, val, &tot1, &tot2);
+          {
+            int spin_left, spin_right;
+            create_noise_spin_effect(11, ch->amp, val, &spin_left, &spin_right);
+            tot1 += spin_left;
+            tot2 += spin_right;
+          }
           break;
        case 12:  // Wspin - spinning white noise
           ch->off1 += ch->inc1;
           ch->off1 &= (ST_SIZ << 16) - 1;
-          val= (ch->inc2 * sin_table[ch->off1 >> 16]) >> 24;
+          // val= (ch->inc2 * sin_table[ch->off1 >> 16]) >> 24;
+          val= (ch->inc2 * sin_tables[ch->v.waveform][ch->off1 >> 16]) >> 24;
           
-          create_noise_spin_effect(12, ch->amp, val, &tot1, &tot2);
+          {
+            int spin_left, spin_right;
+            create_noise_spin_effect(12, ch->amp, val, &spin_left, &spin_right);
+            tot1 += spin_left;
+            tot2 += spin_right;
+          }
           break;
        default:	// Waveform-based binaural tones
 	  tab= waves[-1 - ch->typ];
@@ -1795,6 +1881,12 @@ outChunk() {
 	  ch->off2 &= (ST_SIZ << 16) - 1;
 	  tot2 += ch->amp * tab[ch->off2 >> 16];
 	  break;
+      }
+
+      // Apply volume level
+      if (opt_V != 100) {
+        tot1 = ((long long)tot1 * opt_V + 50) / 100;
+        tot2 = ((long long)tot2 * opt_V + 50) / 100;
       }
 
       // White noise dither; you could also try (rand0-rand1) for a
@@ -2045,13 +2137,16 @@ corrVal(int running) {
 	  vv->amp= rat0 * v0->amp + rat1 * v1->amp;
 	  vv->carr= rat0 * v0->carr + rat1 * v1->carr;
 	  vv->res= rat0 * v0->res + rat1 * v1->res;
+	  vv->waveform= v0->waveform;
 	  break;
        case 2:
 	  vv->amp= rat0 * v0->amp + rat1 * v1->amp;
+	  vv->waveform= v0->waveform;
 	  break;
        case 3:
 	  vv->amp= v0->amp;		// No need to slide, as bell only rings briefly
 	  vv->carr= v0->carr;
+	  vv->waveform= v0->waveform;
 	  break;
        case 4:
 	  vv->amp= rat0 * v0->amp + rat1 * v1->amp;
@@ -2059,14 +2154,17 @@ corrVal(int running) {
 	  vv->res= rat0 * v0->res + rat1 * v1->res;
 	  if (vv->carr > spin_carr_max) vv->carr= spin_carr_max; // Clipping sweep width
 	  if (vv->carr < -spin_carr_max) vv->carr= -spin_carr_max;
+	  vv->waveform= v0->waveform;
 	  break;
        case 5:
 	  vv->amp= rat0 * v0->amp + rat1 * v1->amp;
+	  vv->waveform= v0->waveform;
 	  break;
        case 8:  // Isochronic tones
           vv->amp= rat0 * v0->amp + rat1 * v1->amp;
           vv->carr= rat0 * v0->carr + rat1 * v1->carr;
           vv->res= rat0 * v0->res + rat1 * v1->res;
+          vv->waveform= v0->waveform;
           break;
        case 6:  // Mixspin
           vv->amp= rat0 * v0->amp + rat1 * v1->amp;
@@ -2074,10 +2172,12 @@ corrVal(int running) {
           vv->res= rat0 * v0->res + rat1 * v1->res;
           if (vv->carr > spin_carr_max) vv->carr= spin_carr_max; // Clipping sweep width
           if (vv->carr < -spin_carr_max) vv->carr= -spin_carr_max;
+          vv->waveform= v0->waveform;
           break;
        case 7:  // Mixpulse
           vv->amp= rat0 * v0->amp + rat1 * v1->amp;
           vv->res= rat0 * v0->res + rat1 * v1->res;
+          vv->waveform= v0->waveform;
           break;
        case 11:  // Bspin - spinning brown noise
           vv->amp= rat0 * v0->amp + rat1 * v1->amp;
@@ -2085,6 +2185,7 @@ corrVal(int running) {
 	        vv->res= rat0 * v0->res + rat1 * v1->res;
 	        if (vv->carr > spin_carr_max) vv->carr= spin_carr_max; // Clipping sweep width
 	        if (vv->carr < -spin_carr_max) vv->carr= -spin_carr_max;
+          vv->waveform= v0->waveform;
           break;
        case 12:  // Wspin - spinning white noise
          vv->amp= rat0 * v0->amp + rat1 * v1->amp;
@@ -2092,6 +2193,7 @@ corrVal(int running) {
 	       vv->res= rat0 * v0->res + rat1 * v1->res;
 	       if (vv->carr > spin_carr_max) vv->carr= spin_carr_max; // Clipping sweep width
 	       if (vv->carr < -spin_carr_max) vv->carr= -spin_carr_max;
+         vv->waveform= v0->waveform;
          break;
        default:		// Waveform based binaural
 	  vv->amp= rat0 * v0->amp + rat1 * v1->amp;
@@ -2212,6 +2314,14 @@ corrVal(int running) {
 
 void 
 setup_device(void) {
+
+  if (!opt_Q && opt_V != 100) {
+    warn("Global volume level set to %d%%", opt_V);
+  }
+
+  if (!opt_Q && opt_w != 0) {
+   warn("Using global %s waveform for brainwave tones", waveform_name[opt_w]);
+  }
 
   // Handle output to files and pipes
   if (opt_O || opt_o) {
@@ -2415,6 +2525,9 @@ setup_device(void) {
     
     int device_out_rate;
     int buffer_size= opt_B > 0 ? opt_B : 4096; // Default is 2048 samples (L+R)
+
+    // Initialize the audio buffers for Mac here
+    init_mac_audio();
 
     out_bsiz= buffer_size;
     out_blen= out_mode ? out_bsiz/2 : out_bsiz;
@@ -2887,6 +3000,7 @@ correctPeriods() {
 	  Voice *vq= &qq->v0[a];
 	  if ((fo == 0 || fi == 0) ||		// Fade in/out to silence
 	      (vp->typ != vq->typ) ||		// Different types
+        (vp->waveform != vq->waveform) || // Different waveforms
 	      ((fo == 1 || fi == 1) &&		// Fade thru, but different pitches
 	       (vp->typ == 1 || vp->typ < 0) && 
 	       (vp->carr != vq->carr || vp->res != vq->res))
@@ -3105,7 +3219,7 @@ readNameDef() {
 	   printf("%d %g\n", a, arr[a] * 1.0 / ST_AMP);
      }
      return;
-  } 
+  }
 
   // Must be block or tone-set, then, so put into a NameDef
   nd= (NameDef*)Alloc(sizeof(NameDef));
@@ -3155,21 +3269,53 @@ readNameDef() {
     if (0 == strcmp(p, "-")) continue;
     if (1 == sscanf(p, "pink/%lf %c", &amp, &dmy)) {
        nd->vv[ch].typ= 2;
+       nd->vv[ch].waveform= opt_w;
        nd->vv[ch].amp= AMP_DA(amp);
        continue;
     }
     if (1 == sscanf(p, "white/%lf %c", &amp, &dmy)) {
        nd->vv[ch].typ= 9;
+       nd->vv[ch].waveform= opt_w;
        nd->vv[ch].amp= AMP_DA(amp);
        continue;
     }
     if (1 == sscanf(p, "brown/%lf %c", &amp, &dmy)) {
        nd->vv[ch].typ= 10;
+       nd->vv[ch].waveform= opt_w;
        nd->vv[ch].amp= AMP_DA(amp);
        continue;
     }
     if (2 == sscanf(p, "bell%lf/%lf %c", &carr, &amp, &dmy)) {
        nd->vv[ch].typ= 3;
+       nd->vv[ch].waveform= opt_w;
+       nd->vv[ch].carr= carr;
+       nd->vv[ch].amp= AMP_DA(amp);
+       continue;
+    }
+    if (2 == sscanf(p, "sine:bell%lf/%lf %c", &carr, &amp, &dmy)) {
+       nd->vv[ch].typ= 3;
+       nd->vv[ch].waveform= 0; // Sine
+       nd->vv[ch].carr= carr;
+       nd->vv[ch].amp= AMP_DA(amp);
+       continue;
+    }
+    if (2 == sscanf(p, "square:bell%lf/%lf %c", &carr, &amp, &dmy)) {
+       nd->vv[ch].typ= 3;
+       nd->vv[ch].waveform= 1; // Square
+       nd->vv[ch].carr= carr;
+       nd->vv[ch].amp= AMP_DA(amp);
+       continue;
+    }
+    if (2 == sscanf(p, "triangle:bell%lf/%lf %c", &carr, &amp, &dmy)) {
+       nd->vv[ch].typ= 3;
+       nd->vv[ch].waveform= 2; // Triangle
+       nd->vv[ch].carr= carr;
+       nd->vv[ch].amp= AMP_DA(amp);
+       continue;
+    }
+    if (2 == sscanf(p, "sawtooth:bell%lf/%lf %c", &carr, &amp, &dmy)) {
+       nd->vv[ch].typ= 3;
+       nd->vv[ch].waveform= 3; // Sawtooth
        nd->vv[ch].carr= carr;
        nd->vv[ch].amp= AMP_DA(amp);
        continue;
@@ -3191,29 +3337,197 @@ readNameDef() {
        nd->vv[ch].amp= AMP_DA(amp);	
        continue;
     }
-    if (3 == sscanf(p, "%lf@%lf/%lf %c", &carr, &res, &amp, &dmy)) {
-       nd->vv[ch].typ= 8;  // Isochronic
-       nd->vv[ch].carr= carr;
-       nd->vv[ch].res= res;
-       nd->vv[ch].amp= AMP_DA(amp);	
-       continue;
-    }
-    if (3 == sscanf(p, "%lf%lf/%lf %c", &carr, &res, &amp, &dmy)) {
-      nd->vv[ch].typ= 1;
+    if (3 == sscanf(p, "sine:%lf@%lf/%lf %c", &carr, &res, &amp, &dmy)) {
+      nd->vv[ch].typ= 8; // Isochronic
+      nd->vv[ch].waveform= 0; // Sine
       nd->vv[ch].carr= carr;
       nd->vv[ch].res= res;
       nd->vv[ch].amp= AMP_DA(amp);	
       continue;
     }
-    if (2 == sscanf(p, "%lf/%lf %c", &carr, &amp, &dmy)) {
+    if (3 == sscanf(p, "square:%lf@%lf/%lf %c", &carr, &res, &amp, &dmy)) {
+      nd->vv[ch].typ= 8; // Isochronic
+      nd->vv[ch].waveform= 1; // Square
+      nd->vv[ch].carr= carr;
+      nd->vv[ch].res= res;
+      nd->vv[ch].amp= AMP_DA(amp);	
+      continue;
+    }
+    if (3 == sscanf(p, "triangle:%lf@%lf/%lf %c", &carr, &res, &amp, &dmy)) {
+      nd->vv[ch].typ= 8; // Isochronic
+      nd->vv[ch].waveform= 2; // Triangle
+      nd->vv[ch].carr= carr;
+      nd->vv[ch].res= res;
+      nd->vv[ch].amp= AMP_DA(amp);	
+      continue;
+    }
+    if (3 == sscanf(p, "sawtooth:%lf@%lf/%lf %c", &carr, &res, &amp, &dmy)) {
+      nd->vv[ch].typ= 8; // Isochronic
+      nd->vv[ch].waveform= 3; // Sawtooth
+      nd->vv[ch].carr= carr;
+      nd->vv[ch].res= res;
+      nd->vv[ch].amp= AMP_DA(amp);	
+      continue;
+    }
+    if (3 == sscanf(p, "%lf@%lf/%lf %c", &carr, &res, &amp, &dmy)) {
+       nd->vv[ch].typ= 8;  // Isochronic
+       nd->vv[ch].waveform= opt_w;
+       nd->vv[ch].carr= carr;
+       nd->vv[ch].res= res;
+       nd->vv[ch].amp= AMP_DA(amp);
+       continue;
+    }
+    if (3 == sscanf(p, "sine:%lf%lf/%lf %c", &carr, &res, &amp, &dmy)) {
       nd->vv[ch].typ= 1;
+      nd->vv[ch].waveform= 0; // Sine
+      nd->vv[ch].carr= carr;
+      nd->vv[ch].res= res;
+      nd->vv[ch].amp= AMP_DA(amp);	
+      continue;
+    }
+    if (3 == sscanf(p, "square:%lf%lf/%lf %c", &carr, &res, &amp, &dmy)) {
+      nd->vv[ch].typ= 1;
+      nd->vv[ch].waveform= 1; // Square
+      nd->vv[ch].carr= carr;
+      nd->vv[ch].res= res;
+      nd->vv[ch].amp= AMP_DA(amp);	
+      continue;
+    }
+    if (3 == sscanf(p, "triangle:%lf%lf/%lf %c", &carr, &res, &amp, &dmy)) {
+      nd->vv[ch].typ= 1;
+      nd->vv[ch].waveform= 2; // Triangle
+      nd->vv[ch].carr= carr;
+      nd->vv[ch].res= res;
+      nd->vv[ch].amp= AMP_DA(amp);	
+      continue;
+    }
+    if (3 == sscanf(p, "sawtooth:%lf%lf/%lf %c", &carr, &res, &amp, &dmy)) {
+      nd->vv[ch].typ= 1;
+      nd->vv[ch].waveform= 3; // Sawtooth
+      nd->vv[ch].carr= carr;
+      nd->vv[ch].res= res;
+      nd->vv[ch].amp= AMP_DA(amp);	
+      continue;
+    }
+    if (3 == sscanf(p, "%lf%lf/%lf %c", &carr, &res, &amp, &dmy)) {
+      nd->vv[ch].typ= 1;
+      nd->vv[ch].waveform= opt_w;
+      nd->vv[ch].carr= carr;
+      nd->vv[ch].res= res;
+      nd->vv[ch].amp= AMP_DA(amp);	
+      continue;
+    }
+    if (2 == sscanf(p, "sine:%lf/%lf %c", &carr, &amp, &dmy)) {
+      nd->vv[ch].typ= 1;
+      nd->vv[ch].waveform= 0; // Sine
       nd->vv[ch].carr= carr;
       nd->vv[ch].res= 0;
       nd->vv[ch].amp= AMP_DA(amp);	
       continue;
     }
+    if (2 == sscanf(p, "square:%lf/%lf %c", &carr, &amp, &dmy)) {
+      nd->vv[ch].typ= 1;
+      nd->vv[ch].waveform= 1; // Square
+      nd->vv[ch].carr= carr;
+      nd->vv[ch].res= 0;
+      nd->vv[ch].amp= AMP_DA(amp);	
+      continue;
+    }
+    if (2 == sscanf(p, "triangle:%lf/%lf %c", &carr, &amp, &dmy)) {
+      nd->vv[ch].typ= 1;
+      nd->vv[ch].waveform= 2; // Triangle
+      nd->vv[ch].carr= carr;
+      nd->vv[ch].res= 0;
+      nd->vv[ch].amp= AMP_DA(amp);	
+      continue;
+    }
+    if (2 == sscanf(p, "sawtooth:%lf/%lf %c", &carr, &amp, &dmy)) {
+      nd->vv[ch].typ= 1;
+      nd->vv[ch].waveform= 3; // Sawtooth
+      nd->vv[ch].carr= carr;
+      nd->vv[ch].res= 0;
+      nd->vv[ch].amp= AMP_DA(amp);	
+      continue;
+    }
+    if (2 == sscanf(p, "%lf/%lf %c", &carr, &amp, &dmy)) {
+      nd->vv[ch].typ= 1;
+      nd->vv[ch].waveform= opt_w;
+      nd->vv[ch].carr= carr;
+      nd->vv[ch].res= 0;
+      nd->vv[ch].amp= AMP_DA(amp);	
+      continue;
+    }
+    if (3 == sscanf(p, "sine:spin:%lf%lf/%lf %c", &carr, &res, &amp, &dmy)) {
+      nd->vv[ch].typ= 4;
+      nd->vv[ch].waveform= 0; // Sine
+      nd->vv[ch].carr= carr;
+      nd->vv[ch].res= res;
+      nd->vv[ch].amp= AMP_DA(amp);	
+      continue;
+    }
+    if (3 == sscanf(p, "square:spin:%lf%lf/%lf %c", &carr, &res, &amp, &dmy)) {
+      nd->vv[ch].typ= 4;
+      nd->vv[ch].waveform= 1; // Square
+      nd->vv[ch].carr= carr;
+      nd->vv[ch].res= res;
+      nd->vv[ch].amp= AMP_DA(amp);	
+      continue;
+    }
+    if (3 == sscanf(p, "triangle:spin:%lf%lf/%lf %c", &carr, &res, &amp, &dmy)) {
+      nd->vv[ch].typ= 4;
+      nd->vv[ch].waveform= 2; // Triangle
+      nd->vv[ch].carr= carr;
+      nd->vv[ch].res= res;
+      nd->vv[ch].amp= AMP_DA(amp);	
+      continue;
+    }
+    if (3 == sscanf(p, "sawtooth:spin:%lf%lf/%lf %c", &carr, &res, &amp, &dmy)) {
+      nd->vv[ch].typ= 4;
+      nd->vv[ch].waveform= 3; // Sawtooth
+      nd->vv[ch].carr= carr;
+      nd->vv[ch].res= res;
+      nd->vv[ch].amp= AMP_DA(amp);	
+      continue;
+    }
     if (3 == sscanf(p, "spin:%lf%lf/%lf %c", &carr, &res, &amp, &dmy)) {
       nd->vv[ch].typ= 4;
+      nd->vv[ch].waveform= opt_w;
+      nd->vv[ch].carr= carr;
+      nd->vv[ch].res= res;
+      nd->vv[ch].amp= AMP_DA(amp);	
+      continue;
+    }
+    if (3 == sscanf(p, "sine:mixspin:%lf%lf/%lf %c", &carr, &res, &amp, &dmy)) {
+      checkMixInSequence();
+      nd->vv[ch].typ= 6;
+      nd->vv[ch].waveform= 0; // Sine
+      nd->vv[ch].carr= carr;
+      nd->vv[ch].res= res;
+      nd->vv[ch].amp= AMP_DA(amp);	
+      continue;
+    }
+    if (3 == sscanf(p, "square:mixspin:%lf%lf/%lf %c", &carr, &res, &amp, &dmy)) {
+      checkMixInSequence();
+      nd->vv[ch].typ= 6;
+      nd->vv[ch].waveform= 1; // Square
+      nd->vv[ch].carr= carr;
+      nd->vv[ch].res= res;
+      nd->vv[ch].amp= AMP_DA(amp);	
+      continue;
+    }
+    if (3 == sscanf(p, "triangle:mixspin:%lf%lf/%lf %c", &carr, &res, &amp, &dmy)) {
+      checkMixInSequence();
+      nd->vv[ch].typ= 6;
+      nd->vv[ch].waveform= 2; // Triangle
+      nd->vv[ch].carr= carr;
+      nd->vv[ch].res= res;
+      nd->vv[ch].amp= AMP_DA(amp);	
+      continue;
+    }
+    if (3 == sscanf(p, "sawtooth:mixspin:%lf%lf/%lf %c", &carr, &res, &amp, &dmy)) {
+      checkMixInSequence();
+      nd->vv[ch].typ= 6;
+      nd->vv[ch].waveform= 3; // Sawtooth
       nd->vv[ch].carr= carr;
       nd->vv[ch].res= res;
       nd->vv[ch].amp= AMP_DA(amp);	
@@ -3222,7 +3536,40 @@ readNameDef() {
     if (3 == sscanf(p, "mixspin:%lf%lf/%lf %c", &carr, &res, &amp, &dmy)) {
       checkMixInSequence();
       nd->vv[ch].typ= 6;
+      nd->vv[ch].waveform= opt_w;
       nd->vv[ch].carr= carr;
+      nd->vv[ch].res= res;
+      nd->vv[ch].amp= AMP_DA(amp);	
+      continue;
+    }
+    if (2 == sscanf(p, "sine:mixpulse:%lf/%lf %c", &res, &amp, &dmy)) {
+      checkMixInSequence();
+      nd->vv[ch].typ= 7;
+      nd->vv[ch].waveform= 0; // Sine
+      nd->vv[ch].res= res;
+      nd->vv[ch].amp= AMP_DA(amp);	
+      continue;
+    }
+    if (2 == sscanf(p, "square:mixpulse:%lf/%lf %c", &res, &amp, &dmy)) {
+      checkMixInSequence();
+      nd->vv[ch].typ= 7;
+      nd->vv[ch].waveform= 1; // Square
+      nd->vv[ch].res= res;
+      nd->vv[ch].amp= AMP_DA(amp);	
+      continue;
+    }
+    if (2 == sscanf(p, "triangle:mixpulse:%lf/%lf %c", &res, &amp, &dmy)) {
+      checkMixInSequence();
+      nd->vv[ch].typ= 7;
+      nd->vv[ch].waveform= 2; // Triangle
+      nd->vv[ch].res= res;
+      nd->vv[ch].amp= AMP_DA(amp);	
+      continue;
+    }
+    if (2 == sscanf(p, "sawtooth:mixpulse:%lf/%lf %c", &res, &amp, &dmy)) {
+      checkMixInSequence();
+      nd->vv[ch].typ= 7;
+      nd->vv[ch].waveform= 3; // Sawtooth
       nd->vv[ch].res= res;
       nd->vv[ch].amp= AMP_DA(amp);	
       continue;
@@ -3230,12 +3577,78 @@ readNameDef() {
     if (2 == sscanf(p, "mixpulse:%lf/%lf %c", &res, &amp, &dmy)) {
       checkMixInSequence();
       nd->vv[ch].typ= 7;
+      nd->vv[ch].waveform= opt_w;
+      nd->vv[ch].res= res;
+      nd->vv[ch].amp= AMP_DA(amp);	
+      continue;
+    }
+    if (3 == sscanf(p, "sine:bspin:%lf%lf/%lf %c", &carr, &res, &amp, &dmy)) {
+      nd->vv[ch].typ= 11;
+      nd->vv[ch].waveform= 0; // Sine
+      nd->vv[ch].carr= carr;
+      nd->vv[ch].res= res;
+      nd->vv[ch].amp= AMP_DA(amp);	
+      continue;
+    }
+    if (3 == sscanf(p, "square:bspin:%lf%lf/%lf %c", &carr, &res, &amp, &dmy)) {
+      nd->vv[ch].typ= 11;
+      nd->vv[ch].waveform= 1; // Square
+      nd->vv[ch].carr= carr;
+      nd->vv[ch].res= res;
+      nd->vv[ch].amp= AMP_DA(amp);	
+      continue;
+    }
+    if (3 == sscanf(p, "triangle:bspin:%lf%lf/%lf %c", &carr, &res, &amp, &dmy)) {
+      nd->vv[ch].typ= 11;
+      nd->vv[ch].waveform= 2; // Triangle
+      nd->vv[ch].carr= carr;
+      nd->vv[ch].res= res;
+      nd->vv[ch].amp= AMP_DA(amp);	
+      continue;
+    }
+    if (3 == sscanf(p, "sawtooth:bspin:%lf%lf/%lf %c", &carr, &res, &amp, &dmy)) {
+      nd->vv[ch].typ= 11;
+      nd->vv[ch].waveform= 3; // Sawtooth
+      nd->vv[ch].carr= carr;
       nd->vv[ch].res= res;
       nd->vv[ch].amp= AMP_DA(amp);	
       continue;
     }
     if (3 == sscanf(p, "bspin:%lf%lf/%lf %c", &carr, &res, &amp, &dmy)) {
       nd->vv[ch].typ= 11;
+      nd->vv[ch].waveform= opt_w;
+      nd->vv[ch].carr= carr;
+      nd->vv[ch].res= res;
+      nd->vv[ch].amp= AMP_DA(amp);	
+      continue;
+    }
+    if (3 == sscanf(p, "sine:wspin:%lf%lf/%lf %c", &carr, &res, &amp, &dmy)) {
+      nd->vv[ch].typ= 12;
+      nd->vv[ch].waveform= 0; // Sine
+      nd->vv[ch].carr= carr;
+      nd->vv[ch].res= res;
+      nd->vv[ch].amp= AMP_DA(amp);	
+      continue;
+    }
+    if (3 == sscanf(p, "square:wspin:%lf%lf/%lf %c", &carr, &res, &amp, &dmy)) {
+      nd->vv[ch].typ= 12;
+      nd->vv[ch].waveform= 1; // Square
+      nd->vv[ch].carr= carr;
+      nd->vv[ch].res= res;
+      nd->vv[ch].amp= AMP_DA(amp);	
+      continue;
+    }
+    if (3 == sscanf(p, "triangle:wspin:%lf%lf/%lf %c", &carr, &res, &amp, &dmy)) {
+      nd->vv[ch].typ= 12;
+      nd->vv[ch].waveform= 2; // Triangle
+      nd->vv[ch].carr= carr;
+      nd->vv[ch].res= res;
+      nd->vv[ch].amp= AMP_DA(amp);	
+      continue;
+    }
+    if (3 == sscanf(p, "sawtooth:wspin:%lf%lf/%lf %c", &carr, &res, &amp, &dmy)) {
+      nd->vv[ch].typ= 12;
+      nd->vv[ch].waveform= 3; // Sawtooth
       nd->vv[ch].carr= carr;
       nd->vv[ch].res= res;
       nd->vv[ch].amp= AMP_DA(amp);	
@@ -3243,6 +3656,7 @@ readNameDef() {
     }
     if (3 == sscanf(p, "wspin:%lf%lf/%lf %c", &carr, &res, &amp, &dmy)) {
       nd->vv[ch].typ= 12;
+      nd->vv[ch].waveform= opt_w;
       nd->vv[ch].carr= carr;
       nd->vv[ch].res= res;
       nd->vv[ch].amp= AMP_DA(amp);	
@@ -3251,8 +3665,8 @@ readNameDef() {
     badSeq();
   }
   
-  // Validate total amplitude before adding to the list
-  validateTotalAmplitude(nd->vv, N_CH, lin_copy, in_lin);
+  // Normalize total amplitude before adding to the list
+  normalizeAmplitude(nd->vv, N_CH, lin_copy, in_lin);
   
   nd->nxt= nlist; nlist= nd;
 }  
@@ -3749,31 +4163,50 @@ create_slide(int ac, char **av) {
    correctPeriods();
 }   
 
-// Function to validate the total amplitude of voices
-void validateTotalAmplitude(Voice *voices, int numChannels, const char *line, int lineNum) {
+// Function to normalize the total amplitude of voices
+void normalizeAmplitude(Voice *voices, int numChannels, const char *line, int lineNum) {
   double totalAmplitude = 0.0;
   
+  // First, check mixspin/mixpulse separately (these have different logic)
   for (int ch = 0; ch < numChannels; ch++) {
-    // Check if voice is mixspin or mixpulse to check if effect intensity is over 100%
     if (voices[ch].typ == 6 || voices[ch].typ == 7) {
       double ampPercentage = voices[ch].amp / 40.96;
-
       if (ampPercentage > 100.0) {
-        error("Total intensity of mixspin/mixpulse exceeds 100%% (%.2f%%) at line %d:\n  %s\nPlease reduce intensity to prevent audio distortion.", 
+        error("Total intensity of mixspin/mixpulse exceeds 100%% (%.2f%%) at line %d:\n  %s", 
               ampPercentage, lineNum, line);
       }
     }
-
-    if (voices[ch].typ != 0 && voices[ch].typ != 6 && voices[ch].typ != 7) { // If voice is active. Mixspin and Mixpulse are not included
-      // Convert from internal amplitude format back to percentage
+  }
+  
+  // Calculate the total amplitude of all voices (excluding mixspin/mixpulse)
+  for (int ch = 0; ch < numChannels; ch++) {
+    if (voices[ch].typ != 0 && voices[ch].typ != 6 && voices[ch].typ != 7) {
       double ampPercentage = voices[ch].amp / 40.96;
       totalAmplitude += ampPercentage;
     }
   }
   
-  if (totalAmplitude > 100.0) {
-    error("Total amplitude exceeds 100%% (%.2f%%) at line %d:\n  %s\nPlease reduce amplitudes to prevent audio distortion.", 
-          totalAmplitude, lineNum, line);
+  // If total amplitude exceeds 100%, normalize all active voices (except mixspin/mixpulse)
+  if (opt_N && totalAmplitude > 100.0) {
+    double normalizationFactor = 100.0 / totalAmplitude;
+    
+    if (!opt_Q) {
+      warn("Total amplitude %.2f%% exceeds 100%% at line %d, auto-normalizing by factor %.3f", 
+           totalAmplitude, lineNum, normalizationFactor);
+    }
+    
+    // Apply normalization to all active voices (except mixspin/mixpulse)
+    for (int ch = 0; ch < numChannels; ch++) {
+      if (voices[ch].typ != 0 && voices[ch].typ != 6 && voices[ch].typ != 7) {
+        voices[ch].amp *= normalizationFactor;
+      }
+    }
+  }
+
+  // If total amplitude exceeds 100%, warn the user
+  if (!opt_N && !opt_Q && totalAmplitude > 100.0) {
+    warn("*** WARNING: Total amplitude %.2f%% exceeds 100%% at line %d, distortion may occur ***", 
+         totalAmplitude, lineNum);
   }
 }
 

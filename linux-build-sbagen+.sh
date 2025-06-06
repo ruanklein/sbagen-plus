@@ -30,6 +30,9 @@ TREMOR_LIB_PATH_32="libs/linux-x86-libvorbisidec.a"
 TREMOR_LIB_PATH_64="libs/linux-x86_64-libvorbisidec.a"
 TREMOR_LIB_PATH_ARM64="libs/linux-arm64-libvorbisidec.a"
 
+# Get the version number from the VERSION file
+VERSION=$(cat VERSION)
+
 # Skip 32-bit build on ARM64
 SKIP_32BIT=0
 if [ "$HOST_ARCH" = "aarch64" ]; then
@@ -149,10 +152,13 @@ fi
 info "Compiling 64-bit version with flags: $CFLAGS_64"
 info "Libraries: $LIBS_64"
 
+# Replace VERSION with the actual version number
+sed "s/__VERSION__/\"$VERSION\"/" sbagen+.c > sbagen+.tmp.c
+
 if [ "$HOST_ARCH" = "aarch64" ]; then
-    gcc $CFLAGS_64 sbagen+.c -o dist/sbagen+-linux-arm64 $LIBS_64
+    gcc $CFLAGS_64 sbagen+.tmp.c -o dist/sbagen+-linux-arm64 $LIBS_64
 else
-    gcc $CFLAGS_64 sbagen+.c -o dist/sbagen+-linux64 $LIBS_64
+    gcc $CFLAGS_64 sbagen+.tmp.c -o dist/sbagen+-linux64 $LIBS_64
 fi
 
 if [ $? -eq 0 ]; then
@@ -164,5 +170,8 @@ if [ $? -eq 0 ]; then
 else
     error "64-bit compilation failed!"
 fi
+
+# Remove the temporary file
+rm -f sbagen+.tmp.c
 
 section_header "Build process completed!" 

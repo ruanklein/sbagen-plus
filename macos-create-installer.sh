@@ -5,7 +5,7 @@
 
 APP_NAME="SBaGen+"
 SBAGEN_BINARY="dist/sbagen+-macos-universal"
-PNG_SOURCE="assets/sbagen+.png"
+PNG_SOURCE="assets/mac-icon.png"
 ICON_NAME="app_icon"
 DMG_NAME="SBaGen+-Installer.dmg"
 
@@ -402,6 +402,13 @@ if [ $? -ne 0 ]; then
     error "Failed to create DMG!"
     exit 1
 fi
+
+# Configure the DMG icon
+DeRez -only icns "assets/VolumeIcon.icns" > "build/icns.rsrc"
+Rez -append "build/icns.rsrc" -o "dist/$DMG_NAME"
+
+# Set the DMG icon
+SetFile -a C "dist/$DMG_NAME"
 
 # Remove temporary files
 info "Cleaning up temporary files..."
