@@ -23,6 +23,9 @@ TREMOR_LIB_PATH="libs/macos-universal-libvorbisidec.a"
 CFLAGS="-DT_MACOSX -arch arm64 -arch x86_64 -mmacosx-version-min=11.0 -I."
 LIBS="-framework CoreAudio"
 
+# Get the version number from the VERSION file
+VERSION=$(cat VERSION)
+
 # Check for MP3 support
 if [ -f "$LIB_PATH" ]; then
     info "Including MP3 support using: $LIB_PATH"
@@ -51,7 +54,10 @@ section_header "Starting sbagen+ compilation..."
 info "Compilation flags: $CFLAGS"
 info "Libraries: $LIBS"
 
-gcc $CFLAGS sbagen+.c -o dist/sbagen+-macos-universal $LIBS
+# Replace VERSION with the actual version number
+sed "s/__VERSION__/\"$VERSION\"/" sbagen+.c > sbagen+.tmp.c
+
+gcc $CFLAGS sbagen+.tmp.c -o dist/sbagen+-macos-universal $LIBS
 
 if [ $? -eq 0 ]; then
     success "Compilation successful! Universal binary created: dist/sbagen+-macos-universal"
@@ -60,5 +66,8 @@ if [ $? -eq 0 ]; then
 else
     error "Compilation failed!"
 fi
+
+# Remove the temporary file
+rm -f sbagen+.tmp.c
 
 section_header "Build process completed!" 
