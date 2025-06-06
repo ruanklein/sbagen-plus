@@ -11,7 +11,7 @@ permissions:
   packages: write
 
 jobs:
-  build:
+  build-linux-windows:
     runs-on: ubuntu-latest
 
     outputs:
@@ -37,6 +37,7 @@ jobs:
           echo "version=${DEV_VERSION}" >> $GITHUB_OUTPUT
           echo "base_version=${BASE_VERSION}" >> $GITHUB_OUTPUT
           echo "Generated version: ${DEV_VERSION}"
+          echo $DEV_VERSION > VERSION
 
       - name: Build for Linux and Windows
         run: |
@@ -73,44 +74,123 @@ jobs:
             checksums.txt
           retention-days: 30
 
+  build-macos:
+    runs-on: macos-latest
+
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install dependencies
+        run: |
+          # Install required tools via Homebrew
+          brew install automake autoconf libtool pandoc create-dmg
+
+      - name: Generate development version
+        id: version
+        run: |
+          BASE_VERSION=$(cat VERSION | tr -d '\n')
+          DATE=$(date +'%Y%m%d')
+          SHORT_SHA=${GITHUB_SHA::7}
+          DEV_VERSION="${BASE_VERSION}-dev.${DATE}.${SHORT_SHA}"
+
+          echo "version=${DEV_VERSION}" >> $GITHUB_OUTPUT
+          echo "Generated version: ${DEV_VERSION}"
+          echo $DEV_VERSION > VERSION
+
+      - name: Build libraries for macOS
+        run: |
+          ./macos-build-libs.sh
+
+      - name: Build SBaGen+ for macOS
+        run: |
+          ./macos-build-sbagen+.sh
+
+      - name: Create macOS installer
+        run: |
+          ./macos-create-installer.sh
+
+      - name: Prepare artifacts
+        run: |
+          mkdir -p artifacts
+
+          # Copy DMG installer
+          if [ -f "dist/SBaGen+-Installer.dmg" ]; then
+            cp dist/SBaGen+-Installer.dmg artifacts/SBaGen+-Installer.dmg
+          fi
+
+      - name: Generate SHA256 checksums
+        run: |
+          cd artifacts
+          find . -type f -exec shasum -a 256 {} \; | sort > ../checksums-macos.txt
+          cat ../checksums-macos.txt
+
+      - name: Upload macOS artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbagen-plus-macos-${{ steps.version.outputs.version }}
+          path: |
+            artifacts/
+            checksums-macos.txt
+          retention-days: 30
+
   create-release:
-    needs: build
+    needs: [build-linux-windows, build-macos]
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Download artifacts
+      - name: Download Linux/Windows artifacts
         uses: actions/download-artifact@v4
         with:
-          name: sbagen-plus-${{ needs.build.outputs.version }}
+          name: sbagen-plus-${{ needs.build-linux-windows.outputs.version }}
+          path: linux-windows/
+
+      - name: Download macOS artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: sbagen-plus-macos-${{ needs.build-macos.outputs.version }}
+          path: macos/
+
+      - name: Combine artifacts
+        run: |
+          mkdir -p all-artifacts
+
+          # Copy Linux/Windows artifacts
+          if [ -d "linux-windows/artifacts" ]; then
+            cp linux-windows/artifacts/* all-artifacts/ 2>/dev/null || true
+          fi
+
+          # Copy macOS artifacts
+          if [ -d "macos/artifacts" ]; then
+            cp macos/artifacts/* all-artifacts/ 2>/dev/null || true
+          fi
+
+          # Merge checksums
+          if [ -f "macos/checksums-macos.txt" ]; then
+            cat macos/checksums-macos.txt >> all-artifacts/checksums.txt
+            rm -f macos/checksums-macos.txt
+          fi
 
       - name: Generate release body with checksums
         run: |
           echo "**This is a development version and may contain bugs or unstable features.**" > release_body.md
-          echo "" >> release_body.md
-          echo "SHA256SUM:" >> release_body.md
-
-          if [ -f checksums.txt ]; then
-            while IFS= read -r line; do
-              # Extract hash and filename
-              hash=$(echo "$line" | cut -d' ' -f1)
-              file=$(echo "$line" | cut -d' ' -f3- | sed 's|^\./||')
-              echo "$hash $file" >> release_body.md
-            done < checksums.txt
-          fi
-
-          cat release_body.md
 
       - name: Create Development Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: v${{ needs.build.outputs.version }}
-          name: "Development Release v${{ needs.build.outputs.version }}"
+          tag_name: v${{ needs.build-linux-windows.outputs.version }}
+          name: "Development Release v${{ needs.build-linux-windows.outputs.version }}"
           body_path: release_body.md
           files: |
-            artifacts/*
+            all-artifacts/*
           prerelease: true
           draft: false
         env:
