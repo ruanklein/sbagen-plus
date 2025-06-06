@@ -25,7 +25,19 @@ create_dir_if_not_exists "dist"
 
 # Get version from VERSION file
 VERSION=$(cat VERSION)
-VERSION_RC=$(echo $VERSION | sed 's/\./,/g' | sed 's/$/,0/')
+
+# Extract numeric version and build number for RC file
+NUMERIC_VERSION=$(echo $VERSION | sed 's/-.*$//')
+BUILD_DATE=$(echo $VERSION | sed -n 's/.*-dev\.\([0-9]\{8\}\)\..*$/\1/p')
+BUILD_NUMBER="0"
+
+if [ ! -z "$BUILD_DATE" ]; then
+    # Use last 4 digits of date as build number (avoid overflow)
+    BUILD_NUMBER=$(echo $BUILD_DATE | tail -c 5)  # Gets "0606"
+fi
+
+# Create version for RC file (format: major,minor,patch,build)
+VERSION_RC=$(echo $NUMERIC_VERSION | sed 's/\./,/g'),$BUILD_NUMBER
 
 # Create resource file with version information
 cat > /tmp/sbagen.rc << EOF
