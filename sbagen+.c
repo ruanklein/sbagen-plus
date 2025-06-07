@@ -663,6 +663,13 @@ void cleanup_mac_audio() {
         AudioDeviceDestroyIOProcID(aud_dev, proc_id);
         proc_id = 0;
     }
+    
+    for (int i = 0; i < BUFFER_COUNT; i++) {
+        if (aud_buf[i]) {
+            free(aud_buf[i]);
+            aud_buf[i] = NULL;
+        }
+    }
 }
 
 void init_mac_audio() {
