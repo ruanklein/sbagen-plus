@@ -1,6 +1,13 @@
-# <img src="assets/sbagen+.png" alt="SBaGen+ Logo" width="32" height="32"> SBaGen+ - Sequenced Brainwave Generator
+<img src="assets/sbagen+.png" alt="SBaGen+ Logo" width="32" height="32"> SBaGen+ - Sequenced Brainwave Generator
 
 SBaGen+ is a command-line tool for generating binaural beats and isochronic tones, designed to assist with meditation, relaxation, and altering states of consciousness.
+
+> ⚠️ **SBaGen+ is no longer under active development.**  
+> While the project remains available and usable as-is, future features and improvements are now being developed under a new project: [**SynapSeq**](https://github.com/ruanklein/synapseq).
+>
+> SynapSeq is a modern and simplified brainwave sequencing engine, focused on clarity, portability, and long-term maintainability.
+>
+> If you're starting a new project or looking for an updated experience, we highly recommend switching to **SynapSeq**.
 
 ## 📑 Table of Contents
 
